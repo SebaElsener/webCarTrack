@@ -1,0 +1,53 @@
+
+.terminarCompra,
+.vaciarCarrito{
+    border: none;
+    padding: 5px;
+    width: 250px;
+    font-size: 1.4rem;
+    height: 72px;
+    color: #282828;
+    background-color: #c4c4c4;
+    transition: all .3s;
+}
+
+.vaciarCarrito{
+    margin: 0px 15px;
+}
+
+.terminarCompra:hover,
+.vaciarCarrito:hover{
+    background-color: #282828;
+    color: #c4c4c4;
+}
+
+.terminarCompra:active,
+.vaciarCarrito:active{
+    translate: 2px 2px;
+}
+
+.totalCompra{
+    margin: 0px 15px;
+    padding: 15px 0px;
+    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid gray;
+}
+
+.totalCompra p{
+    font-size: 1.5rem;
+    margin: 0px;
+    padding: 20px;
+    background-color: #e8ffff;
+  }
+
+  .carritoVacio{
+    margin: 60px;
+  }
+
+  .pCarritoVacio,
+  .linkCarritoVacio{
+    font-size: 1.4rem;
+  }

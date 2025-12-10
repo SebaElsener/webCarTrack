@@ -1,0 +1,81 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+    <head>
+        <%- include('./partials/head') %>
+
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
+    </head>
+
+    <body>
+
+        <h2 class="formTitle">Consulta VIN colectados</h2>
+
+        <div id="tableContainer">
+<table class="table table-hover table-bordered">
+  <thead class='table-success'>
+    <tr>
+      <th class="tableTh" scope="col">Modelo</th>
+      <th class="tableTh VINth" scope="col">VIN</th>
+      <th class="tableTh codeTh" scope="col">Area</th>
+      <th class="tableTh codeTh" scope="col">Avería</th>
+      <th class="tableTh codeTh" scope="col">Ext</th>
+      <th class="tableTh" scope="col">Observación</th>
+      <th class="tableTh codeTh" scope="col">Código</th>
+      <th class="tableTh codeTh" scope="col">Fotos</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% scansData.forEach((scan) => { %>
+    <tr>
+      <td class="tableTd"><%= scan.type %></td>
+      <td class="tableTd"><%= scan.code %></td>
+      <td class="tableTd"><%= scan.area %></td>
+      <td class="tableTd"><%= scan.averia %></td>
+      <td class="tableTd"><%= scan.grav %></td>
+      <td class="tableTd"><%= scan.obs %></td>
+      <td class="tableTd"><%= scan.codigo %></td>
+      <td id="tableTdPhoto" class="tableTd">
+        <% if (scan.pictures.length !== 0) { %>
+<button id="picsBtn" type="button"  data-bs-toggle="modal" data-bs-target="#modalCarouselGallery<%= scan.code %>" class="btn">
+    📷
+</button>
+<div class="modal fade" id="modalCarouselGallery<%= scan.code %>" tabindex="-1" aria-labelledby="modalCarouselGalleryLabel" aria-hidden="true">
+  <div class="modal-dialog modal-l"> <!-- Usa modal-xl para un modal extra grande -->
+    <div class="modal-content">
+      <div class="modal-header">
+        <!-- <h6 class="modal-title" id="modalCarouselGalleryLabel"><%= scan.code %></h6> -->
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+
+                   <%- include('./partials/carousel', { id: scan.code, images: scan.pictures } ) %>
+      </div>
+    </div>
+  </div>
+</div>
+        <% } %>
+        </td>
+
+<!-- //////////////////////////////// -->
+<!-- //////////////////////////////// -->
+
+            </tr>
+          <% }) %>
+
+  </tbody>
+</table>
+           
+        </div>
+
+        <a class='formBackLink' href="/api/productos"><button class="formBackLinkBtn">Volver</button></a>
+
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+
+    </body>
+
+</html>

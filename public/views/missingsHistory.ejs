@@ -1,0 +1,53 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+    <head>
+        <%- include('./partials/head') %>
+
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    </head>
+
+    <body>
+
+        <h2 class="formTitle">Histórico por piezas faltantes</h2>
+
+        <div id="tableContainer">
+<table class="table table-hover table-bordered">
+  <thead class='table-success'>
+    <tr>
+      <th class="tableTh" scope="col">Pieza</th>
+      <th class="tableTh" scope="col">Cantidad</th>
+      <th class="tableTh" scope="col">Porcentaje</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% missingsHistory.forEach((piece) => { %>
+    <tr>
+      <td class="tableTdAverias tableTd"><%= piece[0] %></td>
+      <td class="tableTdCantidades tableTd"><%= piece[1] %></td>
+      <td class="tableTd"><%= Number(((piece[1]*100) / missingsTotal).toFixed(2)) %> %</td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+           
+        </div>
+
+        <div class="statsBtnsContainer">
+        <a class='formBackLink' href="/api/charts"><button id="graphStatLinkBtn" class="formBackLinkBtn">Generar gráfico</button></a>
+        <a class='formBackLink' href="/api/productos"><button class="formBackLinkBtn">Volver</button></a>
+        </div>
+
+        <div id="graphStat">
+            <canvas id="barChart" width="500" height="500"></canvas>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="../../js/missingsHistory.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+
+    </body>
+
+</html>

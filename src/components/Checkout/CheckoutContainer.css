@@ -1,0 +1,64 @@
+
+.checkoutContainer{
+    margin: 35px;
+}
+
+.pBold{
+    font-weight: bold;
+}
+
+.pExito{
+    font-size: 1.3rem;
+}
+
+.btnCheckoutContainer{
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 5px;
+    width: 215px;
+    color: #282828;
+    background-color: #c4c4c4;
+    transition: all .3s;
+    border: none;
+    padding: 8px;
+}
+
+.btnCheckoutContainer:hover{
+    background-color: #282828;
+    color: #c4c4c4;
+}
+
+.orderForm{
+    margin: 35px;
+}
+
+.orderForm p{
+    font-size: 1.4rem;
+}
+
+.orderForm div label{
+    display: block;
+}
+
+.orderForm div input{
+    width: 300px;
+    padding: 5px;
+    margin: 10px 0px;
+}
+
+.btnSend{
+    padding: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    width: 150px;
+    border: none;
+    margin-top: 15px;
+    color: #282828;
+    background-color: #c4c4c4;
+    transition: all .3s;
+}
+
+.btnSend:hover{
+    background-color: #282828;
+    color: #c4c4c4;
+}

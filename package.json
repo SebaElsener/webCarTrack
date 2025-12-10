@@ -1,0 +1,53 @@
+{
+  "dependencies": {
+    "@faker-js/faker": "^10.1.0",
+    "@supabase/supabase-js": "^2.86.0",
+    "autocannon": "^7.10.0",
+    "axios": "^1.3.6",
+    "bcrypt": "^5.1.0",
+    "bootstrap": "^5.3.8",
+    "chart.js": "^4.5.1",
+    "compression": "^1.7.4",
+    "connect-mongo": "^4.6.0",
+    "dotenv": "^16.0.3",
+    "ejs": "^3.1.8",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "firebase-admin": "^11.5.0",
+    "mongoose": "^6.8.4",
+    "nodemailer": "^6.9.1",
+    "normalizr": "^3.6.2",
+    "passport": "^0.6.0",
+    "passport-local": "^1.0.0",
+    "pino": "^8.11.0",
+    "postgres": "^3.4.7",
+    "react-chartjs-2": "^5.3.1",
+    "skia-canvas": "^3.0.8",
+    "socket.io": "^4.6.1",
+    "twilio": "^4.9.0",
+    "yargs": "^17.7.1"
+  },
+  "name": "webcartrack",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "benchmark": "node benchmark.js",
+    "test-mocha": "mocha src/test/test-mocha.js",
+    "test-http": "node src/test/test-axios-http.js",
+    "profiling": "0x src/server.js",
+    "dev": "nodemon --watch src src/server.js",
+    "populateSupabase": "node src/persistence/populate.js",
+    "cluster": "node src/server.js -m=CLUSTER",
+    "firebase": "nodemon src/server.js --DB=firebase"
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "---",
+  "devDependencies": {
+    "chai": "^4.3.7",
+    "mocha": "^10.2.0",
+    "supertest": "^6.3.3"
+  }
+}

@@ -1,0 +1,39 @@
+
+
+<section id='productsCards'>
+
+    <% if (productsQty) { %>
+        <div class='cardContainer'>
+            <% allProducts.forEach(function(product) { %>
+                <div class='productCard'>
+                    <input class='cardInput productInput' value='<%= product.product %>' `<% if (userData.admin === 'false') { %> disabled <% } %>`>
+                    <div class='priceContainer'>
+                        <span class='priceSign'>$ </span>
+                        <input class='cardInput price' value='<%= product.price %>' `<% if (userData.admin === 'false') { %> disabled <% } %>`>
+                    </div>
+                    <div class='thumbContainer'>
+                        <img class='thumbnail' src='<%= product.thumbnail %>' alt='imagen producto' width='60px'>
+                    </div>
+                    <input class='cardInput descriptionInput' value='<%= product.description %>' `<% if (userData.admin === 'false') { %> disabled <% } %>`>
+                    <div class="stockContainer">
+                        <span class='priceSign'>Stock: </span>
+                        <input class='cardInput stock' value='<%= product.stock %>' `<% if (userData.admin === 'false') { %> disabled <% } %>`>
+                    </div>
+                    <div class='buyBtnContainer'>
+                        <button class='buyBtn' id='<%= product._id %>'>COMPRAR</button>
+                    </div>
+                    <% if (userData.admin === 'true') { %>
+                        <div class='actionBtnsContainer'>
+                            <button class='updateBtn'>ACTUALIZAR</button>
+                            <button class='deleteBtn'>ELIMINAR</button>
+                        </div>
+                    <% } %>
+                    <input class='codeInput' type='hidden' value='<%= product.code %>'>
+                </div>
+            <% }) %>
+        </div>
+    <% } else { %>
+        <p class='prodsLink'>No se encontraron productos</p>
+    <% } %>
+
+</section>

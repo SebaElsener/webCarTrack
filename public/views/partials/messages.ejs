@@ -1,0 +1,25 @@
+
+<article id="MessagesCenter">
+    <div id="closeChat">
+        X
+    </div>
+    <h2 class='messagesCenterTitle' style="text-align: center; margin: 15px 0px; font-size: 1.3rem">Centro de mensajes</h2>
+
+    <div id="userInfo">
+        <p id="userEmail"><%= userData.user %></p>
+        <p id="userName"><%= userData.name %></p>
+        <p id="userAge"><%= userData.age %></p>
+        <p id="userAddress"><%= userData.address %></p>
+        <p id="userPhone"><%= userData.phone %></p>
+        <p id="userAvatar"><%= userData.avatar %></p>
+    </div>
+
+    <div id="messagesContainer">
+    </div>
+
+    <form id="messagesForm" autocomplete="off">
+        <input id='messageContent' type="text" placeholder="Ingrese su mensaje" required>
+        <button class="msgBtn" type="submit">Enviar</button>
+    </form>
+
+</article>

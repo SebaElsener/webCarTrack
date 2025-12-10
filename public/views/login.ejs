@@ -1,0 +1,36 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login usuario</title>
+    <link rel="stylesheet" href="/css/index.css">
+</head>
+
+<body>
+
+    <script>localStorage.removeItem('sessionId')</script>
+
+    <main>
+        
+        <form id='loginForm' autocomplete="off">
+            <h2 class="loginFormTitle">Login de usuario</h2>
+            <label class="userName" for="userName">Ingrese su email</label>
+            <input id='userName' class="userNameInput" name='username' type="text" required>
+            <label class="userName" for="userName">Ingrese su contraseña</label>
+            <input id='userPass' class="userPassInput" name='password' type="password" required>
+            <button class="loginBtn" type="submit" formmethod="post" formaction="/api/login">Enviar</button>
+        </form>
+        <div class="gotoRegisterContainer">
+            <p class="regContainerText">¿No estás registrado?  Ir a</p>
+            <button class="loginBtn"><a class="regLink" href="/api/register">Registro</a></button>
+        </div>
+
+    </main>
+
+</body>
+
+</html>

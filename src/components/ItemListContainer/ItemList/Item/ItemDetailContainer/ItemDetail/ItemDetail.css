@@ -1,0 +1,27 @@
+
+.cajaItemDetail{
+    display: flex;
+    margin: 50px;
+}
+
+.detailContainer{
+    margin-left: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.itemName,
+.itemPrice{
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.itemStock{
+    margin-bottom: 45px;
+}
+
+.imgContainer{
+    display: flex;
+    justify-content: center;
+}

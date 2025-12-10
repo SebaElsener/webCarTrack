@@ -1,0 +1,19 @@
+
+.pBold{
+    font-weight: bold;
+}
+
+.pExito{
+    font-size: 1.3rem;
+}
+
+.total{
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+.loadingOrder{
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin-bottom: 40px;
+}

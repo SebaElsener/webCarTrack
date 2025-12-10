@@ -1,0 +1,26 @@
+
+.itemListContainer{
+    text-align: center;
+}
+
+.saludo{
+    margin-top: 35px;
+    margin-bottom: 5px;
+    color: rgb(74, 74, 74);
+    animation-name: saludo;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-delay: 1s;
+}
+
+@keyframes saludo {
+    20%{
+        transform: scale(1.2);
+    }
+    40%{
+        transform: rotate(4deg);
+    }
+    80%{
+        transform: rotate(-4deg);
+    }
+}

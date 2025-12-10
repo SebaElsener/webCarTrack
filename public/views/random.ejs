@@ -1,0 +1,40 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+    <head>
+        <%- include('./partials/head') %>
+    </head>
+
+    <body>
+
+        <main id='main'>
+
+            <section id="info">
+            
+                <div class="info">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Random number</th>
+                                <th>Appearances</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% randomNumbersGenerated.forEach(function(number) { %>
+                                <tr>
+                                    <td><%= number.number %></td>
+                                    <td><%= number.qty %></td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+
+            </section>
+
+        </main>
+
+    </body>
+
+</html>

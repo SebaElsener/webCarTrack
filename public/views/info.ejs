@@ -1,0 +1,32 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+    <head>
+        <%- include('./partials/head') %>
+    </head>
+
+    <body>
+
+        <main id='main'>
+
+            <section id="info">
+            
+                <div class="info">
+                        <h3 class="infoTitle">Argumentos de entrada: <span class="infoItem"><%= processInfo.args %></span></h3>
+                        <h3 class="infoTitle">Plataforma: <span class="infoItem"><%= processInfo.platform %></span></h3>
+                        <h3 class="infoTitle">Versión Node.JS: <span class="infoItem"><%= processInfo.version %></span></h3>
+                        <h3 class="infoTitle">Carpeta del proyecto: <span class="infoItem"><%= processInfo.projectFolder %></span></h3>
+                        <h3 class="infoTitle">Path ejecución: <span class="infoItem"><%= processInfo.projectPath %></span></h3>
+                        <h3 class="infoTitle">ID process: <span class="infoItem"><%= processInfo.processId %></span></h3>
+                        <h3 class="infoTitle">Memoria total reservada: <span class="infoItem"><%= processInfo.memUsage %></span></h3>
+                        <h3 class="infoTitle">Cantidad de CPUs: <span class="infoItem"><%= processInfo.CPUsQty %></span></h3>
+                </div>
+
+            </section>
+
+        </main>
+
+    </body>
+
+</html>

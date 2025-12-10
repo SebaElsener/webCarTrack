@@ -1,0 +1,30 @@
+
+.imgCarrito{
+    transition: all .5s;
+    position: relative;
+    top: 32px;
+    right: 9px;
+}
+
+.imgCarrito:hover{
+    transform: rotate(-8deg) scale(1.1);
+}
+
+.cantidadItems{
+    color: rgb(49, 55, 54);
+    font-weight: bold;
+    position: relative;
+    top: -25px;
+    right: -12px;
+    background-color: rgb(250, 0, 225);
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+}
+
+.hidden{
+    visibility: hidden;
+}
