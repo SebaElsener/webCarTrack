@@ -1,14 +1,17 @@
 
 import { createRequire } from 'node:module'
 import { infoLogger, errorLogger } from '../../logger.js'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 const require = createRequire(import.meta.url)
-const serviceAccount = require('../config/coder-test-67523-firebase-adminsdk-w5t74-8bca7fec93.json')
+//const serviceAccount = require('../config/coder-test-67523-firebase-adminsdk-w5t74-8bca7fec93.json')
 const admin = require("firebase-admin")
 
 try {
     admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)})
+    credential: admin.credential.cert(process.env.serviceAccount)})
     infoLogger.info('FIREBASE:  Base de datos conectada')
 } catch (error) {
     infoLogger.info('ERROR DE CONEXION A FIREBASE', error)
