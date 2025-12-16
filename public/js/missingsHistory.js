@@ -37,7 +37,6 @@ graphStatLinkBtn.addEventListener('click', async (event) => {
   generateChart(data)
 })
 
-
 const generateChart = (data)=> {
 
 // Función para generar color random

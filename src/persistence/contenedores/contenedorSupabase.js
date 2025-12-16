@@ -53,6 +53,19 @@ class ContenedorSupabase {
         }
     }
 
+    async getDataByDate (startDate, endDate) {
+        try {
+            const { data, error } = await this.sql.from("scans")
+                .select("*")
+                .gte('date', startDate)
+                .lte('date', endDate)
+                .order('date', { ascending: true })
+            return data
+        } catch (error) {
+            infoLogger.info("Error al consultar base de datos por fecha", error)
+        }
+    }
+
     async getPictures() {
         try {
             const { data, error } = await this.sql.from("pictures")

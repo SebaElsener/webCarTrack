@@ -24,10 +24,10 @@ import { logs } from './middleware/logs.js'
 import userData from './router/userData.js'
 import { infoLogger, errorLogger } from './logger.js'
 import SessionStore from '../utils/chatSessionStorage.js'
-
 import scansRoute from './router/scansRoute.js'
 import chartsRoute from './router/chartsRouter.js'
 import statsRoute from './router/statsRouter.js'
+import querysRouter from './router/querysRouter.js'
 
 dotenv.config()
 
@@ -64,7 +64,8 @@ app.use('/', userLogin)
 app.use('/api/productos', userLoginWatcher, routeProducts)
 app.use('/api/carrito', userLoginWatcher, routeCart)
 app.use('/api/userdata', userLoginWatcher, userData)
-app.use('/api/scans', userLoginWatcher, scansRoute)
+app.use('/api/scans', scansRoute)
+app.use('/api/querys', querysRouter)
 app.use('/api/login', userLogin)
 app.use('/api/logout', userLogout)
 app.use('/api/register', userReg)
