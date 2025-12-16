@@ -15,7 +15,7 @@
 
 <div class="container mt-4">
   <form id="form-fechas">
-    <div class="input-group">
+    <div id="inputGroup" class="input-group">
       <span class="input-group-text">📅</span>
       <input
         type="text"
@@ -24,15 +24,20 @@
         placeholder="Seleccionar rango de fechas"
         readonly
       >
-      <button class="btn btn-primary" type="submit">
+      <div class="btnFormContainer">
+      <button id="btnFormSubmit" class="btn btn-primary" type="submit">
         Consultar
       </button>
+      </div>
     </div>
   </form>
 </div>
 
         <div id="resultados" class="container mt-4">
         </div>
+        
+        <div id="paginacion"></div>
+
 
         <div class="container mt-4">
         <a class='formBackLink' href="/api/productos"><button class="formBackLinkBtn">Volver</button></a>
