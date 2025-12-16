@@ -26,6 +26,33 @@ class ContenedorSupabase {
         }
     }
 
+    async getOnlyAreas (){
+        try {
+            const { data, error } = await this.sql.from("scans").select("area")
+            return data
+        } catch (error) {
+            infoLogger.info("Error al consultar areas", error)
+        }
+    }
+
+    async getOnlyDamages (){
+        try {
+            const { data, error } = await this.sql.from("scans").select("averia")
+            return data
+        } catch (error) {
+            infoLogger.info("Error al consultar averias", error)
+        }
+    }
+
+    async getOnlyMissings (){
+        try {
+            const { data, error } = await this.sql.from("scans").select("area").eq('averia', 'M')
+            return data
+        } catch (error) {
+            infoLogger.info("Error al consultar base de datos", error)
+        }
+    }
+
     async getPictures() {
         try {
             const { data, error } = await this.sql.from("pictures")

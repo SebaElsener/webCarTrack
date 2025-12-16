@@ -22,18 +22,9 @@
       <% images.forEach((img, idx) => { %>
         <div class="carousel-item <%= idx === 0 ? 'active' : '' %>">
           <img src="<%= img %>" class="d-block w-100" alt="imagen_carousel" 
-               loading="lazy" style="max-height: 500px; object-fit: cover;">
+            style="max-height: 500px; object-fit: cover;">
+          <p class="pp" style="color:red; font-size:12px"><%= img %></p>
 
-          <% if (img.captionTitle || img.captionText) { %>
-            <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-2">
-              <% if (img.captionTitle) { %>
-                <h5><%= img.captionTitle %></h5>
-              <% } %>
-              <% if (img.captionText) { %>
-                <p><%= img.captionText %></p>
-              <% } %>
-            </div>
-          <% } %>
         </div>
       <% }) %>
     </div>

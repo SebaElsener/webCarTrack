@@ -1,12 +1,15 @@
 
 import { faker } from "@faker-js/faker"; // para datos falsos
 import { supabaseRepo } from "../persistence/factory.js";
+import areas from '../../utils/areas.json' with { type: 'json' };
+import averias from '../../utils/averias.json' with { type: 'json' };
+import codigos from '../../utils/codigos.json' with { type: 'json' };
+import gravedades from '../../utils/gravedades.json' with { type: 'json' };
 
-const AREAS = ["34", "37", "44", "12", "18"];
-const AVERIAS = ["A", "G", "S", "R", "M", "K", "I", "B"];
-const GRAVEDADES = ["1", "2", "5"];
-const CODIGOS = ["SSTD", "NTD", "NAGR"];
-const date = new Date().toISOString()
+const AREAS = areas.map(p => (p.id))
+const AVERIAS = averias.map(p => (p.id))
+const GRAVEDADES = gravedades.map(p => (p.id))
+const CODIGOS = codigos.map(p => (p.id))
 
 const generarRegistros = async (req, res) => {
   const batchSize = 500; // Supabase soporta inserts en lotes
@@ -22,7 +25,7 @@ const generarRegistros = async (req, res) => {
       grav: faker.helpers.arrayElement(GRAVEDADES),
       obs: faker.lorem.sentence(),
       codigo: faker.helpers.arrayElement(CODIGOS),
-      date: date
+      date: faker.date.anytime()
     });
 
     // INSERTAR CADA 500

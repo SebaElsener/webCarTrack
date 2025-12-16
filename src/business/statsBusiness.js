@@ -1,13 +1,12 @@
 
-import { filter } from "compression"
 import { infoLogger } from "../logger.js"
 import { supabaseRepo } from "../persistence/factory.js"
 
 const danosHistoryRenderBusiness = async () => {
     try {
-        const allData = await supabaseRepo.getAll()
+        const onlyDamages = await supabaseRepo.getOnlyDamages()
         const contador = {}
-        allData.forEach(elemento => {
+        onlyDamages.forEach(elemento => {
             contador[elemento.averia] = (contador[elemento.averia] || 0) + 1
         })
         const contadorToArray = Object.entries(contador)
@@ -21,9 +20,9 @@ const danosHistoryRenderBusiness = async () => {
 
 const partsHistoryRenderBusiness = async () => {
     try {
-        const allData = await supabaseRepo.getAll()
+        const onlyAreas = await supabaseRepo.getOnlyAreas()
         const contador = {}
-        allData.forEach(elemento => {
+        onlyAreas.forEach(elemento => {
             contador[elemento.area] = (contador[elemento.area] || 0) + 1
         })
         const contadorToArray = Object.entries(contador)
@@ -37,10 +36,9 @@ const partsHistoryRenderBusiness = async () => {
 
 const missingsHistoryRenderBusiness = async () => {
     try {
-        const allData = await supabaseRepo.getAll()
-        const filtered = allData.filter(elemento => elemento.averia === 'M')
+        const onlyMissings = await supabaseRepo.getOnlyMissings()
         const contador = {}
-        filtered.forEach(elemento => {
+        onlyMissings.forEach(elemento => {
             contador[elemento.area] = (contador[elemento.area] || 0) + 1
         })
         const contadorToArray = Object.entries(contador)
