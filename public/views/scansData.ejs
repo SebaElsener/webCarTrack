@@ -1,98 +1,137 @@
-
 <!DOCTYPE html>
 <html lang="es">
+  <head>
+    <%- include('./partials/head') %>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css"
+    />
+  </head>
 
-    <head>
-        <%- include('./partials/head') %>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css">
+  <body>
+    <h2 class="formTitle">Consulta VIN colectados</h2>
 
+    <div id="tableContainer">
+      <table class="table table-hover table-bordered">
+        <thead class="table-success">
+          <tr>
+            <th class="tableTh" scope="col">Modelo</th>
+            <th class="tableTh VINth" scope="col">VIN</th>
+            <th class="tableTh codeTh" scope="col">Area</th>
+            <th class="tableTh codeTh" scope="col">Avería</th>
+            <th class="tableTh codeTh" scope="col">Ext</th>
+            <th class="tableTh" scope="col">Observación</th>
+            <th class="tableTh codeTh" scope="col">Código</th>
+            <th class="tableTh codeTh" scope="col">Fotos</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% scansData.forEach((scan) => { %> <% if (scan.damages.length > 0) {
+          %> <% scan.damages.forEach((damage, dIdx) => { %>
+          <tr>
+            <td class="tableTd"><%= scan.scan_id %></td>
+            <td class="tableTd"><%= scan.vin %></td>
 
-    </head>
+            <td class="tableTd"><%= damage.area %></td>
+            <td class="tableTd"><%= damage.averia %></td>
+            <td class="tableTd"><%= damage.grav %></td>
+            <td class="tableTd"><%= damage.obs %></td>
+            <td class="tableTd"><%= damage.codigo %></td>
 
-    <body>
+            <td id="tableTdPhoto" class="tableTd">
+              <% if (scan.fotos.length > 0) { %> <% scan.fotos.forEach((img,
+              idx) => { %>
+              <a
+                href="<%= img %>"
+                class="glightbox"
+                data-gallery="gallery-<%= scan.scan_id %>"
+                data-title="Imagen <%= idx + 1 %> de <%= scan.fotos.length %>"
+                style="<%= idx > 0 ? 'display:none' : '' %>"
+              >
+                <img
+                  src="<%= img %>"
+                  alt="Preview"
+                  class="img-thumbnail"
+                  loading="lazy"
+                  style="
+                    width: 60px;
+                    height: 60px;
+                    object-fit: cover;
+                    margin-right: 4px;
+                  "
+                />
+              </a>
+              <% }) %> <% } %>
+            </td>
+          </tr>
+          <% }) %> <% } else { %>
+          <!-- Scan sin daños -->
+          <tr>
+            <td class="tableTd"><%= scan.scan_id %></td>
+            <td class="tableTd"><%= scan.vin %></td>
+            <td colspan="5" class="tableTd text-center">Sin daños</td>
 
-        <h2 class="formTitle">Consulta VIN colectados</h2>
+            <td class="tableTd">
+              <% if (scan.fotos.length > 0) { %> <% scan.fotos.forEach((img,
+              idx) => { %>
+              <a
+                href="<%= img %>"
+                class="glightbox"
+                data-gallery="gallery-<%= scan.scan_id %>"
+                style="<%= idx > 0 ? 'display:none' : '' %>"
+              >
+                <img
+                  src="<%= img %>"
+                  class="img-thumbnail"
+                  style="width: 60px; height: 60px; object-fit: cover"
+                />
+              </a>
+              <% }) %> <% } %>
+            </td>
+          </tr>
+          <% } %> <% }) %>
+        </tbody>
+      </table>
+    </div>
 
-        <div id="tableContainer">
-<table class="table table-hover table-bordered">
-  <thead class='table-success'>
-    <tr>
-      <th class="tableTh" scope="col">Modelo</th>
-      <th class="tableTh VINth" scope="col">VIN</th>
-      <th class="tableTh codeTh" scope="col">Area</th>
-      <th class="tableTh codeTh" scope="col">Avería</th>
-      <th class="tableTh codeTh" scope="col">Ext</th>
-      <th class="tableTh" scope="col">Observación</th>
-      <th class="tableTh codeTh" scope="col">Código</th>
-      <th class="tableTh codeTh" scope="col">Fotos</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% scansData.forEach((scan) => { %>
-    <tr>
-      <td class="tableTd"><%= scan.type %></td>
-      <td class="tableTd"><%= scan.code %></td>
-      <td class="tableTd"><%= scan.area %></td>
-      <td class="tableTd"><%= scan.averia %></td>
-      <td class="tableTd"><%= scan.grav %></td>
-      <td class="tableTd"><%= scan.obs %></td>
-      <td class="tableTd"><%= scan.codigo %></td>
-      <td id="tableTdPhoto" class="tableTd">
-  <% if (scan.pictures.length > 0) { %>
-    <% scan.pictures.forEach((img, idx) => { %>
-      <a href="<%= img %>" 
-         class="glightbox"
-         data-gallery="gallery-<%= scan.code %>"
-         data-title="Imagen <%= idx + 1 %> de <%= scan.pictures.length %>"
-         style="<%= idx > 0 ? 'display:none' : '' %>">
-        <img src="<%= img %>" 
-             alt="Preview" 
-             class="img-thumbnail" 
-             loading="lazy"
-             style="width:60px; height:60px; object-fit:cover; margin-right:4px;">
-      </a>
-    <% }) %>
-  <% } %>
-        </td>
-        </tr>
-          <% }) %>
+    <a class="formBackLink" href="/api/productos"
+      ><button class="formBackLinkBtn">Volver</button></a
+    >
 
-  </tbody>
-</table>
-           
-        </div>
-
-        <a class='formBackLink' href="/api/productos"><button class="formBackLinkBtn">Volver</button></a>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"                    integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous">
-    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+      crossorigin="anonymous"
+    ></script>
     <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
 
-<script>
-const lightbox = GLightbox({
-  selector: '.glightbox',
-  loop: true,
-  zoomable: true,
-  touchNavigation: true,
-  keyboardNavigation: true,
-  returnFocus: false
-});
+    <script>
+      const lightbox = GLightbox({
+        selector: ".glightbox",
+        loop: true,
+        zoomable: true,
+        touchNavigation: true,
+        keyboardNavigation: true,
+        returnFocus: false,
+      });
 
-// Guardamos la posición de scroll al abrir
-let scrollTop = 0;
+      // Guardamos la posición de scroll al abrir
+      let scrollTop = 0;
 
-lightbox.on('open', () => {
-  scrollTop = window.scrollY || window.pageYOffset;
-});
+      lightbox.on("open", () => {
+        scrollTop = window.scrollY || window.pageYOffset;
+      });
 
-lightbox.on('close', () => {
-  // Restauramos exactamente la posición
-  window.scrollTo({ top: scrollTop, behavior: 'instant' });
-});
-</script>
-
-
-    </body>
-
+      lightbox.on("close", () => {
+        // Restauramos exactamente la posición
+        window.scrollTo({ top: scrollTop, behavior: "instant" });
+      });
+    </script>
+  </body>
 </html>

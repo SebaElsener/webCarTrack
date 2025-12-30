@@ -1,91 +1,106 @@
-
 <!DOCTYPE html>
 <html lang="es">
+  <head>
+    <%- include('./partials/head') %>
+    <!-- Script normalizr -->
+    <script src="https://cdn.jsdelivr.net/npm/normalizr@3.6.2/dist/normalizr.browser.min.js"></script>
+    <!-- Script toastify -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+    />
+    <script src="/socket.io/socket.io.js"></script>
+  </head>
 
-    <head>
-        <%- include('./partials/head') %>
-        <!-- Script normalizr -->
-        <script src="https://cdn.jsdelivr.net/npm/normalizr@3.6.2/dist/normalizr.browser.min.js"></script>
-        <!-- Script toastify -->
-        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-        <script src="/socket.io/socket.io.js"></script>
-    </head>
-
-    <body>
-    
-        <nav id="userContainer">
-            <div class="userDataContainer">
-                <ul class="navList">
-                    <li class="navItem" style="padding: 3px 0px">
-                        <a class='cartLink' href="#">Inicio</a>
-                    </li>
-                </ul>
-                <div class="dropdown">
-                    <ul class="navList cartLink" style="margin: 0px 20px">
-                        <li class="navItem">Administrador</li>
-                    </ul>
-                    <div class="dropdown-content">
-                        <% if (userName === 'admin@admin.com') { %>
-                            <a class='itemLink' href="/api/userdata/usersadmin">Administrar usuarios</a>
-                        <% } %>
-                        <% if (userData.admin === 'true') { %>
-                            <a class='itemLink' href="/api/productos/form">Tablas</a>
-                        <% } %>
-                        <a class='itemLink' href="/api/userdata">Mis datos</a>
-                        <a class='itemLink' href="/api/logout">Logout</a>
-                    </div>
-                </div>
-                <div class="dropdown">
-                    <ul class="navList cartLink" style="margin: 0px 20px">
-                        <li class="navItem">Consultas</li>
-                    </ul>
-                    <div class="dropdown-content">
-                        <a class='itemLink' href="/api/scans">VIN colectados</a>
-                        <a class='itemLink' href="/api/querys/queryByDate">Por fecha</a>
-                    </div>
-                </div>
-                <div class="dropdown">
-                    <ul class="navList cartLink" style="margin: 0px 20px">
-                        <li class="navItem">Estadísticas</li>
-                    </ul>
-                    <div class="dropdown-content">
-                        <a class='itemLink' href="/api/stats/danosHistory">Histórico daños</a>
-                        <a class='itemLink' href="/api/stats/partsHistory">Histórico partes dañadas</a>
-                        <a class='itemLink' href="/api/stats/missingsHistory">Histórico piezas faltantes</a>
-                    </div>
-                </div>
-                <!-- <div class="avatarItem">
+  <body>
+    <nav id="userContainer">
+      <div class="userDataContainer">
+        <ul class="navList">
+          <li class="navItem" style="padding: 3px 0px">
+            <a class="cartLink" href="#">Inicio</a>
+          </li>
+        </ul>
+        <div class="dropdown">
+          <ul class="navList cartLink" style="margin: 0px 20px">
+            <li class="navItem">Administrador</li>
+          </ul>
+          <div class="dropdown-content">
+            <% if (userName === 'admin@admin.com') { %>
+            <a class="itemLink" href="/api/userdata/usersadmin"
+              >Administrar usuarios</a
+            >
+            <% } %> <% if (userData.admin === 'true') { %>
+            <a class="itemLink" href="/api/productos/form">Tablas</a>
+            <% } %>
+            <a class="itemLink" href="/api/userdata">Mis datos</a>
+            <a class="itemLink" href="/api/logout">Logout</a>
+          </div>
+        </div>
+        <div class="dropdown">
+          <ul class="navList cartLink" style="margin: 0px 20px">
+            <li class="navItem">Consultas</li>
+          </ul>
+          <div class="dropdown-content">
+            <a class="itemLink" href="/api/scans">VIN colectados</a>
+            <a class="itemLink" href="/api/querys/queryByDate">Por fecha</a>
+            <a class="itemLink" href="/api/querys/queryByVIN">Por chasis-VIN</a>
+          </div>
+        </div>
+        <div class="dropdown">
+          <ul class="navList cartLink" style="margin: 0px 20px">
+            <li class="navItem">Estadísticas</li>
+          </ul>
+          <div class="dropdown-content">
+            <a class="itemLink" href="/api/stats/danosHistory"
+              >Histórico daños</a
+            >
+            <a class="itemLink" href="/api/stats/partsHistory"
+              >Histórico partes dañadas</a
+            >
+            <a class="itemLink" href="/api/stats/missingsHistory"
+              >Histórico piezas faltantes</a
+            >
+          </div>
+        </div>
+        <!-- <div class="avatarItem">
                     <img class='userAvatar' src='<%= userData.avatar %>' alt="Avatar">
                 </div> -->
-                <h2 class="userTitle">Bienvenido <span id='<%= userData._id %>' class="userWelcome"> <%= userName %></span></h2>
-            </div>
-            <div style="display: flex">
-                <ul class="navList">
-                    <li class="navItem">
-                        <a id='chatLink' class='chatLink' target="_blank">Asistencia</a>
-                    </li>
-                </ul>
-                <!-- <ul class="navList">
+        <h2 class="userTitle">
+          Bienvenido
+          <span id="<%= userData._id %>" class="userWelcome">
+            <%= userName %></span
+          >
+        </h2>
+      </div>
+      <div style="display: flex">
+        <ul class="navList">
+          <li class="navItem">
+            <a id="chatLink" class="chatLink" target="_blank">Asistencia</a>
+          </li>
+        </ul>
+        <!-- <ul class="navList">
                     <li class="navItem">
                         <a class='cartLink' href='/api/carrito'>CARRITO</a><span class='cartLinkSpan'></span>
                     </li>
                 </ul> -->
-            </div>
-        </nav>
+      </div>
+    </nav>
 
-        <main id='main'>
-            <!-- <%- include('./partials/cards') %> -->
-            <%- include('./partials/messages') %>
-            <div class="CarTrackContainer">
-                <p class="CarTrackP">Car<span class="CarTrackSpan">Track</span></p>
-            </div>
-        </main>
+    <main id="main">
+      <!-- <%- include('./partials/cards') %> -->
+      <%- include('./partials/messages') %>
+      <div class="CarTrackContainer">
+        <p class="CarTrackP">Car<span class="CarTrackSpan">Track</span></p>
+      </div>
+    </main>
 
-        <!-- Script toastify -->
-        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-        <script src="/js/main.js"></script>
-        <script src="/js/socketLogic.js"></script>
-
-    </body>
-
+    <!-- Script toastify -->
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/toastify-js"
+    ></script>
+    <script src="/js/main.js"></script>
+    <script src="/js/socketLogic.js"></script>
+  </body>
 </html>
