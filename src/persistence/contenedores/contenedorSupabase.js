@@ -120,22 +120,25 @@ class ContenedorSupabase {
         .from("scans")
         .select(
           `
-        supabase_id,
-        vin,
-        date,
-        damages (
-          id,
-          area,
-          averia,
-          grav,
-          obs,
-          codigo,
-          date
-        ),
-        pictures (
-          pictureurl
-        )
-      `
+            supabase_id,
+            vin,
+            date,
+            marca,
+            modelo,
+            clima,
+            user,
+            damages (
+              id,
+              area,
+              averia,
+              grav,
+              obs,
+              date
+            ),
+            pictures (
+              pictureurl
+            )
+        `
         )
         .gte("date", startDate)
         .lte("date", endDate)
@@ -145,13 +148,16 @@ class ContenedorSupabase {
         scan_id: s.supabase_id,
         vin: s.vin,
         scan_date: s.date,
+        marca: s.marca,
+        modelo: s.modelo,
+        user: s.user,
+        clima: s.clima,
         damages: (s.damages ?? []).filter(
           (d) =>
             d.area !== null ||
             d.averia !== null ||
             d.grav !== null ||
-            d.obs !== null ||
-            d.codigo !== null
+            d.obs !== null
         ),
         fotos: (s.pictures ?? []).map((p) => p.pictureurl).filter(Boolean),
       }));
@@ -171,7 +177,7 @@ class ContenedorSupabase {
     }
   }
 
-  //////////// Func para popular DB supabse
+  // Func para popular DB supabse
   async populateDb(info) {
     console.log(info);
     const [modelo, vin, area, averia, gravedad, observacion, codigo] = info;

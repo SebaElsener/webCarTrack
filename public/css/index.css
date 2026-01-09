@@ -1,28 +1,27 @@
-
 * {
-    font-family: sans-serif;
-    scroll-behavior: smooth;
+  font-family: sans-serif;
+  scroll-behavior: smooth;
 }
 
 body {
-    padding: 0;
-    box-sizing: border-box;
-    font-family: sans-serif;
-    display: flex;
-    flex-direction: column;
-    background-color: rgba(240, 244, 249, 0.8);
-    margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(240, 244, 249, 0.8);
+  margin: 0;
 }
 
 h2,
 .h2ProductsList {
-    margin: 40px auto;
-    color: rgba(34, 34, 34, 0.879);
-    font-weight: normal;
+  margin: 40px auto;
+  color: rgba(34, 34, 34, 0.879);
+  font-weight: normal;
 }
 
 .h2ProductsList {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 .product,
@@ -30,263 +29,263 @@ h2,
 .stock,
 .description,
 .code {
-    padding: 5px;
-    width: 300px;
-    border: none;
-    margin: 20px;
-    font-size: 1rem;
+  padding: 5px;
+  width: 300px;
+  border: none;
+  margin: 20px;
+  font-size: 1rem;
 }
 
 .price,
 .stock,
 .code {
-    width: 80px;
+  width: 80px;
 }
 
 .description {
-    width: 460px;
+  width: 460px;
 }
 
 label {
-    margin: 15px 0px;
-    background-color: transparent;
-    font-weight: bold;
-    color: whitesmoke
+  margin: 15px 0px;
+  background-color: transparent;
+  font-weight: bold;
+  color: whitesmoke;
 }
 
 .sendBtn,
 .formBackLinkBtn {
-    margin: 12px auto;
-    padding: 8px;
-    width: 150px;
-    font-size: 1rem;
-    border: none;
-    border-radius: 5px;
-    background-color: rgb(184, 184, 184);
-    transition: all .2s;
-    font-weight: bold;
-    color: rgba(34, 34, 34, 0.879);
+  margin: 12px auto;
+  padding: 8px;
+  width: 150px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  background-color: rgb(184, 184, 184);
+  transition: all 0.2s;
+  font-weight: bold;
+  color: rgba(34, 34, 34, 0.879);
 }
 
 .sendBtn:hover {
-    box-shadow: 0px 0px 5px whitesmoke;
+  box-shadow: 0px 0px 5px whitesmoke;
 }
 
 .formBackLinkBtn:hover {
-    box-shadow: 0px 0px 5px rgba(98, 128, 174, 0.92);
+  box-shadow: 0px 0px 5px rgba(98, 128, 174, 0.92);
 }
 
 .formBackLink {
-    height: 34px;
-    width: 150px;
-    margin: 0px auto;
-    margin-top: 20px;
+  height: 34px;
+  width: 150px;
+  margin: 0px auto;
+  margin-top: 20px;
 }
 
 .prodsLink {
-    color: rgba(34, 34, 34, 0.879);
-    margin: 40px auto;
-    font-size: 1.3rem;
-    text-align: center;
-    margin-bottom: 30px;
+  color: rgba(34, 34, 34, 0.879);
+  margin: 40px auto;
+  font-size: 1.3rem;
+  text-align: center;
+  margin-bottom: 30px;
 }
 
 .thumbnailImg {
-    padding: 8px;
+  padding: 8px;
 }
 
 .cardContainer {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    padding: 25px;
-    justify-content: center;
-    margin-top: 70px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 25px;
+  justify-content: center;
+  margin-top: 70px;
 }
 
 .thumbContainer {
-    width: 100%;
-    display: flex;
-    justify-content: center;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .thumbnail,
 .thumbnailInput {
-    width: 30%;
-    font-size: 1rem;
-    border: none;
-    padding: 5px;
+  width: 30%;
+  font-size: 1rem;
+  border: none;
+  padding: 5px;
 }
 
 .thumbnailInput {
-    width: 68%;
-    margin-left: 20px;
+  width: 68%;
+  margin-left: 20px;
 }
 
 .thumbnailImg {
-    width: 70px;
+  width: 70px;
 }
 
 .productCard {
-    width: 200px;
-    height: 330px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    background-color: #b8d2d7c7;
-    padding: 25px;
-    text-align: center;
+  width: 200px;
+  height: 330px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  background-color: #b8d2d7c7;
+  padding: 25px;
+  text-align: center;
 }
 
 .productPriceStockCont,
 .descriptionCodeCont,
 .thumbnailCont {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .buyBtnContainer,
 .actionBtnsContainer {
-    width: 200px;
+  width: 200px;
 }
 
 .buyBtn {
-    width: 185px;
-    padding: 3px;
-    margin: 20px 0px;
+  width: 185px;
+  padding: 3px;
+  margin: 20px 0px;
 }
 
 .updateBtn,
 .deleteBtn {
-    padding: 3px;
-    width: 90px;
+  padding: 3px;
+  width: 90px;
 }
 
 .deleteBtn {
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 .cardInput {
-    background-color: transparent;
-    border: none;
-    font-size: 1rem;
-    color: rgba(17, 17, 17, 0.841);
-    margin: 8px 0px;
-    text-align: center;
+  background-color: transparent;
+  border: none;
+  font-size: 1rem;
+  color: rgba(17, 17, 17, 0.841);
+  margin: 8px 0px;
+  text-align: center;
 }
 
 .price {
-    width: 70px;
+  width: 70px;
 }
 
 .stock {
-    width: 40px;
+  width: 40px;
 }
 
 .cartsList {
-    list-style: none;
-    display: flex;
-    padding: 10px;
-    flex-wrap: wrap;
-    border: 1px solid gray;
-    justify-content: center;
+  list-style: none;
+  display: flex;
+  padding: 10px;
+  flex-wrap: wrap;
+  border: 1px solid gray;
+  justify-content: center;
 }
 
 .cartsContainer {
-    width: 100%;
+  width: 100%;
 }
 
 .cartLi {
-    width: 100px;
-    padding: 8px;
-    margin: 0;
+  width: 100px;
+  padding: 8px;
+  margin: 0;
 }
 
 .cartPrice,
 .cartStock {
-    display: inline;
+  display: inline;
 }
 
 .addCart {
-    font-size: 1rem;
-    display: block;
-    margin-bottom: 40px;
+  font-size: 1rem;
+  display: block;
+  margin-bottom: 40px;
 }
 
 .cartProducts {
-    padding: 25px;
-    background-color: #e6eaee;
-    margin-bottom: 25px;
+  padding: 25px;
+  background-color: #e6eaee;
+  margin-bottom: 25px;
 }
 
 .cartName {
-    padding: 25px;
-    padding-top: 0;
+  padding: 25px;
+  padding-top: 0;
 }
 
 .cartTitle {
-    font-size: 1.2rem;
-    display: inline;
-    margin-right: 40px;
+  font-size: 1.2rem;
+  display: inline;
+  margin-right: 40px;
 }
 
 .productDiv {
-    display: flex;
-    align-items: center;
-    justify-content: space-evenly;
-    background-color: #a6d0d0;
-    margin-bottom: 25px;
-    padding: 20px;
-    width: 80%;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  background-color: #a6d0d0;
+  margin-bottom: 25px;
+  padding: 20px;
+  width: 80%;
 }
 
 .productContainer {
-    width: 300px;
+  width: 300px;
 }
 
 .productContainer,
 .deleteProductBtnContainer {
-    margin: 0;
+  margin: 0;
 }
 
 .productContainerP {
-    text-align: left;
-    color: #1b6605;
+  text-align: left;
+  color: #1b6605;
 }
 
 .emptyCart,
 .buyProductLink,
 .backLink {
-    font-size: 1.2rem;
+  font-size: 1.2rem;
 }
 
 .backLink {
-    margin: 0;
-    margin-bottom: 25px;
-    display: inline-block;
-    margin-top: 70px;
+  margin: 0;
+  margin-bottom: 25px;
+  display: inline-block;
+  margin-top: 70px;
 }
 
 .buyProductLink {
-    margin-top: 15px;
-    display: block;
+  margin-top: 15px;
+  display: block;
 }
 
 p {
-    color: rgba(34, 34, 34, 0.879);
+  color: rgba(34, 34, 34, 0.879);
 }
 
 .descriptionInput {
-    overflow: auto;
+  overflow: auto;
 }
 
 .productContainerSpan {
-    color: #280abb;
+  color: #280abb;
 }
 
 .thumbnailContainer {
-    margin: 0;
+  margin: 0;
 }
 
 .deleteCartBtn,
@@ -294,25 +293,25 @@ p {
 #endPurchaseBtn,
 #confirmPurchaseBtn,
 .cancelPurchaseBtn {
-    margin: 0;
-    width: 110px;
-    padding: 5px;
-    border: none;
-    border-radius: 3px;
-    background-color: cadetblue;
-    color: antiquewhite;
-    transition: all .3s;
+  margin: 0;
+  width: 110px;
+  padding: 5px;
+  border: none;
+  border-radius: 3px;
+  background-color: cadetblue;
+  color: antiquewhite;
+  transition: all 0.3s;
 }
 
 #endPurchaseBtn,
 .deleteCartBtn,
 #confirmPurchaseBtn,
 .cancelPurchaseBtn {
-    padding: 8px;
-    font-size: 1.2rem;
-    width: 250px;
-    margin-right: 30px;
-    margin-bottom: 20px;
+  padding: 8px;
+  font-size: 1.2rem;
+  width: 250px;
+  margin-right: 30px;
+  margin-bottom: 20px;
 }
 
 .deleteCartBtn:hover,
@@ -320,432 +319,432 @@ p {
 #endPurchaseBtn:hover,
 #confirmPurchaseBtn:hover,
 .cancelPurchaseBtn:hover {
-    background-color: rgba(222, 235, 253, 0.726);
-    color: rgb(80, 132, 134);
+  background-color: rgba(222, 235, 253, 0.726);
+  color: rgb(80, 132, 134);
 }
 
 #addProductBtn {
-    width: 280px;
-    border: none;
-    border-radius: 3px;
-    padding: 8px;
-    background-color: cadetblue;
-    color: antiquewhite;
-    font-size: 1rem;
-    transition: all .3s;
+  width: 280px;
+  border: none;
+  border-radius: 3px;
+  padding: 8px;
+  background-color: cadetblue;
+  color: antiquewhite;
+  font-size: 1rem;
+  transition: all 0.3s;
 }
 
 #addProductBtn:hover {
-    background-color: rgba(176, 187, 202, 0.726);
-    color: rgb(80, 132, 134);
+  background-color: rgba(176, 187, 202, 0.726);
+  color: rgb(80, 132, 134);
 }
 
 .cartsLink {
-    font-size: 1.2rem;
+  font-size: 1.2rem;
 }
 
 .cartTitleAndDeleteBtn {
-    display: flex;
-    align-items: center;
-    justify-content: space-evenly;
-    padding: 25px;
-    background-color: rgba(119, 165, 240, 0.921);
-    margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  padding: 25px;
+  background-color: rgba(119, 165, 240, 0.921);
+  margin-bottom: 20px;
 }
 
 .cartH2 {
-    margin: 0;
-    color: rgb(10, 102, 130);
+  margin: 0;
+  color: rgb(10, 102, 130);
 }
 
 .h2PurchaseOrder {
-    margin-bottom: 25px;
+  margin-bottom: 25px;
 }
 
 /* //////////// IMPORTADO DE MOCKS Y NORMALIZACION ////////////////// */
 
 h2 {
-    margin: 30px auto;
-    color: rgba(34, 34, 34, 0.879);
+  margin: 30px auto;
+  color: rgba(34, 34, 34, 0.879);
 }
 
 #productsForm,
 #usersForm {
-    background-color: rgba(98, 128, 174, 0.92);
-    width: 630px;
-    padding: 35px;
-    border-radius: 5px;
-    margin: 0px auto;
+  background-color: rgba(98, 128, 174, 0.92);
+  width: 630px;
+  padding: 35px;
+  border-radius: 5px;
+  margin: 0px auto;
 }
 
 .price {
-    width: 80px;
+  width: 80px;
 }
 
 label {
-    margin: 15px 0px;
-    background-color: transparent;
-    font-weight: bold;
-    color: whitesmoke
+  margin: 15px 0px;
+  background-color: transparent;
+  font-weight: bold;
+  color: whitesmoke;
 }
 
 .sendBtn {
-    margin: 20px auto;
-    margin-bottom: 10px;
-    padding: 8px;
-    width: 150px;
-    font-size: 1rem;
-    border: none;
-    border-radius: 5px;
-    background-color: rgb(184, 184, 184);
-    transition: all .2s;
-    font-weight: bold;
-    color: rgba(34, 34, 34, 0.879);
+  margin: 20px auto;
+  margin-bottom: 10px;
+  padding: 8px;
+  width: 150px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  background-color: rgb(184, 184, 184);
+  transition: all 0.2s;
+  font-weight: bold;
+  color: rgba(34, 34, 34, 0.879);
 }
 
 .sendBtn:hover {
-    box-shadow: 0px 0px 5px whitesmoke;
+  box-shadow: 0px 0px 5px whitesmoke;
 }
 
 .prodsLink {
-    color: rgba(34, 34, 34, 0.879);
-    margin: 40px auto;
-    font-size: 1.3rem;
-    text-align: center;
+  color: rgba(34, 34, 34, 0.879);
+  margin: 40px auto;
+  font-size: 1.3rem;
+  text-align: center;
 }
 
 /* /////////////////////////// */
 
 .prodsLink {
-    color: rgba(34, 34, 34, 0.879);
-    font-size: 1.3rem;
-    margin-bottom: 30px;
+  color: rgba(34, 34, 34, 0.879);
+  font-size: 1.3rem;
+  margin-bottom: 30px;
 }
 
 table {
-    padding: 20px;
-    min-width: 340px;
-    table-layout: fixed;
-    border-collapse: collapse;
-    margin: 0px auto;
+  padding: 20px;
+  min-width: 340px;
+  table-layout: fixed;
+  border-collapse: collapse;
+  margin: 0px auto;
 }
 
 thead {
-    color: whitesmoke;
-    background-color: rgba(45, 87, 153, 0.921);
+  color: whitesmoke;
+  background-color: rgba(45, 87, 153, 0.921);
 }
 
 th {
-    padding: 8px;
+  padding: 8px;
 }
 
 td {
-    color: rgb(57, 57, 57);
-    text-align: center;
+  color: rgb(57, 57, 57);
+  text-align: center;
 }
 
 .usersAdminTd {
-    min-width: 300px;
+  min-width: 300px;
 }
 
 tbody tr:nth-child(odd) {
-    background-color: rgba(119, 165, 240, 0.921);
+  background-color: rgba(119, 165, 240, 0.921);
 }
 
 tbody tr:nth-child(even) {
-    background-color: rgba(87, 143, 232, 0.921);
+  background-color: rgba(87, 143, 232, 0.921);
 }
 
 .thumbnailImg {
-    padding: 8px;
+  padding: 8px;
 }
 
 .userInfo {
-    text-align: center;
+  text-align: center;
 }
 
 #userInfo {
-    display: none;
+  display: none;
 }
 
 #MessagesCenter {
-    width: 550px;
-    margin: 0;
-    position: fixed;
-    top: 70px;
-    left: 100%;
-    background-color: #b3d294e5;
-    padding: 10px 40px;
+  width: 550px;
+  margin: 0;
+  position: fixed;
+  top: 70px;
+  left: 100%;
+  background-color: #b3d294e5;
+  padding: 10px 40px;
 }
 
 .msgAuthor {
-    display: inline-block;
-    text-align: right;
-    margin: 0px 10px;
+  display: inline-block;
+  text-align: right;
+  margin: 0px 10px;
 }
 
 .userImgContainer {
-    text-align: right;
+  text-align: right;
 }
 
 .textContainer,
 .userDataContainer {
-    display: flex;
-    align-items: center;
-    margin: 0;
+  display: flex;
+  align-items: center;
+  margin: 0;
 }
 
 .textContainer {
-    width: 330px;
+  width: 330px;
 }
 
 .userDataContainer {
-    max-width: 700px;
+  max-width: 700px;
 }
 
 #messagesDiv {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    column-gap: 10px;
-    margin-bottom: 7px;
-    border-bottom: 1px solid #bbb9b9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  column-gap: 10px;
+  margin-bottom: 7px;
+  border-bottom: 1px solid #bbb9b9;
 }
 
 .msgBtn {
-    border: none;
-    background-color: gray;
-    padding: 5px;
-    width: 70px;
-    color: antiquewhite;
-    font-size: .9rem;
+  border: none;
+  background-color: gray;
+  padding: 5px;
+  width: 70px;
+  color: antiquewhite;
+  font-size: 0.9rem;
 }
 
 .userEmailLbl {
-    color: rgba(34, 34, 34, 0.879);
-    width: 75px;
-    display: inline-block;
-    text-align: right;
+  color: rgba(34, 34, 34, 0.879);
+  width: 75px;
+  display: inline-block;
+  text-align: right;
 }
 
 #messagesContainer {
-    margin-top: 20px;
-    max-height: 340px;
-    overflow-y: auto;
+  margin-top: 20px;
+  max-height: 340px;
+  overflow-y: auto;
 }
 
 #userEmail,
 .userEmail {
-    width: 320px;
+  width: 320px;
 }
 
 #messagesForm {
-    text-align: center;
-    visibility: collapse;
+  text-align: center;
+  visibility: collapse;
 }
 
 #messageContent,
 #userEmail,
 .userEmail {
-    padding: 5px;
-    width: 300px;
-    border: none;
-    margin: 20px;
-    font-size: 1rem;
+  padding: 5px;
+  width: 300px;
+  border: none;
+  margin: 20px;
+  font-size: 1rem;
 }
 
 #messageContent {
-    margin: 13px;
-    font-size: .9rem;
+  margin: 13px;
+  font-size: 0.9rem;
 }
 
 .userTitle,
 .gotoLogin,
 .retryLogin {
-    color:rgb(215 212 125);
-    margin: 0;
-    padding: 20px;
+  color: rgb(215 212 125);
+  margin: 0;
+  padding: 20px;
 }
 
 .userWelcome {
-    margin-left: 6px;
-    color:rgb(215 212 125);
-    font-style: italic;
+  margin-left: 6px;
+  color: rgb(215 212 125);
+  font-style: italic;
 }
 
 .userTitle {
-    font-size: 1rem;
-    display: flex;
-    width: fit-content;
+  font-size: 1rem;
+  display: flex;
+  width: fit-content;
 }
 
 #tableContainer {
-    width: 95%;
-    margin: 0 auto;
+  width: 95%;
+  margin: 0 auto;
 }
 
 .VINth {
-    width: 300px;
+  width: 300px;
 }
 
 .gotoLogin,
 .retryLogin {
-    font-size: 1.3rem;
+  font-size: 1.3rem;
 }
 
 #userContainer {
-    background-color: rgba(33, 33, 33, 0.719);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    height: 60px;
-    min-width: 655px;
-    position: fixed;
+  background-color: rgba(33, 33, 33, 0.719);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 60px;
+  min-width: 655px;
+  position: fixed;
 }
 
 #loginForm,
 #regForm,
 #userDataForm,
 #passForm {
-    background-color: #c5dbee;
-    display: flex;
-    flex-direction: column;
-    width: 600px;
-    border-radius: 5px;
-    padding: 25px;
-    margin: 20px;
+  background-color: #c5dbee;
+  display: flex;
+  flex-direction: column;
+  width: 600px;
+  border-radius: 5px;
+  padding: 25px;
+  margin: 20px;
 }
 
 #passContainer {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 #regForm,
 #userDataForm,
 #passForm {
-    align-items: center;
+  align-items: center;
 }
 
 #passForm {
-    visibility: collapse;
-    opacity: 0;
-    transition: all .5s;
+  visibility: collapse;
+  opacity: 0;
+  transition: all 0.5s;
 }
 
 .userName,
 .userPass {
-    color: rgb(10, 102, 130);
+  color: rgb(10, 102, 130);
 }
 
 #passChangeBtn {
-    width: 230px;
-    margin: 20px;
+  width: 230px;
+  margin: 20px;
 }
 
 .userNameInput,
 .userPassInput,
 .userPassCheckInput {
-    padding: 5px;
-    width: 300px;
-    border: none;
-    font-size: 1rem;
+  padding: 5px;
+  width: 300px;
+  border: none;
+  font-size: 1rem;
 }
 
 .formTitle {
-    text-align: center;
-    margin: 3rem 0;
+  text-align: center;
+  margin: 3rem 0;
 }
 
 .tableTd {
-    text-align: left;
-    overflow: clip;
+  text-align: left;
+  overflow: clip;
 }
 
 .tableTh {
-    text-align: center;
+  text-align: center;
 }
 
 .codeTh {
-    width: 70px;
+  width: 70px;
 }
 
 .loginFormTitle,
 .regFormTitle {
-    color: rgb(10, 102, 130);
+  color: rgb(10, 102, 130);
 }
 
 #errorPassCheck {
-    font-size: .9rem;
-    color: red;
-    display: none;
+  font-size: 0.9rem;
+  color: red;
+  display: none;
 }
 
 .loginBtn,
 .regBtn {
-    margin-top: 25px;
-    border: none;
-    font-size: 1rem;
-    padding: 7px;
-    width: 100px;
-    color: #605f5f;
-    font-weight: bold;
-    background-color: #c8c8c8;
-    transition: all .3s;
+  margin-top: 25px;
+  border: none;
+  font-size: 1rem;
+  padding: 7px;
+  width: 100px;
+  color: #605f5f;
+  font-weight: bold;
+  background-color: #c8c8c8;
+  transition: all 0.3s;
 }
 
 .loginLink,
 .regLink {
-    text-decoration: none;
-    color: #605f5f;
+  text-decoration: none;
+  color: #605f5f;
 }
 
 .loginBtn:hover,
 .regBtn:hover {
-    background-color: #ebd829;
+  background-color: #ebd829;
 }
 
 .gotoRegisterContainer,
 .gotoLoginContainer {
-    margin: 20px;
+  margin: 20px;
 }
 
 .regContainerText,
 .loginContainerText {
-    display: inline-block;
-    margin-right: 10px;
-    color: #4f4f4f;
+  display: inline-block;
+  margin-right: 10px;
+  color: #4f4f4f;
 }
 
 .infoTitle,
 .infoItem {
-    color: #4f4f4f;
+  color: #4f4f4f;
 }
 
 .infoItem {
-    font-weight: 400;
+  font-weight: 400;
 }
 
 .labelTitle {
-    width: 200px;
-    display: inline-block;
+  width: 200px;
+  display: inline-block;
 }
 
 .navList {
-    display: flex;
-    align-items: center;
-    margin: 20px;
-    padding: 0;
+  display: flex;
+  align-items: center;
+  margin: 20px;
+  padding: 0;
 }
 
 .cartNav {
-    width: 70%;
+  width: 70%;
 }
 
 .navItem {
-    list-style: none;
-    padding: 3px 0px;
+  list-style: none;
+  padding: 3px 0px;
 }
 
 .cartLink,
@@ -753,215 +752,214 @@ tbody tr:nth-child(even) {
 .itemLink,
 .navItem,
 .cartLinkSpan {
-    text-decoration: none;
-    color: rgb(234 234 234);
+  text-decoration: none;
+  color: rgb(234 234 234);
 }
 
 .cartLink,
 .chatLink {
-    font-weight: 500;
-    display: inline-block;
-    padding: 8px 0px;
-    position: relative;
+  font-weight: 500;
+  display: inline-block;
+  padding: 8px 0px;
+  position: relative;
 }
 
 .cartLink:after,
 .chatLink:after {
-    bottom: 0;
-    content: "";
-    display: block;
-    height: 2px;
-    left: 50%;
-    position: absolute;
-    background: #9c6db9;
-    transition: width 0.3s ease 0s, left 0.3s ease 0s;
-    width: 0;
+  bottom: 0;
+  content: "";
+  display: block;
+  height: 2px;
+  left: 50%;
+  position: absolute;
+  background: #9c6db9;
+  transition: width 0.3s ease 0s, left 0.3s ease 0s;
+  width: 0;
 }
 
 .cartLink:hover:after,
 .chatLink:hover:after {
-    width: 100%;
-    left: 0;
+  width: 100%;
+  left: 0;
 }
 
 .navItem {
-    font-weight: 500;
+  font-weight: 500;
 }
 
 .userAvatar {
-    width: 40px;
-    color: #1a191996;
+  width: 40px;
+  color: #1a191996;
 }
 
 .avatarItem {
-    border-radius: 50%;
-    background-color: #aae8e8a3;
-    padding: 5px;
-    margin: 15px;
+  border-radius: 50%;
+  background-color: #aae8e8a3;
+  padding: 5px;
+  margin: 15px;
 }
 
 .dropdown {
-    display: inline-block;
-    position: relative;
-    cursor: pointer;
-  }
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+}
 
 .dropdown-content {
-    visibility: collapse;
-    opacity: 0;
-    transition: all .5s;
-    margin-top: 13px;
-    margin-left: 18px;
-    position: absolute;
-    width: 180px;
-    box-shadow: 0px 10px 10px 0px rgba(0,0,0,0.4);
-    background-color: #eaeaea;
-    border-radius: 0px 3px 3px 3px;
-    padding: 8px;
-    margin-top: 0;
+  visibility: collapse;
+  opacity: 0;
+  transition: all 0.5s;
+  margin-top: 13px;
+  margin-left: 18px;
+  position: absolute;
+  width: 180px;
+  box-shadow: 0px 10px 10px 0px rgba(0, 0, 0, 0.4);
+  background-color: #eaeaea;
+  border-radius: 0px 3px 3px 3px;
+  padding: 8px;
+  margin-top: 0;
 }
 .dropdown:hover .dropdown-content {
-    visibility: visible;
-    opacity: 1;
+  visibility: visible;
+  opacity: 1;
 }
 
 .dropdown-content a {
-    display: block;
-    color: rgb(10, 102, 130);
-    padding: 5px;
-    text-decoration: none;
+  display: block;
+  color: rgb(10, 102, 130);
+  padding: 5px;
+  text-decoration: none;
 }
 
 .dropdown-content a:hover {
-    color: #FFFFFF;
-    background-color: #00A4BD;
+  color: #ffffff;
+  background-color: #00a4bd;
 }
 
 #chatLink {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 #closeChat {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #60080875;
-    font-weight: bold;
-    background-color: #d75f5fc7;
-    position: absolute;
-    top: 0;
-    left: 0;
-    font-size: 2rem;
-    transition: box-shadow .3s;
-    cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #60080875;
+  font-weight: bold;
+  background-color: #d75f5fc7;
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 2rem;
+  transition: box-shadow 0.3s;
+  cursor: pointer;
 }
 
 #closeChat:hover {
-    box-shadow: 0px 0px 10px #d75f5f;
+  box-shadow: 0px 0px 10px #d75f5f;
 }
 
 #closePrivateChat {
-    width: 20px;
-    height: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #60080875;
-    font-weight: bold;
-    background-color: #d75f5fc7;
-    position: sticky;
-    top: -7%;
-    left: 100%;
-    font-size: 1rem;
-    transition: box-shadow .3s;
-    cursor: pointer;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #60080875;
+  font-weight: bold;
+  background-color: #d75f5fc7;
+  position: sticky;
+  top: -7%;
+  left: 100%;
+  font-size: 1rem;
+  transition: box-shadow 0.3s;
+  cursor: pointer;
 }
 
 #closePrivateChat:hover {
-    box-shadow: 0px 0px 10px #d75f5f;
+  box-shadow: 0px 0px 10px #d75f5f;
 }
 
 #privateMssgContainer {
-    padding: 20px;
+  padding: 20px;
 }
 
 .privateMssgTitle {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 .connUsersContainer {
-    display: flex;
-    width: 100%;
-    justify-content: center;
+  display: flex;
+  width: 100%;
+  justify-content: center;
 }
 
 .sndMssgBtn {
-    border: none;
-    padding: 3px;
-    color: rgba(44, 44, 44, 0.817);
-    width: 120px;
-    border-radius: 5px;
-    cursor: pointer;
-    background-color: #8dce57;
-    transition: background-color .3s;
+  border: none;
+  padding: 3px;
+  color: rgba(44, 44, 44, 0.817);
+  width: 120px;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #8dce57;
+  transition: background-color 0.3s;
 }
 
 .sndMssgBtn:hover {
-    background-color: #7eb94e;
+  background-color: #7eb94e;
 }
 
 /* //////////////// CARROUSEL */ /* //////////////// */
-        .car {
-            position: relative;
-            width: 80%;
-            max-width: 600px;
-            overflow: hidden;
-        }
-        .img-wrap {
-            display: flex;
-            transition: transform 0.5s ease;
-        }
-        .img-wrap img {
-            width: 100%;
-            height: auto;
-        }
-        .btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(0, 0, 0, 0.5);
-            color: #fff;
-            border: none;
-            padding: 10px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .btn:hover {
-            background: rgba(0, 0, 0, 0.8);
-        }
-        .prev {
-            left: 10px;
-        }
-        .next {
-            right: 10px;
-        }
+.car {
+  position: relative;
+  width: 80%;
+  max-width: 600px;
+  overflow: hidden;
+}
+.img-wrap {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+.img-wrap img {
+  width: 100%;
+  height: auto;
+}
+.btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  border: none;
+  padding: 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+.btn:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+.prev {
+  left: 10px;
+}
+.next {
+  right: 10px;
+}
 
-        #picsBtn {
-    font-size: 3rem;
-    top: 29px;
-    position: relative;
-    padding: 0;
-        width: 100%;
-        }
+#picsBtn {
+  font-size: 3rem;
+  top: 29px;
+  position: relative;
+  padding: 0;
+  width: 100%;
+}
 
-        #tableTdPhoto {
-            padding: 0;
-        }
+#tableTdPhoto {
+  padding: 0;
+}
 
-
-        .panel {
+.panel {
   background: #f4f4f4;
   padding: 20px;
   width: 250px;
@@ -986,42 +984,103 @@ tbody tr:nth-child(even) {
 }
 
 #graphStat {
-    margin: 0 auto;
-    height: 500px;
-    margin-top: 2.5rem;
+  margin: 0 auto;
+  height: 500px;
+  margin-top: 2.5rem;
 }
 
 .statsBtnsContainer {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 
 .CarTrackContainer {
-    display: flex;
-    margin: 0px auto;
-    justify-content: center;
-    margin-top: 20rem;
+  display: flex;
+  margin: 0px auto;
+  justify-content: center;
+  margin-top: 20rem;
 }
 
 .CarTrackP {
-    color: #21212126;
-    font-size: 6rem;
-    font-weight: 600;
+  color: #21212126;
+  font-size: 6rem;
+  font-weight: 600;
 }
 
 .CarTrackSpan {
-    font-style: italic;
-    color: #ed62462e;
+  font-style: italic;
+  color: #ed62462e;
 }
 
 #inputGroup {
-    justify-content: space-around;
+  justify-content: space-around;
 }
 
 #rangoFechas {
-    max-width: 80%;
+  max-width: 80%;
 }
 
 #btnFormSubmit {
-    border-radius: 0px 8px 8px 0px;
+  border-radius: 0px 8px 8px 0px;
+}
+
+.table-auto td.wrap {
+  white-space: normal;
+  max-width: 350px;
+}
+
+thead {
+  text-align: center;
+  color: #b3ce7aef;
+}
+
+/* contenedor con scroll */
+.table-responsive {
+  max-height: 65vh; /* ajustable */
+  overflow: auto;
+  position: relative;
+}
+
+/* tabla */
+.table-auto {
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* header sticky */
+.table-auto thead th {
+  position: sticky;
+  top: 0;
+  background: #111;
+  color: #b3ce7aef;
+  z-index: 20;
+  text-align: center;
+}
+
+/* celdas */
+.table-auto th,
+.table-auto td {
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* columna con wrap */
+.table-auto td.wrap {
+  white-space: normal;
+  max-width: 350px;
+}
+
+/* resizer */
+.th-resize {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 6px;
+  height: 100%;
+  cursor: col-resize;
+  user-select: none;
+  z-index: 30;
 }

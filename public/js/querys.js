@@ -12,7 +12,7 @@ document.getElementById("form-fechas").addEventListener("submit", async (e) => {
   cargarDatos(desde, hasta);
 });
 
-const FILAS_POR_PAGINA = 10;
+const FILAS_POR_PAGINA = 20;
 let paginaActual = 1;
 let datosGlobales = [];
 
@@ -40,7 +40,7 @@ async function cargarDatos(desde, hasta) {
       return res.json();
     })
     .then((data) => {
-      console.log("Datos", data);
+      //console.log("Datos", data);
       if (!Array.isArray(data) || data.length === 0) {
         document.getElementById("resultados").innerHTML =
           "<p class='text-muted'>No se encontraron datos</p>";
@@ -52,6 +52,7 @@ async function cargarDatos(desde, hasta) {
       paginaActual = 1;
       renderTabla();
       renderPaginacion();
+      enableColumnResize("tabla-resultados");
     })
     .catch((err) => {
       console.error(err);
@@ -70,61 +71,54 @@ function renderTabla() {
   let rows = "";
 
   paginaDatos.forEach((scan) => {
-    // Si no hay daños, mostramos solo una fila "Sin daños"
     if (!scan.damages || scan.damages.length === 0) {
       rows += `
         <tr>
-            <td>${scan.scan_id ?? ""}</td>
-            <td>${scan.vin ?? ""}</td>
-            <td colspan="5" class="text-center">Sin daños</td>
-            <td>
-              ${
-                scan.fotos
-                  ?.map(
-                    (f, idx) => `
-                <a href="${f}" class="glightbox" data-gallery="gallery-${
-                      scan.scan_id
-                    }" data-title="Imagen ${idx + 1} de ${scan.fotos.length}" ${
-                      idx > 0 ? 'style="display:none;"' : ""
-                    }>
-                  <img src="${f}" class="img-thumbnail" style="width:60px;height:60px;object-fit:cover;margin-right:4px;" />
-                </a>
-              `
-                  )
-                  .join("") ?? ""
-              }
-            </td>
+          <td>${new Date(scan.scan_date).toLocaleString("es-AR")}</td>
+          <td>${scan.marca ?? ""}</td>
+          <td>${scan.modelo ?? ""}</td>
+          <td>${scan.vin ?? ""}</td>
+          <td colspan="4" class="text-center">Sin daños</td>
+          <td>${scan.user ?? ""}</td>
+          <td class="text-center">
+            ${
+              scan.fotos?.length
+                ? `
+                  <a href="${scan.fotos[0]}"
+                     class="glightbox"
+                     data-gallery="gallery-${scan.scan_id}">
+                    <i class="bi bi-camera-fill text-primary fs-5"></i>
+                  </a>`
+                : ""
+            }
+          </td>
         </tr>
       `;
     } else {
-      // Si hay daños, 1 fila por daño
-      scan.damages.forEach((damage, dIdx) => {
+      scan.damages.forEach((damage) => {
         rows += `
           <tr>
-              <td>${scan.scan_id ?? ""}</td>
-              <td>${scan.vin ?? ""}</td>
-              <td>${damage.area ?? ""}</td>
-              <td>${damage.averia ?? ""}</td>
-              <td>${damage.grav ?? ""}</td>
-              <td>${damage.obs ?? ""}</td>
-              <td>${damage.codigo ?? ""}</td>
-              <td>
-                ${
-                  scan.fotos
-                    ?.map(
-                      (f, fIdx) => `
-                  <a href="${f}" class="glightbox" data-gallery="gallery-${
-                        scan.scan_id
-                      }" data-title="Imagen ${fIdx + 1} de ${
-                        scan.fotos.length
-                      }" ${fIdx > 0 ? 'style="display:none;"' : ""}>
-                    <img src="${f}" class="img-thumbnail" style="width:60px;height:60px;object-fit:cover;margin-right:4px;" />
-                  </a>
-                `
-                    )
-                    .join("") ?? ""
-                }
-              </td>
+            <td>${new Date(scan.scan_date).toLocaleString("es-AR")}</td>
+            <td>${scan.marca ?? ""}</td>
+            <td>${scan.modelo ?? ""}</td>
+            <td>${scan.vin ?? ""}</td>
+            <td>${damage.area ?? ""}</td>
+            <td>${damage.averia ?? ""}</td>
+            <td>${damage.grav ?? ""}</td>
+            <td class="wrap">${damage.obs ?? ""}</td>
+            <td>${scan.user ?? ""}</td>
+            <td class="text-center">
+              ${
+                scan.fotos?.length
+                  ? `
+                    <a href="${scan.fotos[0]}"
+                       class="glightbox"
+                       data-gallery="gallery-${scan.scan_id}">
+                      <i class="bi bi-camera-fill text-primary fs-5"></i>
+                    </a>`
+                  : ""
+              }
+            </td>
           </tr>
         `;
       });
@@ -132,27 +126,41 @@ function renderTabla() {
   });
 
   document.getElementById("resultados").innerHTML = `
-    <table class="table table-striped table-hover">
+    <div class="table-responsive">
+      <table
+        id="tabla-resultados"
+        class="table table-striped table-hover table-bordered table-auto"
+      >
         <thead>
-            <tr>
-                <th>Modelo</th>
-                <th>VIN</th>
-                <th>Area</th>
-                <th>Avería</th>
-                <th>Gravedad</th>
-                <th>Observación</th>
-                <th>Código</th>
-                <th>Fotos</th>
-            </tr>
+          <tr>
+            <th>Fecha</th>
+            <th>Marca</th>
+            <th>Modelo</th>
+            <th>VIN</th>
+            <th>Área</th>
+            <th>Avería</th>
+            <th>Gravedad</th>
+            <th>Observación</th>
+            <th>Usuario</th>
+            <th>Fotos</th>
+          </tr>
         </thead>
-        <tbody>
-            ${rows}
-        </tbody>
-    </table>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
   `;
 
-  // Inicializamos GLightbox en los nuevos elementos
-  const lightbox = GLightbox({
+  // 🔹 Ajuste automático inicial de ancho según contenido
+  const table = document.getElementById("tabla-resultados");
+  table.querySelectorAll("th").forEach((th) => {
+    th.style.width = th.scrollWidth + 20 + "px";
+  });
+
+  // 🔹 Activar resize manual
+  enableColumnResize("tabla-resultados");
+
+  // 🔹 Inicializar GLightbox
+  GLightbox({
     selector: ".glightbox",
     loop: true,
     zoomable: true,
@@ -212,5 +220,42 @@ function cambiarPagina(nuevaPagina) {
   setTimeout(() => {
     renderTabla();
     renderPaginacion();
+    enableColumnResize("tabla-resultados");
   }, 100); // 100ms
+}
+
+// Resizer tabla
+function enableColumnResize(tableId) {
+  const table = document.getElementById(tableId);
+  const headers = table.querySelectorAll("th");
+
+  headers.forEach((th) => {
+    if (th.querySelector(".th-resize")) return;
+
+    const resizer = document.createElement("div");
+    resizer.classList.add("th-resize");
+    th.appendChild(resizer);
+
+    let startX, startWidth;
+
+    resizer.addEventListener("mousedown", (e) => {
+      startX = e.pageX;
+      startWidth = th.offsetWidth;
+
+      function mouseMove(e) {
+        const newWidth = Math.max(60, startWidth + (e.pageX - startX));
+        th.style.width = newWidth + "px";
+      }
+
+      function mouseUp() {
+        document.removeEventListener("mousemove", mouseMove);
+        document.removeEventListener("mouseup", mouseUp);
+      }
+
+      document.addEventListener("mousemove", mouseMove);
+      document.addEventListener("mouseup", mouseUp);
+
+      e.preventDefault();
+    });
+  });
 }
