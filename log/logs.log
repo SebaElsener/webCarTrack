@@ -2765,3 +2765,17 @@
 {"level":40,"time":"2026-01-11T20:34:07.121Z","pid":9245,"hostname":"Sebastians-MacBook-Pro.local","msg":"Ruta '/favicon.ico' metodo 'GET' no implementada"}
 {"level":40,"time":"2026-01-11T20:40:48.361Z","pid":9245,"hostname":"Sebastians-MacBook-Pro.local","msg":"Ruta '/favicon.ico' metodo 'GET' no implementada"}
 {"level":40,"time":"2026-01-11T20:42:13.388Z","pid":9245,"hostname":"Sebastians-MacBook-Pro.local","msg":"Ruta '/favicon.ico' metodo 'GET' no implementada"}
+{"level":40,"time":"2026-01-11T20:44:01.267Z","pid":9245,"hostname":"Sebastians-MacBook-Pro.local","msg":"Ruta '/favicon.ico' metodo 'GET' no implementada"}
+{"level":40,"time":"2026-01-11T20:44:06.477Z","pid":9245,"hostname":"Sebastians-MacBook-Pro.local","msg":"Ruta '/favicon.ico' metodo 'GET' no implementada"}
+{"level":40,"time":"2026-01-11T20:44:18.121Z","pid":9245,"hostname":"Sebastians-MacBook-Pro.local","msg":"Ruta '/.well-known/appspecific/com.chrome.devtools.json' metodo 'GET' no implementada"}
+{"level":40,"time":"2026-01-11T20:46:02.311Z","pid":9245,"hostname":"Sebastians-MacBook-Pro.local","msg":"Ruta '/.well-known/appspecific/com.chrome.devtools.json' metodo 'GET' no implementada"}
+{"level":40,"time":"2026-01-11T20:53:27.168Z","pid":9245,"hostname":"Sebastians-MacBook-Pro.local","msg":"Ruta '/.well-known/appspecific/com.chrome.devtools.json' metodo 'GET' no implementada"}
+{"level":40,"time":"2026-01-11T20:53:27.289Z","pid":9245,"hostname":"Sebastians-MacBook-Pro.local","msg":"Ruta '/favicon.ico' metodo 'GET' no implementada"}
+{"level":40,"time":"2026-01-11T20:54:12.219Z","pid":9245,"hostname":"Sebastians-MacBook-Pro.local","msg":"Ruta '/.well-known/appspecific/com.chrome.devtools.json' metodo 'GET' no implementada"}
+{"level":40,"time":"2026-01-11T20:54:12.286Z","pid":9245,"hostname":"Sebastians-MacBook-Pro.local","msg":"Ruta '/favicon.ico' metodo 'GET' no implementada"}
+{"level":40,"time":"2026-01-11T20:55:39.612Z","pid":9245,"hostname":"Sebastians-MacBook-Pro.local","msg":"Ruta '/.well-known/appspecific/com.chrome.devtools.json' metodo 'GET' no implementada"}
+{"level":40,"time":"2026-01-11T20:55:39.737Z","pid":9245,"hostname":"Sebastians-MacBook-Pro.local","msg":"Ruta '/favicon.ico' metodo 'GET' no implementada"}
+{"level":40,"time":"2026-01-11T20:57:09.712Z","pid":9245,"hostname":"Sebastians-MacBook-Pro.local","msg":"Ruta '/.well-known/appspecific/com.chrome.devtools.json' metodo 'GET' no implementada"}
+{"level":40,"time":"2026-01-11T20:57:09.822Z","pid":9245,"hostname":"Sebastians-MacBook-Pro.local","msg":"Ruta '/favicon.ico' metodo 'GET' no implementada"}
+{"level":40,"time":"2026-01-11T21:04:10.869Z","pid":9245,"hostname":"Sebastians-MacBook-Pro.local","msg":"Ruta '/.well-known/appspecific/com.chrome.devtools.json' metodo 'GET' no implementada"}
+{"level":40,"time":"2026-01-11T21:04:10.946Z","pid":9245,"hostname":"Sebastians-MacBook-Pro.local","msg":"Ruta '/favicon.ico' metodo 'GET' no implementada"}

@@ -40,7 +40,6 @@ async function cargarDatos(desde, hasta) {
       return res.json();
     })
     .then((data) => {
-      //console.log("Datos", data);
       if (!Array.isArray(data) || data.length === 0) {
         document.getElementById("resultados").innerHTML =
           "<p class='text-muted'>No se encontraron datos</p>";
@@ -48,7 +47,6 @@ async function cargarDatos(desde, hasta) {
         return;
       }
 
-      console.log(data);
       datosGlobales = data;
       paginaActual = 1;
       renderTabla();
