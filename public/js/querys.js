@@ -80,7 +80,7 @@ function renderTabla() {
           <td>${scan.modelo ?? ""}</td>
           <td>${scan.vin ?? ""}</td>
           <td colspan="4" class="text-center">Sin daños</td>
-          <td>${scan.clima ?? ""}</td>
+          <td>${renderClimaIcon(scan.clima)}</td>
           <td>${scan.user ?? ""}</td>
           <td class="text-center">
             ${
@@ -121,7 +121,7 @@ function renderTabla() {
             <td>${damage.averia ?? ""}</td>
             <td>${damage.grav ?? ""}</td>
             <td class="wrap">${damage.obs ?? ""}</td>
-            <td>${scan.clima ?? ""}</td>
+            <td>${renderClimaIcon(scan.clima)}</td>
             <td>${scan.user ?? ""}</td>
             <td class="text-center">
               ${
@@ -290,4 +290,30 @@ function enableColumnResize(tableId) {
       e.preventDefault();
     });
   });
+}
+
+function renderClimaIcon(clima) {
+  if (!clima) return "";
+
+  const c = clima.toLowerCase();
+
+  switch (c) {
+    case "sunny":
+      return `<i class="mdi mdi-weather-sunny text-warning" title="Sunny"></i>`;
+
+    case "night":
+      return `<i class="mdi mdi-weather-night text-dark" title="Night"></i>`;
+
+    case "rain":
+      return `<i class="mdi mdi-weather-rainy text-primary" title="Rain"></i>`;
+
+    case "frost":
+      return `<i class="mdi mdi-snowflake text-info" title="Frost"></i>`;
+
+    case "dew":
+      return `<i class="mdi mdi-water-outline text-secondary" title="Dew"></i>`;
+
+    default:
+      return `<i class="mdi mdi-help-circle-outline text-muted" title="${clima}"></i>`;
+  }
 }

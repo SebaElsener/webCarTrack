@@ -1092,3 +1092,8 @@ thead {
 .dateTh {
   width: 122px;
 }
+
+.mdi {
+  font-size: 22px;
+  vertical-align: middle;
+}
