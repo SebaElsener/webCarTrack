@@ -48,6 +48,7 @@ async function cargarDatos(desde, hasta) {
         return;
       }
 
+      console.log(data);
       datosGlobales = data;
       paginaActual = 1;
       renderTabla();
@@ -79,16 +80,30 @@ function renderTabla() {
           <td>${scan.modelo ?? ""}</td>
           <td>${scan.vin ?? ""}</td>
           <td colspan="4" class="text-center">Sin daños</td>
+          <td>${scan.clima ?? ""}</td>
           <td>${scan.user ?? ""}</td>
           <td class="text-center">
             ${
               scan.fotos?.length
-                ? `
-                  <a href="${scan.fotos[0]}"
-                     class="glightbox"
-                     data-gallery="gallery-${scan.scan_id}">
-                    <i class="bi bi-camera-fill text-primary fs-5"></i>
-                  </a>`
+                ? scan.fotos
+                    .map(
+                      (f, idx) => `
+                        <a
+                          href="${f}"
+                          class="glightbox"
+                          data-gallery="gallery-${scan.scan_id}"
+                          data-title="Imagen ${idx + 1} de ${scan.fotos.length}"
+                          ${idx > 0 ? 'style="display:none"' : ""}
+                        >
+                          ${
+                            idx === 0
+                              ? `<i class="bi bi-camera-fill" style="font-size:1.2rem;color:#007bff;"></i>`
+                              : ""
+                          }
+                        </a>
+                      `
+                    )
+                    .join("")
                 : ""
             }
           </td>
@@ -106,16 +121,32 @@ function renderTabla() {
             <td>${damage.averia ?? ""}</td>
             <td>${damage.grav ?? ""}</td>
             <td class="wrap">${damage.obs ?? ""}</td>
+            <td>${scan.clima ?? ""}</td>
             <td>${scan.user ?? ""}</td>
             <td class="text-center">
               ${
                 scan.fotos?.length
-                  ? `
-                    <a href="${scan.fotos[0]}"
-                       class="glightbox"
-                       data-gallery="gallery-${scan.scan_id}">
-                      <i class="bi bi-camera-fill text-primary fs-5"></i>
-                    </a>`
+                  ? scan.fotos
+                      .map(
+                        (f, idx) => `
+                          <a
+                            href="${f}"
+                            class="glightbox"
+                            data-gallery="gallery-${scan.scan_id}"
+                            data-title="Imagen ${idx + 1} de ${
+                          scan.fotos.length
+                        }"
+                            ${idx > 0 ? 'style="display:none"' : ""}
+                          >
+                            ${
+                              idx === 0
+                                ? `<i class="bi bi-camera-fill" style="font-size:1.2rem;color:#007bff;"></i>`
+                                : ""
+                            }
+                          </a>
+                        `
+                      )
+                      .join("")
                   : ""
               }
             </td>
@@ -133,14 +164,15 @@ function renderTabla() {
       >
         <thead>
           <tr>
-            <th>Fecha</th>
+            <th class="dateTh">Fecha</th>
             <th>Marca</th>
             <th>Modelo</th>
-            <th>VIN</th>
+            <th class="VINth">VIN</th>
             <th>Área</th>
             <th>Avería</th>
             <th>Gravedad</th>
             <th>Observación</th>
+            <th>Clima</th>
             <th>Usuario</th>
             <th>Fotos</th>
           </tr>

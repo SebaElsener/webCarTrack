@@ -1084,3 +1084,11 @@ thead {
   user-select: none;
   z-index: 30;
 }
+
+.VINth {
+  width: 210px;
+}
+
+.dateTh {
+  width: 122px;
+}
