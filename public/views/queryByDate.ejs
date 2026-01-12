@@ -50,30 +50,49 @@
       </form>
     </div>
 
-    <div class="row mb-3 g-3 align-items-end">
-      <div class="col-md-3">
-        <label class="form-label fw-bold">Marca</label>
-        <select id="filtroMarca" class="form-select">
-          <option value="">Todas</option>
-        </select>
-      </div>
+    <div class="card mb-3 shadow-sm" id="filtersCard">
+      <div class="card-body">
+        <div class="row g-3 align-items-end">
+          <!-- Marca -->
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Marca</label>
+            <select id="filtroMarca" class="form-select">
+              <option value="">Todas</option>
+            </select>
+          </div>
 
-      <div class="col-md-3 form-check">
-        <input class="form-check-input" type="checkbox" id="chkTopAreas" />
-        <label class="form-check-label fw-bold" for="chkTopAreas">
-          Top 5 Áreas dañadas
-        </label>
-      </div>
+          <!-- Checks -->
+          <div class="col-md-8">
+            <label class="form-label fw-semibold">Estadísticas</label>
+            <div class="d-flex gap-4 flex-wrap">
+              <div class="form-check form-switch">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="chkTopAreas"
+                />
+                <label class="form-check-label" for="chkTopAreas">
+                  Top 5 Áreas dañadas
+                </label>
+              </div>
 
-      <div class="col-md-3 form-check">
-        <input class="form-check-input" type="checkbox" id="chkTopAverias" />
-        <label class="form-check-label fw-bold" for="chkTopAverias">
-          Top 5 Tipos de daños
-        </label>
+              <div class="form-check form-switch">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="chkTopAverias"
+                />
+                <label class="form-check-label" for="chkTopAverias">
+                  Top 5 Tipos de daño
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div id="estadisticas" class="mb-3"></div>
+    <div id="estadisticas" class="row g-3 mb-3"></div>
 
     <div id="resultados" class="container-fluid mt-4"></div>
 

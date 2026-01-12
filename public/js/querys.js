@@ -23,7 +23,7 @@ document.getElementById("form-fechas").addEventListener("submit", async (e) => {
   cargarDatos(desde, hasta);
 });
 
-const FILAS_POR_PAGINA = 20;
+const FILAS_POR_PAGINA = 10;
 let paginaActual = 1;
 let datosGlobales = [];
 
@@ -378,20 +378,42 @@ document.getElementById("chkTopAverias").addEventListener("change", (e) => {
 });
 
 function aplicarFiltros() {
-  let data = [...datosGlobales];
+  const tabla = document.getElementById("resultados");
+  const stats = document.getElementById("estadisticas");
 
-  // 🔹 Filtrar por marca
-  if (filtros.marca) {
-    data = data.filter((d) => d.marca === filtros.marca);
-  }
+  // Animación salida
+  tabla?.classList.add("fade-out");
+  stats?.classList.add("fade-out");
 
-  // 🔹 Render estadísticas
-  renderEstadisticas(data);
+  setTimeout(() => {
+    let data = [...datosGlobales];
 
-  // 🔹 Render tabla normal
-  paginaActual = 1;
-  renderTablaFiltrada(data);
-  renderPaginacionFiltrada(data);
+    // 🔹 Filtro marca
+    if (filtros.marca) {
+      data = data.filter((d) => d.marca === filtros.marca);
+    }
+
+    // 🔹 Reset página
+    paginaActual = 1;
+
+    // 🔹 Render
+    renderEstadisticas(data);
+    renderTablaFiltrada(data);
+    renderPaginacionFiltrada(data);
+
+    // 🔹 Entrada animada
+    tabla?.classList.remove("fade-out");
+    stats?.classList.remove("fade-out");
+
+    tabla?.classList.add("fade-in");
+    stats?.classList.add("fade-in");
+
+    // limpiar clase luego
+    setTimeout(() => {
+      tabla?.classList.remove("fade-in");
+      stats?.classList.remove("fade-in");
+    }, 300);
+  }, 200);
 }
 
 function contarPorCampo(scans, campo) {
@@ -415,28 +437,58 @@ function renderEstadisticas(data) {
   cont.innerHTML = "";
 
   if (filtros.topAreas) {
-    const top = contarPorCampo(data, "area");
-    cont.innerHTML += renderBadgeList("Top 5 Áreas dañadas", top);
+    const top = contarPorCampo(data, "area_desc");
+    cont.innerHTML += renderMiniChartList(
+      "Top 5 Áreas dañadas",
+      top
+    );
   }
 
   if (filtros.topAverias) {
-    const top = contarPorCampo(data, "averia");
-    cont.innerHTML += renderBadgeList("Top 5 Tipos de daños", top);
+    const top = contarPorCampo(data, "averia_desc");
+    cont.innerHTML += renderMiniChartList(
+      "Top 5 Tipos de daño",
+      top
+    );
   }
 }
 
-function renderBadgeList(titulo, lista) {
+
+function renderMiniChartList(titulo, lista) {
+  const max = Math.max(...lista.map(([, v]) => v), 1);
+
   return `
-    <div class="mb-2">
-      <strong>${titulo}</strong><br>
-      ${lista
-        .map(
-          ([k, v]) => `<span class="badge bg-primary me-1">${k} (${v})</span>`
-        )
-        .join("")}
+    <div class="col-md-6 col-lg-4 fade-slide">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h6 class="card-title text-primary fw-semibold mb-3">
+            ${titulo}
+          </h6>
+
+          ${
+            lista.length
+              ? lista
+                  .map(([k, v]) => {
+                    const pct = Math.round((v / max) * 100);
+                    return `
+                      <div class="mini-chart-row mb-2">
+                        <small class="text-nowrap">${k}</small>
+                        <div class="mini-bar-container">
+                          <div class="mini-bar" style="width:${pct}%"></div>
+                        </div>
+                        <small class="text-muted">${v}</small>
+                      </div>
+                    `;
+                  })
+                  .join("")
+              : `<span class="text-muted">Sin datos</span>`
+          }
+        </div>
+      </div>
     </div>
   `;
 }
+
 
 let datosFiltrados = [];
 
