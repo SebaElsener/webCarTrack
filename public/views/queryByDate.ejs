@@ -50,6 +50,31 @@
       </form>
     </div>
 
+    <div class="row mb-3 g-3 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label fw-bold">Marca</label>
+        <select id="filtroMarca" class="form-select">
+          <option value="">Todas</option>
+        </select>
+      </div>
+
+      <div class="col-md-3 form-check">
+        <input class="form-check-input" type="checkbox" id="chkTopAreas" />
+        <label class="form-check-label fw-bold" for="chkTopAreas">
+          Top 5 Áreas dañadas
+        </label>
+      </div>
+
+      <div class="col-md-3 form-check">
+        <input class="form-check-input" type="checkbox" id="chkTopAverias" />
+        <label class="form-check-label fw-bold" for="chkTopAverias">
+          Top 5 Tipos de daños
+        </label>
+      </div>
+    </div>
+
+    <div id="estadisticas" class="mb-3"></div>
+
     <div id="resultados" class="container-fluid mt-4"></div>
 
     <div id="paginacion"></div>

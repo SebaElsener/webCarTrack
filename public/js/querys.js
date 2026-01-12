@@ -30,7 +30,14 @@ function mostrarSpinner() {
 // Función para cargar datos desde el servidor
 async function cargarDatos(desde, hasta) {
   mostrarSpinner();
-
+  datosFiltrados = [];
+  filtros = {
+    marca: "",
+    topAreas: false,
+    topAverias: false,
+  };
+  document.getElementById("chkTopAreas").checked = false;
+  document.getElementById("chkTopAverias").checked = false;
   await fetch("/api/querys/queryByDate", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -40,6 +47,17 @@ async function cargarDatos(desde, hasta) {
       return res.json();
     })
     .then((data) => {
+      function cargarMarcas() {
+        const select = document.getElementById("filtroMarca");
+        const marcas = [
+          ...new Set(datosGlobales.map((d) => d.marca).filter(Boolean)),
+        ];
+
+        select.innerHTML =
+          `<option value="">Todas</option>` +
+          marcas.map((m) => `<option value="${m}">${m}</option>`).join("");
+      }
+
       if (!Array.isArray(data) || data.length === 0) {
         document.getElementById("resultados").innerHTML =
           "<p class='text-muted'>No se encontraron datos</p>";
@@ -49,6 +67,8 @@ async function cargarDatos(desde, hasta) {
 
       datosGlobales = data;
       paginaActual = 1;
+      cargarMarcas();
+      aplicarFiltros();
       renderTabla();
       renderPaginacion();
       enableColumnResize("tabla-resultados");
@@ -65,7 +85,7 @@ async function cargarDatos(desde, hasta) {
 function renderTabla() {
   const inicio = (paginaActual - 1) * FILAS_POR_PAGINA;
   const fin = inicio + FILAS_POR_PAGINA;
-  const paginaDatos = datosGlobales.slice(inicio, fin);
+  const paginaDatos = datosFiltrados.slice(inicio, fin);
 
   let rows = "";
 
@@ -314,4 +334,98 @@ function renderClimaIcon(clima) {
     default:
       return `<i class="mdi mdi-help-circle-outline text-muted" title="${clima}"></i>`;
   }
+}
+
+let filtros = {
+  marca: "",
+  topAreas: false,
+  topAverias: false,
+};
+
+document.getElementById("filtroMarca").addEventListener("change", (e) => {
+  filtros.marca = e.target.value;
+  aplicarFiltros();
+});
+
+document.getElementById("chkTopAreas").addEventListener("change", (e) => {
+  filtros.topAreas = e.target.checked;
+  aplicarFiltros();
+});
+
+document.getElementById("chkTopAverias").addEventListener("change", (e) => {
+  filtros.topAverias = e.target.checked;
+  aplicarFiltros();
+});
+
+function aplicarFiltros() {
+  let data = [...datosGlobales];
+
+  // 🔹 Filtrar por marca
+  if (filtros.marca) {
+    data = data.filter((d) => d.marca === filtros.marca);
+  }
+
+  // 🔹 Render estadísticas
+  renderEstadisticas(data);
+
+  // 🔹 Render tabla normal
+  paginaActual = 1;
+  renderTablaFiltrada(data);
+  renderPaginacionFiltrada(data);
+}
+
+function contarPorCampo(scans, campo) {
+  const contador = {};
+
+  scans.forEach((scan) => {
+    scan.damages?.forEach((d) => {
+      const key = d[campo];
+      if (!key) return;
+      contador[key] = (contador[key] || 0) + 1;
+    });
+  });
+
+  return Object.entries(contador)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5);
+}
+
+function renderEstadisticas(data) {
+  const cont = document.getElementById("estadisticas");
+  cont.innerHTML = "";
+
+  if (filtros.topAreas) {
+    const top = contarPorCampo(data, "area");
+    cont.innerHTML += renderBadgeList("Top 5 Áreas dañadas", top);
+  }
+
+  if (filtros.topAverias) {
+    const top = contarPorCampo(data, "averia");
+    cont.innerHTML += renderBadgeList("Top 5 Tipos de daños", top);
+  }
+}
+
+function renderBadgeList(titulo, lista) {
+  return `
+    <div class="mb-2">
+      <strong>${titulo}</strong><br>
+      ${lista
+        .map(
+          ([k, v]) => `<span class="badge bg-primary me-1">${k} (${v})</span>`
+        )
+        .join("")}
+    </div>
+  `;
+}
+
+let datosFiltrados = [];
+
+function renderTablaFiltrada(data) {
+  datosFiltrados = data;
+  renderTabla();
+}
+
+function renderPaginacionFiltrada(data) {
+  datosFiltrados = data;
+  renderPaginacion();
 }

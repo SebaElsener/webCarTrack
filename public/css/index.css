@@ -425,7 +425,9 @@ table {
   padding: 20px;
   min-width: 340px;
   table-layout: fixed;
-  border-collapse: collapse;
+  /* border-collapse: collapse; */
+  border-collapse: separate !important;
+  border-spacing: 0;
   margin: 0px auto;
 }
 
@@ -436,6 +438,7 @@ thead {
 
 th {
   padding: 8px;
+  position: relative;
 }
 
 td {
@@ -1038,7 +1041,7 @@ thead {
 .table-responsive {
   max-height: 65vh; /* ajustable */
   overflow: auto;
-  position: relative;
+  /* position: relative; */
 }
 
 /* tabla */
