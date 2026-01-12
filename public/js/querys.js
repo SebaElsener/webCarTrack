@@ -26,6 +26,9 @@ document.getElementById("form-fechas").addEventListener("submit", async (e) => {
 const FILAS_POR_PAGINA = 10;
 let paginaActual = 1;
 let datosGlobales = [];
+let datosBaseFiltrados = [];
+let datosTabla = [];
+
 
 // Función para mostrar spinner
 function mostrarSpinner() {
@@ -47,6 +50,8 @@ async function cargarDatos(desde, hasta) {
     topAreas: false,
     topAverias: false,
     soloConDanio: false,
+      areaSeleccionada: null,
+  averiaSeleccionada: null,
   };
   document.getElementById("chkTopAreas").checked = false;
   document.getElementById("chkTopAverias").checked = false;
@@ -90,9 +95,9 @@ async function cargarDatos(desde, hasta) {
       paginaActual = 1;
       cargarMarcas();
       aplicarFiltros();
-      renderTabla();
-      renderPaginacion();
-      enableColumnResize("tabla-resultados");
+      // renderTabla();
+      // renderPaginacion();
+      // enableColumnResize("tabla-resultados");
     })
     .catch((err) => {
       console.error(err);
@@ -366,10 +371,16 @@ let filtros = {
   topAreas: false,
   topAverias: false,
   soloConDanio: false,
+    areaSeleccionada: null,
+  averiaSeleccionada: null, 
 };
 
 document.getElementById("filtroMarca").addEventListener("change", (e) => {
   filtros.marca = e.target.value;
+  // 🔹 Limpiar selección de barras
+  filtros.areaSeleccionada = null;
+  filtros.averiaSeleccionada = null;
+  document.querySelectorAll(".mini-bar-row").forEach(r => r.classList.remove("active"));
   aplicarFiltros();
 });
 
@@ -392,22 +403,55 @@ function aplicarFiltros() {
   stats?.classList.add("fade-out");
 
   setTimeout(() => {
-    let data = [...datosGlobales];
+    let dataBase = [...datosGlobales];
 
     // 🔹 Filtro marca
     if (filtros.marca) {
-      data = data.filter((d) => d.marca === filtros.marca);
+      dataBase = dataBase.filter((d) => d.marca === filtros.marca);
     }
 
     // 🔹 Solo VIN con daño
     if (filtros.soloConDanio) {
-      data = data.filter((scan) => scan.damages && scan.damages.length > 0);
+      dataBase = dataBase.filter((scan) => scan.damages && scan.damages.length > 0);
     }
+datosBaseFiltrados = dataBase;
+
+let dataTablaLocal = [...datosBaseFiltrados];
+
+if (filtros.areaSeleccionada) {
+  dataTablaLocal = dataTablaLocal
+    .map(scan => {
+      const filteredDamages = scan.damages?.filter(
+        d => d.area === filtros.areaSeleccionada
+      );
+      if (filteredDamages && filteredDamages.length) {
+        return { ...scan, damages: filteredDamages };
+      }
+      return null;
+    })
+    .filter(Boolean);
+}
+
+if (filtros.averiaSeleccionada) {
+  dataTablaLocal = dataTablaLocal
+    .map(scan => {
+      const filteredDamages = scan.damages?.filter(
+        d => d.averia === filtros.averiaSeleccionada
+      );
+      if (filteredDamages && filteredDamages.length) {
+        return { ...scan, damages: filteredDamages };
+      }
+      return null;
+    })
+    .filter(Boolean);
+}
+
+datosTabla = dataTablaLocal;
 
     // 🔹 Badge contador
     const badge = document.getElementById("badgeConDanio");
     if (filtros.soloConDanio) {
-      badge.textContent = `${data.length} VIN con daño`;
+      badge.textContent = `${dataBase.length} VIN con daño`;
       badge.classList.remove("d-none");
     } else {
       badge.classList.add("d-none");
@@ -419,10 +463,10 @@ function aplicarFiltros() {
     paginaActual = 1;
 
     // 🔹 Render
-    renderEstadisticas(data);
-    renderTablaFiltrada(data);
-    renderPaginacionFiltrada(data);
-    renderEvolucion(data);
+    renderEstadisticas(datosBaseFiltrados);
+    renderTablaFiltrada(datosTabla);
+    renderPaginacionFiltrada(datosTabla);
+    renderEvolucion(datosBaseFiltrados);
 
     // 🔹 Entrada animada
     tabla?.classList.remove("fade-out");
@@ -445,48 +489,72 @@ function renderEstadisticas(data) {
   cont.innerHTML = "";
 
   if (filtros.topAreas) {
-    const totalAreas = data.reduce((acc, scan) => {
-      scan.damages?.forEach((d) => {
-        if (d.area_desc) acc[d.area_desc] = (acc[d.area_desc] || 0) + 1;
-      });
-      return acc;
-    }, {});
+const totalAreas = data.reduce((acc, scan) => {
+  scan.damages?.forEach((d) => {
+    if (!d.area) return;
 
-    const top = Object.entries(totalAreas)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5);
+    if (!acc[d.area]) {
+      acc[d.area] = {
+        id: d.area,
+        label: d.area_desc,
+        value: 0,
+      };
+    }
 
-    cont.innerHTML += renderMiniChartList(
-      "Top 5 Áreas dañadas",
-      top,
-      Object.values(totalAreas).reduce((a, b) => a + b, 0)
-    );
+    acc[d.area].value++;
+  });
+  return acc;
+}, {});
+
+const top = Object.values(totalAreas)
+  .sort((a, b) => b.value - a.value)
+  .slice(0, 5);
+
+cont.innerHTML += renderMiniChartList(
+  "Top 5 Áreas dañadas",
+  top,
+  Object.values(totalAreas).reduce((acc, item) => acc + item.value, 0),
+  "area"
+);
+
   }
 
   if (filtros.topAverias) {
-    const totalAverias = data.reduce((acc, scan) => {
-      scan.damages?.forEach((d) => {
-        if (d.averia_desc) acc[d.averia_desc] = (acc[d.averia_desc] || 0) + 1;
-      });
-      return acc;
-    }, {});
+const totalAverias = data.reduce((acc, scan) => {
+  scan.damages?.forEach((d) => {
+    if (!d.averia) return;
 
-    const top = Object.entries(totalAverias)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5);
+    if (!acc[d.averia]) {
+      acc[d.averia] = {
+        id: d.averia,
+        label: d.averia_desc,
+        value: 0,
+      };
+    }
 
-    cont.innerHTML += renderMiniChartList(
-      "Top 5 Tipos de daño",
-      top,
-      Object.values(totalAverias).reduce((a, b) => a + b, 0)
-    );
+    acc[d.averia].value++;
+  });
+  return acc;
+}, {});
+
+const top = Object.values(totalAverias)
+  .sort((a, b) => b.value - a.value)
+  .slice(0, 5);
+
+cont.innerHTML += renderMiniChartList(
+  "Top 5 Tipos de daño",
+  top,
+  Object.values(totalAverias).reduce((acc, item) => acc + item.value, 0),
+  "averia"
+);
+
   }
 
   animateMiniCharts();
 }
 
-function renderMiniChartList(titulo, lista, total) {
-  const totalTop = lista.reduce((acc, [, v]) => acc + v, 0);
+function renderMiniChartList(titulo, lista, total, tipo) {
+  const totalTop = lista.reduce((acc, item) => acc + item.value, 0);
 
   return `
     <div class="mini-chart card mb-2 fade-slide">
@@ -498,31 +566,36 @@ function renderMiniChartList(titulo, lista, total) {
         ${
           lista.length
             ? lista
-                .map(([label, value]) => {
+                .map((item) => {
+                  const { id, label, value } = item
                   const pctGlobal = ((value / total) * 100).toFixed(1);
                   const pctTop = ((value / totalTop) * 100).toFixed(1);
+
                   return `
-                <div class="mini-bar-row d-flex align-items-center mb-2">
-                  <div class="label text-truncate" title="${label}">
-                    ${label}
-                  </div>
+                    <div 
+                      class="mini-bar-row d-flex align-items-center mb-2 clickable"
+                      data-tipo="${tipo}"
+                      data-id="${id}"
+                    >
+                      <div class="label text-truncate" title="${label}">
+                        ${label}
+                      </div>
 
-                  <div class="bar-wrapper"
-                       data-label="${label}"
-                       data-value="${value}"
-                       data-pct="${pctTop}">
-                    <div class="bar"></div>
+                      <div class="bar-wrapper">
+                        <div class="bar" data-width="${pctGlobal}"></div>
 
-                    <div class="mini-tooltip">
-                      <strong>${label}</strong><br>
-                      ${value} casos<br>
-                      <span class="pct">${pctGlobal}% global · ${pctTop}% top 5</span>
+                        <div class="mini-tooltip">
+                          <strong>${label}</strong><br>
+                          ${value} casos<br>
+                          <span class="pct">
+                            ${pctGlobal}% global · ${pctTop}% top 5
+                          </span>
+                        </div>
+                      </div>
+
+                      <div class="value">${value}</div>
                     </div>
-                  </div>
-
-                  <div class="value">${value}</div>
-                </div>
-              `;
+                  `;
                 })
                 .join("")
             : `<span class="text-muted">Sin datos</span>`
@@ -532,17 +605,24 @@ function renderMiniChartList(titulo, lista, total) {
   `;
 }
 
+
 // 🔹 Activar animación de width al insertar el HTML
 function animateMiniCharts() {
-  document.querySelectorAll(".bar-wrapper").forEach((wrap) => {
-    const bar = wrap.querySelector(".bar");
-    const pct = Number(wrap.dataset.pct) || 0;
+  document.querySelectorAll(".bar").forEach((bar) => {
+    const width = bar.dataset.width;
+    if (!width) return;
+
+    // reset explícito
+    bar.style.width = "0%";
 
     requestAnimationFrame(() => {
-      bar.style.width = pct + "%";
+      requestAnimationFrame(() => {
+        bar.style.width = width + "%";
+      });
     });
   });
 }
+
 
 let datosFiltrados = [];
 
@@ -620,5 +700,55 @@ document.addEventListener("mousemove", (e) => {
 
 document.getElementById("chkSoloConDanio").addEventListener("change", (e) => {
   filtros.soloConDanio = e.target.checked;
+  aplicarFiltros();
+});
+
+document.addEventListener("click", (e) => {
+  const row = e.target.closest(".mini-bar-row.clickable");
+  if (!row) return;
+
+  const tipo = row.dataset.tipo;
+  const id = row.dataset.id;
+
+  // toggle
+const yaActivo =
+  (tipo === "area" && filtros.areaSeleccionada === id) ||
+  (tipo === "averia" && filtros.averiaSeleccionada === id);
+
+filtros.areaSeleccionada = null;
+filtros.averiaSeleccionada = null;
+
+if (!yaActivo) {
+  if (tipo === "area") filtros.areaSeleccionada = id;
+  if (tipo === "averia") filtros.averiaSeleccionada = id;
+}
+
+
+  // feedback visual
+  document
+    .querySelectorAll(".mini-bar-row")
+    .forEach((r) => r.classList.remove("active"));
+
+  if (!yaActivo) row.classList.add("active");
+
+  aplicarFiltros();
+});
+
+document.getElementById("btnLimpiarFiltros").addEventListener("click", () => {
+  // 🔹 Reset filtros
+  filtros.marca = "";
+  filtros.soloConDanio = false;
+  filtros.areaSeleccionada = null;
+  filtros.averiaSeleccionada = null;
+  filtros.topAreas = false;
+  filtros.topAverias = false;
+
+  // 🔹 Reset elementos del DOM
+  document.getElementById("filtroMarca").value = "";
+  document.getElementById("chkSoloConDanio").checked = false;
+  document.getElementById("chkTopAreas").checked = false;
+  document.getElementById("chkTopAverias").checked = false;
+  document.querySelectorAll(".mini-bar-row").forEach(r => r.classList.remove("active"));
+
   aplicarFiltros();
 });

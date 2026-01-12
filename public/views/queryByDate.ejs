@@ -52,17 +52,26 @@
 
     <div class="card mb-3 shadow-sm" id="filtersCard">
       <div class="card-body">
-        <div class="row g-3 align-items-top">
+        <div
+          class="row g-3 align-items-top"
+          style="justify-content: center; gap: 3rem"
+        >
           <!-- Marca -->
-          <div class="col-md-4">
+          <div class="col-md-5">
             <label class="form-label fw-semibold">Marca</label>
             <select id="filtroMarca" class="form-select">
               <option value="">Todas</option>
             </select>
+            <button
+              id="btnLimpiarFiltros"
+              class="btn btn-sm btn-outline-secondary ms-2"
+            >
+              Limpiar filtros
+            </button>
           </div>
 
           <!-- Checks -->
-          <div class="col-md-8">
+          <div class="col-md-5">
             <label class="form-label fw-semibold">Estadísticas</label>
             <div class="d-flex gap-4 flex-wrap">
               <div class="form-check form-switch">
@@ -93,9 +102,8 @@
     </div>
 
     <div id="estadisticas" class="row g-3 mb-3"></div>
-    <div id="evolucion" class="mt-4"></div>
 
-    <div class="d-flex justify-content-start align-items-center mt-5 mx-5">
+    <div class="d-flex justify-content-start align-items-center mx-5">
       <div class="form-check form-switch">
         <input class="form-check-input" type="checkbox" id="chkSoloConDanio" />
         <label class="form-check-label fw-semibold" for="chkSoloConDanio">
@@ -108,6 +116,8 @@
     <div id="resultados" class="container-fluid"></div>
 
     <div id="paginacion"></div>
+
+    <div id="evolucion" class="mt-4"></div>
 
     <div class="container mt-4">
       <a class="formBackLink" href="/api/productos"
