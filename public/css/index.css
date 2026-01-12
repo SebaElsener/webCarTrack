@@ -586,10 +586,6 @@ tbody tr:nth-child(even) {
   margin: 0 auto;
 }
 
-.VINth {
-  width: 300px;
-}
-
 .gotoLogin,
 .retryLogin {
   font-size: 1.3rem;
@@ -1099,4 +1095,24 @@ thead {
 .mdi {
   font-size: 22px;
   vertical-align: middle;
+}
+
+.areaTh {
+  width: 240px;
+}
+
+.averiaTh {
+  width: 200px;
+}
+
+.gravTh {
+  width: 120px;
+}
+
+.climaTh {
+  width: 60px !important;
+}
+
+.fotosTh {
+  width: 60px !important;
 }

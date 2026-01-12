@@ -1,3 +1,14 @@
+import areas from "../utils/areas.json" with { type: "json" }
+import averias from "../utils/averias.json" with { type: "json" }
+import gravedades from "../utils/gravedades.json" with { type: "json" }
+
+const indexById = (arr) =>
+  Object.fromEntries(arr.map((i) => [i.id, i.descripcion]));
+
+const areasMap = indexById(areas);
+const averiasMap = indexById(averias);
+const gravedadesMap = indexById(gravedades);
+
 document.getElementById("form-fechas").addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -64,8 +75,17 @@ async function cargarDatos(desde, hasta) {
         document.getElementById("paginacion").innerHTML = "";
         return;
       }
+      const transformScans = data.map((scan) => ({
+        ...scan,
+        damages: scan.damages.map((d) => ({
+          ...d,
+          area_desc: areasMap[d.area] ?? null,
+          averia_desc: averiasMap[d.averia] ?? null,
+          grav_desc: gravedadesMap[d.grav] ?? null,
+        })),
+      }));
 
-      datosGlobales = data;
+      datosGlobales = transformScans;
       paginaActual = 1;
       cargarMarcas();
       aplicarFiltros();
@@ -135,9 +155,9 @@ function renderTabla() {
             <td>${scan.marca ?? ""}</td>
             <td>${scan.modelo ?? ""}</td>
             <td>${scan.vin ?? ""}</td>
-            <td>${damage.area ?? ""}</td>
-            <td>${damage.averia ?? ""}</td>
-            <td>${damage.grav ?? ""}</td>
+            <td>${damage.area_desc ?? ""}</td>
+            <td>${damage.averia_desc ?? ""}</td>
+            <td>${damage.grav_desc ?? ""}</td>
             <td class="wrap">${damage.obs ?? ""}</td>
             <td>${renderClimaIcon(scan.clima)}</td>
             <td>${scan.user ?? ""}</td>
@@ -186,13 +206,13 @@ function renderTabla() {
             <th>Marca</th>
             <th>Modelo</th>
             <th class="VINth">VIN</th>
-            <th>Área</th>
-            <th>Avería</th>
-            <th>Gravedad</th>
+            <th class="areaTh">Area</th>
+            <th class="averiaTh">Avería</th>
+            <th class="gravTh">Gravedad</th>
             <th>Observación</th>
-            <th>Clima</th>
+            <th class="climaTh">Clima</th>
             <th>Usuario</th>
-            <th>Fotos</th>
+            <th class="fotosTh">Fotos</th>
           </tr>
         </thead>
         <tbody>${rows}</tbody>
@@ -222,43 +242,43 @@ function renderTabla() {
 
 // Render de paginación
 function renderPaginacion() {
-  const totalPaginas = Math.ceil(datosGlobales.length / FILAS_POR_PAGINA);
+  const totalPaginas = Math.ceil(datosFiltrados.length / FILAS_POR_PAGINA);
   let html = `<nav><ul class="pagination justify-content-center">`;
 
   html += `
-        <li class="page-item ${paginaActual === 1 ? "disabled" : ""}">
-            <button class="page-link" onclick="cambiarPagina(${
-              paginaActual - 1
-            })">Anterior</button>
-        </li>
-    `;
+    <li class="page-item ${paginaActual === 1 ? "disabled" : ""}">
+      <button class="page-link" data-page="${paginaActual - 1}">Anterior</button>
+    </li>
+  `;
 
   for (let i = 1; i <= totalPaginas; i++) {
     html += `
-            <li class="page-item ${paginaActual === i ? "active" : ""}">
-                <button class="page-link" onclick="cambiarPagina(${i})">${i}</button>
-            </li>
-        `;
+      <li class="page-item ${paginaActual === i ? "active" : ""}">
+        <button class="page-link" data-page="${i}">${i}</button>
+      </li>
+    `;
   }
 
   html += `
-        <li class="page-item ${
-          paginaActual === totalPaginas ? "disabled" : ""
-        }">
-            <button class="page-link" onclick="cambiarPagina(${
-              paginaActual + 1
-            })">Siguiente</button>
-        </li>
-    `;
+    <li class="page-item ${paginaActual === totalPaginas ? "disabled" : ""}">
+      <button class="page-link" data-page="${paginaActual + 1}">Siguiente</button>
+    </li>
+  `;
 
   html += `</ul></nav>`;
-
   document.getElementById("paginacion").innerHTML = html;
+
+  // 🔹 Listener único
+  document.querySelectorAll("#paginacion button[data-page]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      cambiarPagina(Number(btn.dataset.page));
+    });
+  });
 }
 
 // Cambiar de página con spinner
 function cambiarPagina(nuevaPagina) {
-  const totalPaginas = Math.ceil(datosGlobales.length / FILAS_POR_PAGINA);
+  const totalPaginas = Math.ceil(datosFiltrados.length / FILAS_POR_PAGINA);
   if (nuevaPagina < 1 || nuevaPagina > totalPaginas) return;
 
   paginaActual = nuevaPagina;
