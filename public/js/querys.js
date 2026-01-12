@@ -491,7 +491,7 @@ function renderMiniChartList(titulo, lista, total) {
   return `
     <div class="mini-chart card mb-2 fade-slide">
       <div class="card-body py-2">
-        <h6 class="card-title text-primary fw-semibold mb-3">
+        <h6 class="card-title text-primary fw-semibold mt-2 mb-3">
           ${titulo}
         </h6>
 

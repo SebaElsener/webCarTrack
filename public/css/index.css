@@ -653,7 +653,7 @@ tbody tr:nth-child(even) {
 
 .formTitle {
   text-align: center;
-  margin: 3rem 0;
+  margin: 1.5rem 0;
 }
 
 .tableTd {
@@ -1145,6 +1145,10 @@ thead {
   gap: 8px;
 }
 
+.mini-chart {
+  max-width: 39rem !important;
+}
+
 .mini-bar-container {
   flex: 1;
   height: 8px;
@@ -1189,6 +1193,7 @@ thead {
   margin-left: 2rem;
   margin-right: 2rem;
   margin-bottom: 0 !important;
+  justify-content: space-between;
 }
 
 #filtersCard {
@@ -1235,6 +1240,7 @@ thead {
   align-items: center;
   gap: 8px;
   margin-bottom: 6px;
+  width: 35em;
 }
 
 .bar-wrapper {
@@ -1269,7 +1275,7 @@ thead {
 }
 
 .mini-bar-row .label {
-  flex: 0 0 140px;
+  flex: 0 0 240px;
   font-size: 0.85rem;
   white-space: nowrap;
   overflow: hidden;
@@ -1361,4 +1367,23 @@ thead {
 
 .badge.show {
   transform: scale(1.05);
+}
+
+.form-label,
+.form-check-label {
+  color: #5e6366e0;
+}
+
+.form-check {
+  display: FLEX !important;
+  align-items: CENTER;
+  gap: 15px;
+}
+
+.form-check-label {
+  margin-right: 15px;
+}
+
+.col-md-8 {
+  padding-left: 60px !important;
 }
