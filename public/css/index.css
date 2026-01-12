@@ -1332,6 +1332,33 @@ thead {
   font-weight: 600;
 }
 
-/* #estadisticas .card {
-  overflow: visible !important;
-} */
+/* 🔹 Hover highlight barra */
+.bar-wrapper:hover .bar {
+  filter: brightness(1.15);
+  box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.35);
+}
+
+/* 🔹 Efecto “focus” en toda la fila */
+.mini-bar-row:hover {
+  background: rgba(13, 110, 253, 0.05);
+  border-radius: 6px;
+}
+
+/* 🔹 Pequeño crecimiento vertical */
+.bar-wrapper:hover .bar {
+  height: 18px;
+}
+
+.bar {
+  height: 14px;
+  transition: width 0.5s ease, filter 0.15s ease, box-shadow 0.15s ease,
+    height 0.15s ease;
+}
+
+.badge {
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.badge.show {
+  transform: scale(1.05);
+}

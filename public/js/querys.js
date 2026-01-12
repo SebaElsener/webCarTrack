@@ -46,6 +46,7 @@ async function cargarDatos(desde, hasta) {
     marca: "",
     topAreas: false,
     topAverias: false,
+    soloConDanio: false,
   };
   document.getElementById("chkTopAreas").checked = false;
   document.getElementById("chkTopAverias").checked = false;
@@ -364,6 +365,7 @@ let filtros = {
   marca: "",
   topAreas: false,
   topAverias: false,
+  soloConDanio: false,
 };
 
 document.getElementById("filtroMarca").addEventListener("change", (e) => {
@@ -396,6 +398,22 @@ function aplicarFiltros() {
     if (filtros.marca) {
       data = data.filter((d) => d.marca === filtros.marca);
     }
+
+    // 🔹 Solo VIN con daño
+    if (filtros.soloConDanio) {
+      data = data.filter((scan) => scan.damages && scan.damages.length > 0);
+    }
+
+    // 🔹 Badge contador
+    const badge = document.getElementById("badgeConDanio");
+    if (filtros.soloConDanio) {
+      badge.textContent = `${data.length} VIN con daño`;
+      badge.classList.remove("d-none");
+    } else {
+      badge.classList.add("d-none");
+    }
+    badge.classList.add("show");
+    setTimeout(() => badge.classList.remove("show"), 200);
 
     // 🔹 Reset página
     paginaActual = 1;
@@ -598,4 +616,9 @@ document.addEventListener("mousemove", (e) => {
   x = Math.max(10, Math.min(x, rect.width - 10));
 
   tooltip.style.left = x + "px";
+});
+
+document.getElementById("chkSoloConDanio").addEventListener("change", (e) => {
+  filtros.soloConDanio = e.target.checked;
+  aplicarFiltros();
 });
