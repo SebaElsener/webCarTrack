@@ -1372,6 +1372,11 @@ thead {
   transform: scale(1.05);
 }
 
+#badgeConDanio {
+  padding: 8px;
+  font-size: 0.9rem;
+}
+
 .form-label,
 .form-check-label {
   color: #5e6366e0;
@@ -1405,7 +1410,8 @@ thead {
 }
 
 #btnLimpiarFiltros {
-  margin-left: 0 !important;
-  margin-top: 1.5rem;
-  margin-bottom: 1rem;
+  margin-right: 2rem;
+  padding: 8px;
+  font-size: 0.9rem;
+  width: 8rem;
 }

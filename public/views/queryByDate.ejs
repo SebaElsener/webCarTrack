@@ -62,12 +62,6 @@
             <select id="filtroMarca" class="form-select">
               <option value="">Todas</option>
             </select>
-            <button
-              id="btnLimpiarFiltros"
-              class="btn btn-sm btn-outline-secondary ms-2"
-            >
-              Limpiar filtros
-            </button>
           </div>
 
           <!-- Checks -->
@@ -103,14 +97,20 @@
 
     <div id="estadisticas" class="row g-3 mb-3"></div>
 
-    <div class="d-flex justify-content-start align-items-center mx-5">
+    <div class="d-flex justify-content-start align-items-center mt-2 mx-5">
+      <button
+        id="btnLimpiarFiltros"
+        class="btn btn-sm btn-outline-secondary ms-2"
+      >
+        Limpiar filtros
+      </button>
       <div class="form-check form-switch">
         <input class="form-check-input" type="checkbox" id="chkSoloConDanio" />
         <label class="form-check-label fw-semibold" for="chkSoloConDanio">
           Solo VIN con daño
         </label>
+        <span id="badgeConDanio" class="badge bg-primary d-none"></span>
       </div>
-      <span id="badgeConDanio" class="badge bg-primary d-none"></span>
     </div>
 
     <div id="resultados" class="container-fluid"></div>

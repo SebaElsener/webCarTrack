@@ -293,15 +293,33 @@ function cambiarPagina(nuevaPagina) {
 
   paginaActual = nuevaPagina;
 
-  // Mostrar spinner temporal mientras se "renderiza"
-  mostrarSpinner();
+  const tabla = document.getElementById("resultados");
+  const stats = document.getElementById("estadisticas");
+  if (!tabla || !stats) return;
 
-  // Simular un pequeño retardo para que se vea el spinner (opcional)
+  // 🔹 Animación fade-out
+  tabla.classList.add("fade-out");
+  stats.classList.add("fade-out");
+
   setTimeout(() => {
+    // 🔹 Render de tabla y paginación de la nueva página
     renderTabla();
     renderPaginacion();
+
+    // 🔹 Entrada animada
+    tabla.classList.remove("fade-out");
+    stats.classList.remove("fade-out");
+
+    tabla.classList.add("fade-in");
+    stats.classList.add("fade-in");
+
+    setTimeout(() => {
+      tabla.classList.remove("fade-in");
+      stats.classList.remove("fade-in");
+    }, 300);
+
     enableColumnResize("tabla-resultados");
-  }, 100); // 100ms
+  }, 200);
 }
 
 // Resizer tabla
@@ -398,7 +416,7 @@ function aplicarFiltros() {
   const tabla = document.getElementById("resultados");
   const stats = document.getElementById("estadisticas");
 
-  // Animación salida
+  // 🔹 Animación salida
   tabla?.classList.add("fade-out");
   stats?.classList.add("fade-out");
 
@@ -406,58 +424,41 @@ function aplicarFiltros() {
     let dataBase = [...datosGlobales];
 
     // 🔹 Filtro marca
-    if (filtros.marca) {
-      dataBase = dataBase.filter((d) => d.marca === filtros.marca);
-    }
+    if (filtros.marca) dataBase = dataBase.filter(d => d.marca === filtros.marca);
 
     // 🔹 Solo VIN con daño
-    if (filtros.soloConDanio) {
-      dataBase = dataBase.filter((scan) => scan.damages && scan.damages.length > 0);
-    }
-datosBaseFiltrados = dataBase;
-
-let dataTablaLocal = [...datosBaseFiltrados];
-
-if (filtros.areaSeleccionada) {
-  dataTablaLocal = dataTablaLocal
-    .map(scan => {
-      const filteredDamages = scan.damages?.filter(
-        d => d.area === filtros.areaSeleccionada
-      );
-      if (filteredDamages && filteredDamages.length) {
-        return { ...scan, damages: filteredDamages };
-      }
-      return null;
-    })
-    .filter(Boolean);
-}
-
-if (filtros.averiaSeleccionada) {
-  dataTablaLocal = dataTablaLocal
-    .map(scan => {
-      const filteredDamages = scan.damages?.filter(
-        d => d.averia === filtros.averiaSeleccionada
-      );
-      if (filteredDamages && filteredDamages.length) {
-        return { ...scan, damages: filteredDamages };
-      }
-      return null;
-    })
-    .filter(Boolean);
-}
-
-datosTabla = dataTablaLocal;
+    if (filtros.soloConDanio) dataBase = dataBase.filter(scan => scan.damages?.length);
 
     // 🔹 Badge contador
-    const badge = document.getElementById("badgeConDanio");
-    if (filtros.soloConDanio) {
-      badge.textContent = `${dataBase.length} VIN con daño`;
-      badge.classList.remove("d-none");
-    } else {
-      badge.classList.add("d-none");
+const badge = document.getElementById("badgeConDanio");
+if (filtros.soloConDanio) {
+  badge.textContent = `${dataBase.length} VIN con daño`;
+  badge.classList.remove("d-none");
+} else {
+  badge.classList.add("d-none");
+}
+
+badge.classList.add("show");
+setTimeout(() => badge.classList.remove("show"), 200);
+
+
+    datosBaseFiltrados = dataBase;
+
+    let dataTablaLocal = [...datosBaseFiltrados];
+
+    if (filtros.areaSeleccionada) {
+      dataTablaLocal = dataTablaLocal.filter(scan =>
+        scan.damages?.some(d => d.area === filtros.areaSeleccionada)
+      );
     }
-    badge.classList.add("show");
-    setTimeout(() => badge.classList.remove("show"), 200);
+
+    if (filtros.averiaSeleccionada) {
+      dataTablaLocal = dataTablaLocal.filter(scan =>
+        scan.damages?.some(d => d.averia === filtros.averiaSeleccionada)
+      );
+    }
+
+    datosTabla = dataTablaLocal;
 
     // 🔹 Reset página
     paginaActual = 1;
@@ -475,11 +476,11 @@ datosTabla = dataTablaLocal;
     tabla?.classList.add("fade-in");
     stats?.classList.add("fade-in");
 
-    // limpiar clase luego
     setTimeout(() => {
       tabla?.classList.remove("fade-in");
       stats?.classList.remove("fade-in");
     }, 300);
+
   }, 200);
 }
 
