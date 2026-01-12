@@ -1238,16 +1238,21 @@ thead {
 }
 
 .bar-wrapper {
+  position: relative;
+  flex: 1;
+  height: 14px;
   background: #e9ecef;
-  height: 8px;
-  border-radius: 4px;
-  overflow: hidden;
+  border-radius: 7px;
+  overflow: visible;
+  cursor: pointer;
 }
 
 .bar {
   height: 100%;
-  background: linear-gradient(90deg, #0d6efd, #5aa9ff);
-  transition: width 0.4s ease;
+  width: 0%;
+  background: linear-gradient(90deg, #0d6efd, #4dabf7);
+  border-radius: 7px;
+  transition: width 0.5s ease;
 }
 
 .label {
@@ -1258,21 +1263,18 @@ thead {
 }
 
 .value {
+  flex: 0 0 36px;
   text-align: right;
   font-size: 0.8rem;
-  color: #555;
 }
 
 .mini-bar-row .label {
+  flex: 0 0 140px;
   font-size: 0.85rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-/* .mini-bar-row .bar-wrapper {
-  position: relative;
-} */
 
 .mini-bar-row .bar {
   transition: width 0.5s ease;
@@ -1288,3 +1290,48 @@ thead {
   opacity: 1;
   transform: translateY(0);
 }
+
+/* 🔹 Tooltip */
+.mini-tooltip {
+  position: absolute;
+  top: -8px;
+  /* left: 50%; */
+  transform: translate(-50%, -100%);
+  background: #212529;
+  color: #fff;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 9999;
+}
+
+.mini-tooltip::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px 5px 0 5px;
+  border-style: solid;
+  border-color: #212529 transparent transparent transparent;
+}
+
+/* Hover */
+.bar-wrapper:hover .mini-tooltip {
+  opacity: 1;
+  transform: translate(-50%, -110%);
+}
+
+.mini-tooltip .pct {
+  color: #9fd3ff;
+  font-weight: 600;
+}
+
+/* #estadisticas .card {
+  overflow: visible !important;
+} */

@@ -247,7 +247,9 @@ function renderPaginacion() {
 
   html += `
     <li class="page-item ${paginaActual === 1 ? "disabled" : ""}">
-      <button class="page-link" data-page="${paginaActual - 1}">Anterior</button>
+      <button class="page-link" data-page="${
+        paginaActual - 1
+      }">Anterior</button>
     </li>
   `;
 
@@ -261,7 +263,9 @@ function renderPaginacion() {
 
   html += `
     <li class="page-item ${paginaActual === totalPaginas ? "disabled" : ""}">
-      <button class="page-link" data-page="${paginaActual + 1}">Siguiente</button>
+      <button class="page-link" data-page="${
+        paginaActual + 1
+      }">Siguiente</button>
     </li>
   `;
 
@@ -269,7 +273,7 @@ function renderPaginacion() {
   document.getElementById("paginacion").innerHTML = html;
 
   // 🔹 Listener único
-  document.querySelectorAll("#paginacion button[data-page]").forEach(btn => {
+  document.querySelectorAll("#paginacion button[data-page]").forEach((btn) => {
     btn.addEventListener("click", () => {
       cambiarPagina(Number(btn.dataset.page));
     });
@@ -417,73 +421,6 @@ function aplicarFiltros() {
   }, 200);
 }
 
-// function renderEstadisticas(data) {
-//   const cont = document.getElementById("estadisticas");
-//   if (!cont) return;
-//   cont.innerHTML = "";
-
-//   if (filtros.topAreas) {
-//     // Total de todas las áreas
-//     const totalAreas = data.reduce((acc, scan) => {
-//       scan.damages?.forEach((d) => {
-//         if (d.area_desc) acc[d.area_desc] = (acc[d.area_desc] || 0) + 1;
-//       });
-//       return acc;
-//     }, {});
-
-//     const top = Object.entries(totalAreas)
-//       .sort((a, b) => b[1] - a[1])
-//       .slice(0, 5);
-
-//     const maxGlobalAreas = Object.values(totalAreas).reduce((sum, val) => sum + val, 0)
-
-//     cont.innerHTML += renderMiniChartList("Top 5 Áreas dañadas", top, maxGlobalAreas);
-//   }
-
-//   if (filtros.topAverias) {
-//     // Total de todas las averías
-//     const totalAverias = data.reduce((acc, scan) => {
-//       scan.damages?.forEach((d) => {
-//         if (d.averia_desc) acc[d.averia_desc] = (acc[d.averia_desc] || 0) + 1;
-//       });
-//       return acc;
-//     }, {});
-
-//     const top = Object.entries(totalAverias)
-//       .sort((a, b) => b[1] - a[1])
-//       .slice(0, 5);
-
-//     const maxGlobalAverias = Object.values(totalAverias).reduce((sum,val)=>sum+val,0);
-
-//     cont.innerHTML += renderMiniChartList("Top 5 Tipos de daño", top, maxGlobalAverias);
-//   }
-// }
-
-// function renderMiniChartList(titulo, lista, maxGlobal) {
-//   return `
-//     <div class="mini-chart card mb-2">
-//       <div class="card-body py-2">
-//            <h6 class="card-title text-primary fw-semibold mb-3">
-//             ${titulo}
-//            </h6>        
-//            ${lista.map(([label, value]) => {
-//             const width = (value / maxGlobal) * 100;
-
-//             return `
-//               <div class="mini-bar-row">
-//                 <div class="label" title="${label}">${label}</div>
-//                 <div class="bar-wrapper">
-//                   <div class="bar" style="width:${width}%"></div>
-//                 </div>
-//                 <div class="value">${value}</div>
-//               </div>
-//             `;
-//           })
-//           .join("")}
-//       </div>
-//     </div>
-//   `;
-// }
 function renderEstadisticas(data) {
   const cont = document.getElementById("estadisticas");
   if (!cont) return;
@@ -491,65 +428,86 @@ function renderEstadisticas(data) {
 
   if (filtros.topAreas) {
     const totalAreas = data.reduce((acc, scan) => {
-      scan.damages?.forEach(d => {
+      scan.damages?.forEach((d) => {
         if (d.area_desc) acc[d.area_desc] = (acc[d.area_desc] || 0) + 1;
       });
       return acc;
     }, {});
-    const topAreas = Object.entries(totalAreas)
-      .sort((a,b)=>b[1]-a[1])
-      .slice(0,5);
 
-    cont.innerHTML += renderMiniChartList("Top 5 Áreas dañadas", topAreas, Object.values(totalAreas).reduce((a,b)=>a+b,0));
+    const top = Object.entries(totalAreas)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+
+    cont.innerHTML += renderMiniChartList(
+      "Top 5 Áreas dañadas",
+      top,
+      Object.values(totalAreas).reduce((a, b) => a + b, 0)
+    );
   }
 
   if (filtros.topAverias) {
     const totalAverias = data.reduce((acc, scan) => {
-      scan.damages?.forEach(d => {
+      scan.damages?.forEach((d) => {
         if (d.averia_desc) acc[d.averia_desc] = (acc[d.averia_desc] || 0) + 1;
       });
       return acc;
     }, {});
-    const topAverias = Object.entries(totalAverias)
-      .sort((a,b)=>b[1]-a[1])
-      .slice(0,5);
 
-    cont.innerHTML += renderMiniChartList("Top 5 Tipos de daño", topAverias, Object.values(totalAverias).reduce((a,b)=>a+b,0));
+    const top = Object.entries(totalAverias)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+
+    cont.innerHTML += renderMiniChartList(
+      "Top 5 Tipos de daño",
+      top,
+      Object.values(totalAverias).reduce((a, b) => a + b, 0)
+    );
   }
 
-  // animar todas las barras
   animateMiniCharts();
 }
 
-
 function renderMiniChartList(titulo, lista, total) {
+  const totalTop = lista.reduce((acc, [, v]) => acc + v, 0);
+
   return `
     <div class="mini-chart card mb-2 fade-slide">
       <div class="card-body py-2">
         <h6 class="card-title text-primary fw-semibold mb-3">
           ${titulo}
-        </h6>        
-        ${lista.length
-          ? lista
-              .map(([label, value]) => {
-                const pct = ((value / total) * 100).toFixed(1);
-                return `
-                  <div class="mini-bar-row d-flex align-items-center mb-2">
-                    <div class="label text-truncate" title="${label}" style="flex:1 0 auto;">
-                      ${label}
-                    </div>
-                    <div class="bar-wrapper flex-grow-1 mx-2 position-relative" style="background:#e9ecef; height:14px; border-radius:7px; overflow:hidden;">
-                      <div class="bar" 
-                           style="width:0%; background:#0d6efd; height:100%; border-radius:7px; transition: width 0.5s;" 
-                           title="${pct}%">
-                      </div>
-                    </div>
-                    <div class="value" style="min-width:35px; text-align:right;">${value}</div>
+        </h6>
+
+        ${
+          lista.length
+            ? lista
+                .map(([label, value]) => {
+                  const pctGlobal = ((value / total) * 100).toFixed(1);
+                  const pctTop = ((value / totalTop) * 100).toFixed(1);
+                  return `
+                <div class="mini-bar-row d-flex align-items-center mb-2">
+                  <div class="label text-truncate" title="${label}">
+                    ${label}
                   </div>
-                `;
-              })
-              .join("")
-          : `<span class="text-muted">Sin datos</span>`
+
+                  <div class="bar-wrapper"
+                       data-label="${label}"
+                       data-value="${value}"
+                       data-pct="${pctTop}">
+                    <div class="bar"></div>
+
+                    <div class="mini-tooltip">
+                      <strong>${label}</strong><br>
+                      ${value} casos<br>
+                      <span class="pct">${pctGlobal}% global · ${pctTop}% top 5</span>
+                    </div>
+                  </div>
+
+                  <div class="value">${value}</div>
+                </div>
+              `;
+                })
+                .join("")
+            : `<span class="text-muted">Sin datos</span>`
         }
       </div>
     </div>
@@ -558,11 +516,13 @@ function renderMiniChartList(titulo, lista, total) {
 
 // 🔹 Activar animación de width al insertar el HTML
 function animateMiniCharts() {
-  document.querySelectorAll(".mini-bar-row .bar").forEach(bar => {
-    const targetWidth = bar.getAttribute("title")?.replace("%", "") || "0";
-    setTimeout(() => {
-      bar.style.width = targetWidth + "%";
-    }, 50); // leve delay para que se note la animación
+  document.querySelectorAll(".bar-wrapper").forEach((wrap) => {
+    const bar = wrap.querySelector(".bar");
+    const pct = Number(wrap.dataset.pct) || 0;
+
+    requestAnimationFrame(() => {
+      bar.style.width = pct + "%";
+    });
   });
 }
 
@@ -588,9 +548,7 @@ function agruparPorFecha(scans) {
     map[fecha] = (map[fecha] || 0) + cantidad;
   });
 
-  return Object.entries(map).sort(
-    (a, b) => new Date(a[0]) - new Date(b[0])
-  );
+  return Object.entries(map).sort((a, b) => new Date(a[0]) - new Date(b[0]));
 }
 
 function renderEvolucion(data) {
@@ -625,3 +583,19 @@ function renderEvolucion(data) {
     </div>
   `;
 }
+
+document.addEventListener("mousemove", (e) => {
+  const wrapper = e.target.closest(".bar-wrapper");
+  if (!wrapper) return;
+
+  const tooltip = wrapper.querySelector(".mini-tooltip");
+  if (!tooltip) return;
+
+  const rect = wrapper.getBoundingClientRect();
+  let x = e.clientX - rect.left;
+
+  // límites
+  x = Math.max(10, Math.min(x, rect.width - 10));
+
+  tooltip.style.left = x + "px";
+});
