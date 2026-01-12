@@ -400,6 +400,7 @@ function aplicarFiltros() {
     renderEstadisticas(data);
     renderTablaFiltrada(data);
     renderPaginacionFiltrada(data);
+    renderEvolucion(data);
 
     // 🔹 Entrada animada
     tabla?.classList.remove("fade-out");
@@ -416,79 +417,154 @@ function aplicarFiltros() {
   }, 200);
 }
 
-function contarPorCampo(scans, campo) {
-  const contador = {};
+// function renderEstadisticas(data) {
+//   const cont = document.getElementById("estadisticas");
+//   if (!cont) return;
+//   cont.innerHTML = "";
 
-  scans.forEach((scan) => {
-    scan.damages?.forEach((d) => {
-      const key = d[campo];
-      if (!key) return;
-      contador[key] = (contador[key] || 0) + 1;
-    });
-  });
+//   if (filtros.topAreas) {
+//     // Total de todas las áreas
+//     const totalAreas = data.reduce((acc, scan) => {
+//       scan.damages?.forEach((d) => {
+//         if (d.area_desc) acc[d.area_desc] = (acc[d.area_desc] || 0) + 1;
+//       });
+//       return acc;
+//     }, {});
 
-  return Object.entries(contador)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5);
-}
+//     const top = Object.entries(totalAreas)
+//       .sort((a, b) => b[1] - a[1])
+//       .slice(0, 5);
 
+//     const maxGlobalAreas = Object.values(totalAreas).reduce((sum, val) => sum + val, 0)
+
+//     cont.innerHTML += renderMiniChartList("Top 5 Áreas dañadas", top, maxGlobalAreas);
+//   }
+
+//   if (filtros.topAverias) {
+//     // Total de todas las averías
+//     const totalAverias = data.reduce((acc, scan) => {
+//       scan.damages?.forEach((d) => {
+//         if (d.averia_desc) acc[d.averia_desc] = (acc[d.averia_desc] || 0) + 1;
+//       });
+//       return acc;
+//     }, {});
+
+//     const top = Object.entries(totalAverias)
+//       .sort((a, b) => b[1] - a[1])
+//       .slice(0, 5);
+
+//     const maxGlobalAverias = Object.values(totalAverias).reduce((sum,val)=>sum+val,0);
+
+//     cont.innerHTML += renderMiniChartList("Top 5 Tipos de daño", top, maxGlobalAverias);
+//   }
+// }
+
+// function renderMiniChartList(titulo, lista, maxGlobal) {
+//   return `
+//     <div class="mini-chart card mb-2">
+//       <div class="card-body py-2">
+//            <h6 class="card-title text-primary fw-semibold mb-3">
+//             ${titulo}
+//            </h6>        
+//            ${lista.map(([label, value]) => {
+//             const width = (value / maxGlobal) * 100;
+
+//             return `
+//               <div class="mini-bar-row">
+//                 <div class="label" title="${label}">${label}</div>
+//                 <div class="bar-wrapper">
+//                   <div class="bar" style="width:${width}%"></div>
+//                 </div>
+//                 <div class="value">${value}</div>
+//               </div>
+//             `;
+//           })
+//           .join("")}
+//       </div>
+//     </div>
+//   `;
+// }
 function renderEstadisticas(data) {
   const cont = document.getElementById("estadisticas");
+  if (!cont) return;
   cont.innerHTML = "";
 
   if (filtros.topAreas) {
-    const top = contarPorCampo(data, "area_desc");
-    cont.innerHTML += renderMiniChartList(
-      "Top 5 Áreas dañadas",
-      top
-    );
+    const totalAreas = data.reduce((acc, scan) => {
+      scan.damages?.forEach(d => {
+        if (d.area_desc) acc[d.area_desc] = (acc[d.area_desc] || 0) + 1;
+      });
+      return acc;
+    }, {});
+    const topAreas = Object.entries(totalAreas)
+      .sort((a,b)=>b[1]-a[1])
+      .slice(0,5);
+
+    cont.innerHTML += renderMiniChartList("Top 5 Áreas dañadas", topAreas, Object.values(totalAreas).reduce((a,b)=>a+b,0));
   }
 
   if (filtros.topAverias) {
-    const top = contarPorCampo(data, "averia_desc");
-    cont.innerHTML += renderMiniChartList(
-      "Top 5 Tipos de daño",
-      top
-    );
+    const totalAverias = data.reduce((acc, scan) => {
+      scan.damages?.forEach(d => {
+        if (d.averia_desc) acc[d.averia_desc] = (acc[d.averia_desc] || 0) + 1;
+      });
+      return acc;
+    }, {});
+    const topAverias = Object.entries(totalAverias)
+      .sort((a,b)=>b[1]-a[1])
+      .slice(0,5);
+
+    cont.innerHTML += renderMiniChartList("Top 5 Tipos de daño", topAverias, Object.values(totalAverias).reduce((a,b)=>a+b,0));
   }
+
+  // animar todas las barras
+  animateMiniCharts();
 }
 
 
-function renderMiniChartList(titulo, lista) {
-  const max = Math.max(...lista.map(([, v]) => v), 1);
-
+function renderMiniChartList(titulo, lista, total) {
   return `
-    <div class="col-md-6 col-lg-4 fade-slide">
-      <div class="card shadow-sm h-100">
-        <div class="card-body">
-          <h6 class="card-title text-primary fw-semibold mb-3">
-            ${titulo}
-          </h6>
-
-          ${
-            lista.length
-              ? lista
-                  .map(([k, v]) => {
-                    const pct = Math.round((v / max) * 100);
-                    return `
-                      <div class="mini-chart-row mb-2">
-                        <small class="text-nowrap">${k}</small>
-                        <div class="mini-bar-container">
-                          <div class="mini-bar" style="width:${pct}%"></div>
-                        </div>
-                        <small class="text-muted">${v}</small>
+    <div class="mini-chart card mb-2 fade-slide">
+      <div class="card-body py-2">
+        <h6 class="card-title text-primary fw-semibold mb-3">
+          ${titulo}
+        </h6>        
+        ${lista.length
+          ? lista
+              .map(([label, value]) => {
+                const pct = ((value / total) * 100).toFixed(1);
+                return `
+                  <div class="mini-bar-row d-flex align-items-center mb-2">
+                    <div class="label text-truncate" title="${label}" style="flex:1 0 auto;">
+                      ${label}
+                    </div>
+                    <div class="bar-wrapper flex-grow-1 mx-2 position-relative" style="background:#e9ecef; height:14px; border-radius:7px; overflow:hidden;">
+                      <div class="bar" 
+                           style="width:0%; background:#0d6efd; height:100%; border-radius:7px; transition: width 0.5s;" 
+                           title="${pct}%">
                       </div>
-                    `;
-                  })
-                  .join("")
-              : `<span class="text-muted">Sin datos</span>`
-          }
-        </div>
+                    </div>
+                    <div class="value" style="min-width:35px; text-align:right;">${value}</div>
+                  </div>
+                `;
+              })
+              .join("")
+          : `<span class="text-muted">Sin datos</span>`
+        }
       </div>
     </div>
   `;
 }
 
+// 🔹 Activar animación de width al insertar el HTML
+function animateMiniCharts() {
+  document.querySelectorAll(".mini-bar-row .bar").forEach(bar => {
+    const targetWidth = bar.getAttribute("title")?.replace("%", "") || "0";
+    setTimeout(() => {
+      bar.style.width = targetWidth + "%";
+    }, 50); // leve delay para que se note la animación
+  });
+}
 
 let datosFiltrados = [];
 
@@ -500,4 +576,52 @@ function renderTablaFiltrada(data) {
 function renderPaginacionFiltrada(data) {
   datosFiltrados = data;
   renderPaginacion();
+}
+
+function agruparPorFecha(scans) {
+  const map = {};
+
+  scans.forEach((scan) => {
+    const fecha = scan.scan_date.split("T")[0];
+    const cantidad = scan.damages?.length || 0;
+
+    map[fecha] = (map[fecha] || 0) + cantidad;
+  });
+
+  return Object.entries(map).sort(
+    (a, b) => new Date(a[0]) - new Date(b[0])
+  );
+}
+
+function renderEvolucion(data) {
+  const cont = document.getElementById("evolucion");
+  cont.innerHTML = "";
+
+  const serie = agruparPorFecha(data);
+  if (!serie.length) return;
+
+  const max = Math.max(...serie.map(([, v]) => v), 1);
+
+  cont.innerHTML = `
+    <div class="card shadow-sm mt-3 fade-slide">
+      <div class="card-body">
+        <h6 class="card-title text-primary fw-semibold">
+          Evolución de daños por fecha
+        </h6>
+
+        <div class="timeline mt-3">
+          ${serie
+            .map(([fecha, v]) => {
+              const h = Math.round((v / max) * 100);
+              return `
+                <div class="timeline-bar" style="height:${h}%">
+                  <span>${fecha}</span>
+                </div>
+              `;
+            })
+            .join("")}
+        </div>
+      </div>
+    </div>
+  `;
 }
