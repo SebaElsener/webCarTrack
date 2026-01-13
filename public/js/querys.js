@@ -446,17 +446,33 @@ setTimeout(() => badge.classList.remove("show"), 200);
 
     let dataTablaLocal = [...datosBaseFiltrados];
 
-    if (filtros.areaSeleccionada) {
-      dataTablaLocal = dataTablaLocal.filter(scan =>
-        scan.damages?.some(d => d.area === filtros.areaSeleccionada)
+if (filtros.areaSeleccionada) {
+  dataTablaLocal = dataTablaLocal
+    .map(scan => {
+      const filteredDamages = scan.damages?.filter(
+        d => d.area === filtros.areaSeleccionada
       );
-    }
+      if (filteredDamages && filteredDamages.length) {
+        return { ...scan, damages: filteredDamages };
+      }
+      return null;
+    })
+    .filter(Boolean);
+}
 
-    if (filtros.averiaSeleccionada) {
-      dataTablaLocal = dataTablaLocal.filter(scan =>
-        scan.damages?.some(d => d.averia === filtros.averiaSeleccionada)
+if (filtros.averiaSeleccionada) {
+  dataTablaLocal = dataTablaLocal
+    .map(scan => {
+      const filteredDamages = scan.damages?.filter(
+        d => d.averia === filtros.averiaSeleccionada
       );
-    }
+      if (filteredDamages && filteredDamages.length) {
+        return { ...scan, damages: filteredDamages };
+      }
+      return null;
+    })
+    .filter(Boolean);
+}
 
     datosTabla = dataTablaLocal;
 
