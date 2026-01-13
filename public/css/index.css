@@ -592,7 +592,7 @@ tbody tr:nth-child(even) {
 }
 
 #userContainer {
-  background-color: rgba(33, 33, 33, 0.719);
+  background-color: rgb(33 33 33 / 81%);
   display: flex;
   align-items: center;
   justify-content: space-between;
