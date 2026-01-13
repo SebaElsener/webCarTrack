@@ -2,9 +2,15 @@ import {
   querysRenderBusiness,
   queryByVINBusiness,
 } from "../business/querysBusiness.js";
+import { mainPage } from "../business/ProductsBusiness.js";
 
 const queryByDateRender = async (req, res) => {
-  res.render("../views/queryByDate");
+  const userName = req.session.passport.user;
+  const data = await mainPage(userName);
+  res.render("../views/queryByDate", {
+    userName: userName,
+    userData: data.userData,
+  });
 };
 
 const queryByVINRender = async (req, res) => {

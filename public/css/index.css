@@ -597,8 +597,17 @@ tbody tr:nth-child(even) {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  height: 60px;
+  height: 40px;
   min-width: 655px;
+  position: fixed;
+  z-index: 999999;
+}
+
+#navBack {
+  height: 50px;
+  width: 100%;
+  background-color: #ffffff;
+  z-index: 999998;
   position: fixed;
 }
 
@@ -654,6 +663,7 @@ tbody tr:nth-child(even) {
 .formTitle {
   text-align: center;
   margin: 1.5rem 0;
+  margin-top: 4rem;
 }
 
 .tableTd {

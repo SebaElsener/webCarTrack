@@ -1,0 +1,72 @@
+<div id="navBack">
+  <nav id="userContainer">
+    <div class="userDataContainer">
+      <ul class="navList">
+        <li class="navItem" style="padding: 3px 0px">
+          <a class="cartLink" href="#">Inicio</a>
+        </li>
+      </ul>
+      <div class="dropdown">
+        <ul class="navList cartLink" style="margin: 0px 20px">
+          <li class="navItem">Administrador</li>
+        </ul>
+        <div class="dropdown-content">
+          <% if (userName === 'admin@admin.com') { %>
+          <a class="itemLink" href="/api/userdata/usersadmin"
+            >Administrar usuarios</a
+          >
+          <% } %> <% if (userData.admin === 'true') { %>
+          <a class="itemLink" href="/api/productos/form">Tablas</a>
+          <% } %>
+          <a class="itemLink" href="/api/userdata">Mis datos</a>
+          <a class="itemLink" href="/api/logout">Logout</a>
+        </div>
+      </div>
+      <div class="dropdown">
+        <ul class="navList cartLink" style="margin: 0px 20px">
+          <li class="navItem">Consultas</li>
+        </ul>
+        <div class="dropdown-content">
+          <a class="itemLink" href="/api/scans">VIN colectados</a>
+          <a class="itemLink" href="/api/querys/queryByDate">Por fecha</a>
+          <a class="itemLink" href="/api/querys/queryByVIN">Por chasis-VIN</a>
+        </div>
+      </div>
+      <div class="dropdown">
+        <ul class="navList cartLink" style="margin: 0px 20px">
+          <li class="navItem">Estadísticas</li>
+        </ul>
+        <div class="dropdown-content">
+          <a class="itemLink" href="/api/stats/danosHistory">Histórico daños</a>
+          <a class="itemLink" href="/api/stats/partsHistory"
+            >Histórico partes dañadas</a
+          >
+          <a class="itemLink" href="/api/stats/missingsHistory"
+            >Histórico piezas faltantes</a
+          >
+        </div>
+      </div>
+      <!-- <div class="avatarItem">
+                    <img class='userAvatar' src='<%= userData.avatar %>' alt="Avatar">
+                </div> -->
+      <h2 class="userTitle">
+        Bienvenido
+        <span id="<%= userData._id %>" class="userWelcome">
+          <%= userName %></span
+        >
+      </h2>
+    </div>
+    <div style="display: flex">
+      <ul class="navList">
+        <li class="navItem">
+          <a id="chatLink" class="chatLink" target="_blank">Asistencia</a>
+        </li>
+      </ul>
+      <!-- <ul class="navList">
+                    <li class="navItem">
+                        <a class='cartLink' href='/api/carrito'>CARRITO</a><span class='cartLinkSpan'></span>
+                    </li>
+                </ul> -->
+    </div>
+  </nav>
+</div>
