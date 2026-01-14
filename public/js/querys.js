@@ -29,7 +29,6 @@ let datosGlobales = [];
 let datosBaseFiltrados = [];
 let datosTabla = [];
 
-
 // Función para mostrar spinner
 function mostrarSpinner() {
   document.getElementById("resultados").innerHTML = `
@@ -50,8 +49,8 @@ async function cargarDatos(desde, hasta) {
     topAreas: false,
     topAverias: false,
     soloConDanio: false,
-      areaSeleccionada: null,
-  averiaSeleccionada: null,
+    areaSeleccionada: null,
+    averiaSeleccionada: null,
   };
   document.getElementById("chkTopAreas").checked = false;
   document.getElementById("chkTopAverias").checked = false;
@@ -389,8 +388,8 @@ let filtros = {
   topAreas: false,
   topAverias: false,
   soloConDanio: false,
-    areaSeleccionada: null,
-  averiaSeleccionada: null, 
+  areaSeleccionada: null,
+  averiaSeleccionada: null,
 };
 
 document.getElementById("filtroMarca").addEventListener("change", (e) => {
@@ -398,7 +397,9 @@ document.getElementById("filtroMarca").addEventListener("change", (e) => {
   // 🔹 Limpiar selección de barras
   filtros.areaSeleccionada = null;
   filtros.averiaSeleccionada = null;
-  document.querySelectorAll(".mini-bar-row").forEach(r => r.classList.remove("active"));
+  document
+    .querySelectorAll(".mini-bar-row")
+    .forEach((r) => r.classList.remove("active"));
   aplicarFiltros();
 });
 
@@ -424,55 +425,56 @@ function aplicarFiltros() {
     let dataBase = [...datosGlobales];
 
     // 🔹 Filtro marca
-    if (filtros.marca) dataBase = dataBase.filter(d => d.marca === filtros.marca);
+    if (filtros.marca)
+      dataBase = dataBase.filter((d) => d.marca === filtros.marca);
 
     // 🔹 Solo VIN con daño
-    if (filtros.soloConDanio) dataBase = dataBase.filter(scan => scan.damages?.length);
+    if (filtros.soloConDanio)
+      dataBase = dataBase.filter((scan) => scan.damages?.length);
 
     // 🔹 Badge contador
-const badge = document.getElementById("badgeConDanio");
-if (filtros.soloConDanio) {
-  badge.textContent = `${dataBase.length} VIN con daño`;
-  badge.classList.remove("d-none");
-} else {
-  badge.classList.add("d-none");
-}
+    const badge = document.getElementById("badgeConDanio");
+    if (filtros.soloConDanio) {
+      badge.textContent = `${dataBase.length} VIN con daño`;
+      badge.classList.remove("d-none");
+    } else {
+      badge.classList.add("d-none");
+    }
 
-badge.classList.add("show");
-setTimeout(() => badge.classList.remove("show"), 200);
-
+    badge.classList.add("show");
+    setTimeout(() => badge.classList.remove("show"), 200);
 
     datosBaseFiltrados = dataBase;
 
     let dataTablaLocal = [...datosBaseFiltrados];
 
-if (filtros.areaSeleccionada) {
-  dataTablaLocal = dataTablaLocal
-    .map(scan => {
-      const filteredDamages = scan.damages?.filter(
-        d => d.area === filtros.areaSeleccionada
-      );
-      if (filteredDamages && filteredDamages.length) {
-        return { ...scan, damages: filteredDamages };
-      }
-      return null;
-    })
-    .filter(Boolean);
-}
+    if (filtros.areaSeleccionada) {
+      dataTablaLocal = dataTablaLocal
+        .map((scan) => {
+          const filteredDamages = scan.damages?.filter(
+            (d) => d.area === filtros.areaSeleccionada
+          );
+          if (filteredDamages && filteredDamages.length) {
+            return { ...scan, damages: filteredDamages };
+          }
+          return null;
+        })
+        .filter(Boolean);
+    }
 
-if (filtros.averiaSeleccionada) {
-  dataTablaLocal = dataTablaLocal
-    .map(scan => {
-      const filteredDamages = scan.damages?.filter(
-        d => d.averia === filtros.averiaSeleccionada
-      );
-      if (filteredDamages && filteredDamages.length) {
-        return { ...scan, damages: filteredDamages };
-      }
-      return null;
-    })
-    .filter(Boolean);
-}
+    if (filtros.averiaSeleccionada) {
+      dataTablaLocal = dataTablaLocal
+        .map((scan) => {
+          const filteredDamages = scan.damages?.filter(
+            (d) => d.averia === filtros.averiaSeleccionada
+          );
+          if (filteredDamages && filteredDamages.length) {
+            return { ...scan, damages: filteredDamages };
+          }
+          return null;
+        })
+        .filter(Boolean);
+    }
 
     datosTabla = dataTablaLocal;
 
@@ -496,7 +498,6 @@ if (filtros.averiaSeleccionada) {
       tabla?.classList.remove("fade-in");
       stats?.classList.remove("fade-in");
     }, 300);
-
   }, 200);
 }
 
@@ -506,65 +507,63 @@ function renderEstadisticas(data) {
   cont.innerHTML = "";
 
   if (filtros.topAreas) {
-const totalAreas = data.reduce((acc, scan) => {
-  scan.damages?.forEach((d) => {
-    if (!d.area) return;
+    const totalAreas = data.reduce((acc, scan) => {
+      scan.damages?.forEach((d) => {
+        if (!d.area) return;
 
-    if (!acc[d.area]) {
-      acc[d.area] = {
-        id: d.area,
-        label: d.area_desc,
-        value: 0,
-      };
-    }
+        if (!acc[d.area]) {
+          acc[d.area] = {
+            id: d.area,
+            label: d.area_desc,
+            value: 0,
+          };
+        }
 
-    acc[d.area].value++;
-  });
-  return acc;
-}, {});
+        acc[d.area].value++;
+      });
+      return acc;
+    }, {});
 
-const top = Object.values(totalAreas)
-  .sort((a, b) => b.value - a.value)
-  .slice(0, 5);
+    const top = Object.values(totalAreas)
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 5);
 
-cont.innerHTML += renderMiniChartList(
-  "Top 5 Áreas dañadas",
-  top,
-  Object.values(totalAreas).reduce((acc, item) => acc + item.value, 0),
-  "area"
-);
-
+    cont.innerHTML += renderMiniChartList(
+      "Top 5 Áreas dañadas",
+      top,
+      Object.values(totalAreas).reduce((acc, item) => acc + item.value, 0),
+      "area"
+    );
   }
 
   if (filtros.topAverias) {
-const totalAverias = data.reduce((acc, scan) => {
-  scan.damages?.forEach((d) => {
-    if (!d.averia) return;
+    const totalAverias = data.reduce((acc, scan) => {
+      scan.damages?.forEach((d) => {
+        if (!d.averia) return;
 
-    if (!acc[d.averia]) {
-      acc[d.averia] = {
-        id: d.averia,
-        label: d.averia_desc,
-        value: 0,
-      };
-    }
+        if (!acc[d.averia]) {
+          acc[d.averia] = {
+            id: d.averia,
+            label: d.averia_desc,
+            value: 0,
+          };
+        }
 
-    acc[d.averia].value++;
-  });
-  return acc;
-}, {});
+        acc[d.averia].value++;
+      });
+      return acc;
+    }, {});
 
-const top = Object.values(totalAverias)
-  .sort((a, b) => b.value - a.value)
-  .slice(0, 5);
+    const top = Object.values(totalAverias)
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 5);
 
-cont.innerHTML += renderMiniChartList(
-  "Top 5 Tipos de daño",
-  top,
-  Object.values(totalAverias).reduce((acc, item) => acc + item.value, 0),
-  "averia"
-);
-
+    cont.innerHTML += renderMiniChartList(
+      "Top 5 Tipos de daño",
+      top,
+      Object.values(totalAverias).reduce((acc, item) => acc + item.value, 0),
+      "averia"
+    );
   }
 
   animateMiniCharts();
@@ -584,7 +583,7 @@ function renderMiniChartList(titulo, lista, total, tipo) {
           lista.length
             ? lista
                 .map((item) => {
-                  const { id, label, value } = item
+                  const { id, label, value } = item;
                   const pctGlobal = ((value / total) * 100).toFixed(1);
                   const pctTop = ((value / totalTop) * 100).toFixed(1);
 
@@ -622,7 +621,6 @@ function renderMiniChartList(titulo, lista, total, tipo) {
   `;
 }
 
-
 // 🔹 Activar animación de width al insertar el HTML
 function animateMiniCharts() {
   document.querySelectorAll(".bar").forEach((bar) => {
@@ -639,7 +637,6 @@ function animateMiniCharts() {
     });
   });
 }
-
 
 let datosFiltrados = [];
 
@@ -728,18 +725,17 @@ document.addEventListener("click", (e) => {
   const id = row.dataset.id;
 
   // toggle
-const yaActivo =
-  (tipo === "area" && filtros.areaSeleccionada === id) ||
-  (tipo === "averia" && filtros.averiaSeleccionada === id);
+  const yaActivo =
+    (tipo === "area" && filtros.areaSeleccionada === id) ||
+    (tipo === "averia" && filtros.averiaSeleccionada === id);
 
-filtros.areaSeleccionada = null;
-filtros.averiaSeleccionada = null;
+  filtros.areaSeleccionada = null;
+  filtros.averiaSeleccionada = null;
 
-if (!yaActivo) {
-  if (tipo === "area") filtros.areaSeleccionada = id;
-  if (tipo === "averia") filtros.averiaSeleccionada = id;
-}
-
+  if (!yaActivo) {
+    if (tipo === "area") filtros.areaSeleccionada = id;
+    if (tipo === "averia") filtros.averiaSeleccionada = id;
+  }
 
   // feedback visual
   document
@@ -765,7 +761,135 @@ document.getElementById("btnLimpiarFiltros").addEventListener("click", () => {
   document.getElementById("chkSoloConDanio").checked = false;
   document.getElementById("chkTopAreas").checked = false;
   document.getElementById("chkTopAverias").checked = false;
-  document.querySelectorAll(".mini-bar-row").forEach(r => r.classList.remove("active"));
+  document
+    .querySelectorAll(".mini-bar-row")
+    .forEach((r) => r.classList.remove("active"));
 
   aplicarFiltros();
 });
+
+// function buildExportRows(data) {
+//   const rows = [];
+
+//   data.forEach((scan) => {
+//     if (!scan.damages || scan.damages.length === 0) {
+//       rows.push({
+//         Fecha: new Date(scan.scan_date).toLocaleString("es-AR"),
+//         Marca: scan.marca ?? "",
+//         Modelo: scan.modelo ?? "",
+//         VIN: scan.vin ?? "",
+//         Area: "",
+//         Averia: "",
+//         Gravedad: "",
+//         Observacion: "",
+//         Usuario: scan.user ?? "",
+//         Clima: scan.clima ?? "",
+//       });
+//     } else {
+//       scan.damages.forEach((d) => {
+//         rows.push({
+//           Fecha: new Date(scan.scan_date).toLocaleString("es-AR"),
+//           Marca: scan.marca ?? "",
+//           Modelo: scan.modelo ?? "",
+//           VIN: scan.vin ?? "",
+//           Area: d.area_desc ?? "",
+//           Averia: d.averia_desc ?? "",
+//           Gravedad: d.grav_desc ?? "",
+//           Observacion: d.obs ?? "",
+//           Usuario: scan.user ?? "",
+//           Clima: scan.clima ?? "",
+//         });
+//       });
+//     }
+//   });
+
+//   return rows;
+// }
+
+document.getElementById("btnExportPdf").addEventListener("click", async () => {
+  const payload = buildExportPayload();
+
+  const res = await fetch("/api/export/reportesPDF", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "reporte_danios.pdf";
+  a.click();
+});
+
+document
+  .getElementById("btnExportExcel")
+  .addEventListener("click", async () => {
+    const payload = buildExportPayload();
+
+    const res = await fetch("/api/export/reportesExcel", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    // const blob = await res.blob();
+    // const url = URL.createObjectURL(blob);
+
+    // const a = document.createElement("a");
+    // a.href = url;
+    // a.download = "reporte_danios.xlsx";
+    // a.click();
+  });
+
+function buildStats(data) {
+  const areas = {};
+  const averias = {};
+
+  data.forEach((scan) => {
+    scan.damages?.forEach((d) => {
+      if (d.area) {
+        areas[d.area_desc] = (areas[d.area_desc] || 0) + 1;
+      }
+      if (d.averia) {
+        averias[d.averia_desc] = (averias[d.averia_desc] || 0) + 1;
+      }
+    });
+  });
+
+  return {
+    totalVIN: data.length,
+    conDanio: data.filter((s) => s.damages?.length).length,
+    areasTop: Object.entries(areas)
+      .map(([label, value]) => ({ label, value }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 5),
+    averiasTop: Object.entries(averias)
+      .map(([label, value]) => ({ label, value }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 5),
+  };
+}
+
+function buildExportPayload() {
+  const stats = buildStats(datosTabla);
+
+  return {
+    datos: datosTabla.map((s) => ({
+      fecha: s.scan_date,
+      marca: s.marca,
+      modelo: s.modelo,
+      vin: s.vin,
+      areas: s.damages?.map((d) => d.area_desc).join(", "),
+      averias: s.damages?.map((d) => d.averia_desc).join(", "),
+    })),
+    topAreas: stats.areasTop,
+    topAverias: stats.averiasTop,
+    evolucion: agruparPorFecha(datosTabla).map(([fecha, value]) => ({
+      fecha,
+      value,
+    })),
+  };
+}

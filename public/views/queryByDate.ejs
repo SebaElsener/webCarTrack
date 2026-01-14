@@ -113,19 +113,21 @@
         </label>
         <span id="badgeConDanio" class="badge bg-primary d-none"></span>
       </div>
+      <div class="d-flex justify-content-end gap-3 mx-4">
+        <button id="btnExportPdf" class="btn btn-outline-danger btn-sm">
+          📄 PDF
+        </button>
+        <button id="btnExportExcel" class="btn btn-outline-success btn-sm">
+          📊 Excel
+        </button>
+      </div>
     </div>
 
     <div id="resultados" class="container-fluid"></div>
 
     <div id="paginacion"></div>
 
-    <div id="evolucion" class="mt-4"></div>
-
-    <div class="container mt-4">
-      <a class="formBackLink" href="/api/productos"
-        ><button class="formBackLinkBtn">Volver</button></a
-      >
-    </div>
+    <div id="evolucion" class="mt-4 mb-5"></div>
 
     <script type="module" src="../../js/querys.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -144,5 +146,11 @@
       crossorigin="anonymous"
     ></script>
     <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+    <!-- PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+
+    <!-- Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   </body>
 </html>

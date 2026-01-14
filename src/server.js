@@ -27,6 +27,7 @@ import scansRoute from "./router/scansRoute.js";
 import chartsRoute from "./router/chartsRouter.js";
 import statsRoute from "./router/statsRouter.js";
 import querysRouter from "./router/querysRouter.js";
+import exportRouter from "./router/exportRouter.js";
 
 dotenv.config();
 
@@ -71,6 +72,7 @@ app.use("/api/register", userReg);
 app.use("/api/stats", statsRoute);
 app.use("/api/home", homeRoute);
 app.use("/api/charts", chartsRoute);
+app.use("/api/export", exportRouter);
 app.use("/api/populateSupabase", infoAndRandoms);
 
 // Middleware para mostrar error al intentar acceder a una ruta/método no implementados
