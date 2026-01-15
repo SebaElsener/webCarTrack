@@ -835,13 +835,13 @@ document
       body: JSON.stringify(payload),
     });
 
-    // const blob = await res.blob();
-    // const url = URL.createObjectURL(blob);
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
 
-    // const a = document.createElement("a");
-    // a.href = url;
-    // a.download = "reporte_danios.xlsx";
-    // a.click();
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "reporte_danios.xlsx";
+    a.click();
   });
 
 function buildStats(data) {

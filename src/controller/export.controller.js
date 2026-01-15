@@ -21,20 +21,18 @@ export async function generarReportesExcel(req, res) {
 }
 
 export async function generarReportesPDF(req, res) {
-  const scriptPath = path.resolve("./src/python/export_pdf.py");
-  const outputPath = path.resolve("./exports/reporte_danios.pdf");
+  const excelPath = path.resolve("exports/reporte_danios.xlsx");
 
-  const datos = req.body;
   execFile(
     "python3",
-    [scriptPath, outputPath, JSON.stringify(datos)],
+    ["src/python/export_pdf.py", excelPath],
     (err, stdout, stderr) => {
       if (err) {
         console.error(stderr);
-        return res.status(500).json({ error: "Error generando PDF" });
+        return;
       }
       console.log(stdout);
-      res.download(outputPath);
+      res.download(path.resolve("exports/reporte_danios.pdf"));
     }
   );
 }

@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from openpyxl import Workbook
 from openpyxl.worksheet.table import Table, TableStyleInfo
-from openpyxl.chart import BarChart, Reference
+from openpyxl.chart import BarChart, Reference, LineChart
 from openpyxl.styles import Font, Alignment
 
 if len(sys.argv) < 3:
@@ -34,7 +34,7 @@ bold = Font(bold=True)
 center = Alignment(horizontal="center")
 
 # Hoja de datos como tabla filtrable
-headers = ["Fecha", "Marca", "Modelo", "VIN", "Área", "Avería"]
+headers = ["Fecha", "Marca", "Modelo", "VIN", "Area", "Avería"]
 ws_data.append(headers)
 for d in datos_tabla:
     ws_data.append([
@@ -58,7 +58,7 @@ ws_data.add_table(tab)
 # ----------------------------
 # Top Áreas
 # ----------------------------
-ws_areas = wb.create_sheet("Top Áreas")
+ws_areas = wb.create_sheet("Top Areas")
 ws_areas.append(["Área", "Casos"])
 for t in top_areas:
     ws_areas.append([t["label"], t["value"]])
@@ -99,7 +99,7 @@ ws_evo.append(["Fecha", "Casos"])
 for t in evolucion:
     ws_evo.append([t["fecha"], t["value"]])
 
-chart3 = BarChart()
+chart3 = LineChart()
 chart3.title = "Evolución de daños"
 chart3.y_axis.title = "Casos"
 chart3.x_axis.title = "Fecha"
