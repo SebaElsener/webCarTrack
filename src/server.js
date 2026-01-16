@@ -65,7 +65,7 @@ app.use("/api/productos", userLoginWatcher, routeProducts);
 app.use("/api/carrito", userLoginWatcher, routeCart);
 app.use("/api/userdata", userLoginWatcher, userData);
 app.use("/api/scans", scansRoute);
-app.use("/api/querys", querysRouter);
+app.use("/api/querys", userLoginWatcher, querysRouter);
 app.use("/api/login", userLogin);
 app.use("/api/logout", userLogout);
 app.use("/api/register", userReg);
