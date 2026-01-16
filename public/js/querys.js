@@ -768,44 +768,6 @@ document.getElementById("btnLimpiarFiltros").addEventListener("click", () => {
   aplicarFiltros();
 });
 
-// function buildExportRows(data) {
-//   const rows = [];
-
-//   data.forEach((scan) => {
-//     if (!scan.damages || scan.damages.length === 0) {
-//       rows.push({
-//         Fecha: new Date(scan.scan_date).toLocaleString("es-AR"),
-//         Marca: scan.marca ?? "",
-//         Modelo: scan.modelo ?? "",
-//         VIN: scan.vin ?? "",
-//         Area: "",
-//         Averia: "",
-//         Gravedad: "",
-//         Observacion: "",
-//         Usuario: scan.user ?? "",
-//         Clima: scan.clima ?? "",
-//       });
-//     } else {
-//       scan.damages.forEach((d) => {
-//         rows.push({
-//           Fecha: new Date(scan.scan_date).toLocaleString("es-AR"),
-//           Marca: scan.marca ?? "",
-//           Modelo: scan.modelo ?? "",
-//           VIN: scan.vin ?? "",
-//           Area: d.area_desc ?? "",
-//           Averia: d.averia_desc ?? "",
-//           Gravedad: d.grav_desc ?? "",
-//           Observacion: d.obs ?? "",
-//           Usuario: scan.user ?? "",
-//           Clima: scan.clima ?? "",
-//         });
-//       });
-//     }
-//   });
-
-//   return rows;
-// }
-
 document.getElementById("btnExportPdf").addEventListener("click", async () => {
   const payload = buildExportPayload();
 
@@ -816,12 +778,22 @@ document.getElementById("btnExportPdf").addEventListener("click", async () => {
   });
 
   const blob = await res.blob();
-  const url = URL.createObjectURL(blob);
+  
+    let fileName = "reporte.pdf";
 
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "reporte_danios.pdf";
-  a.click();
+    if (disposition) {
+      const match = disposition.match(/filename="(.+)"/);
+      if (match?.[1]) fileName = match[1];
+    }
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = fileName;
+    a.click();
+
+    URL.revokeObjectURL(url);
 });
 
 document
@@ -836,12 +808,23 @@ document
     });
 
     const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
+       // 👇 leer filename real
+    const disposition = res.headers.get("Content-Disposition");
+    let fileName = "reporte.xlsx";
 
+    if (disposition) {
+      const match = disposition.match(/filename="(.+)"/);
+      if (match?.[1]) fileName = match[1];
+    }
+
+    const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
+
     a.href = url;
-    a.download = "reporte_danios.xlsx";
+    a.download = fileName;
     a.click();
+
+    URL.revokeObjectURL(url);
   });
 
 function buildStats(data) {

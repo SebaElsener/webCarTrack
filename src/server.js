@@ -64,15 +64,15 @@ app.use("/", userLogin);
 app.use("/api/productos", userLoginWatcher, routeProducts);
 app.use("/api/carrito", userLoginWatcher, routeCart);
 app.use("/api/userdata", userLoginWatcher, userData);
-app.use("/api/scans", scansRoute);
 app.use("/api/querys", userLoginWatcher, querysRouter);
+app.use("/api/export", userLoginWatcher, exportRouter);
+app.use("/api/scans", scansRoute);
 app.use("/api/login", userLogin);
 app.use("/api/logout", userLogout);
 app.use("/api/register", userReg);
 app.use("/api/stats", statsRoute);
 app.use("/api/home", homeRoute);
 app.use("/api/charts", chartsRoute);
-app.use("/api/export", exportRouter);
 app.use("/api/populateSupabase", infoAndRandoms);
 
 // Middleware para mostrar error al intentar acceder a una ruta/método no implementados

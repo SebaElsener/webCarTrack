@@ -11,11 +11,88 @@ from openpyxl.worksheet.table import Table, TableStyleInfo
 from openpyxl.chart import BarChart, Reference, LineChart
 from openpyxl.styles import Font, Alignment
 from openpyxl.utils import get_column_letter
-
+from openpyxl.styles import Border, Side, Font
+from openpyxl.styles import Alignment
+from openpyxl.utils import get_column_letter
 
 # =====================================================
 # UTILIDADES
 # =====================================================
+def aplicar_bordes_tabla(ws, start_row, end_row, start_col, end_col):
+    thin = Side(style="thin")
+    border = Border(left=thin, right=thin, top=thin, bottom=thin)
+
+    for row in ws.iter_rows(
+        min_row=start_row,
+        max_row=end_row,
+        min_col=start_col,
+        max_col=end_col
+    ):
+        for cell in row:
+            cell.border = border
+
+def resaltar_header(ws, row=2, start_col=1, end_col=6):
+    thick = Side(style="medium")
+    border = Border(bottom=thick)
+
+    for col in range(start_col, end_col + 1):
+        cell = ws.cell(row=row, column=col)
+        cell.font = Font(bold=True)
+        cell.border = border
+
+def ajustar_columnas_clave(ws):
+    # Anchos óptimos por columna (A=1, B=2, ...)
+    widths = {
+        1: 10,  # Fecha
+        2: 8,  # Marca
+        3: 10,  # Modelo
+        4: 22,  # VIN
+        5: 40,  # Área
+        6: 40,  # Avería
+    }
+
+    for col_idx, width in widths.items():
+        ws.column_dimensions[get_column_letter(col_idx)].width = width
+
+    # Alinear y ajustar texto solo donde importa
+    for row in ws.iter_rows(min_row=3):  # datos (salta título + header)
+        # Fecha centrada
+        row[0].alignment = Alignment(horizontal="center", vertical="center")
+
+        # Marca / Modelo
+        row[1].alignment = Alignment(vertical="top")
+        row[2].alignment = Alignment(vertical="top")
+
+        # VIN monoespaciado y centrado
+        row[3].alignment = Alignment(horizontal="center", vertical="center")
+
+        # Área / Avería con wrap
+        row[4].alignment = Alignment(wrap_text=True, vertical="top")
+        row[5].alignment = Alignment(wrap_text=True, vertical="top")
+
+from openpyxl.styles import Alignment
+
+def ajustar_texto(ws, desde_fila=1):
+    for row in ws.iter_rows(min_row=desde_fila):
+        for cell in row:
+            cell.alignment = Alignment(
+                wrap_text=True,
+                vertical="top"
+            )
+
+def ajustar_altura_filas(ws, min_height=22):
+    for row in ws.iter_rows():
+        max_lines = 1
+        for cell in row:
+            if cell.value:
+                max_lines = max(
+                    max_lines,
+                    str(cell.value).count("\n") + 1
+                )
+        ws.row_dimensions[row[0].row].height = max(
+            min_height * max_lines,
+            min_height
+        )
 
 def agregar_titulo_hoja(ws, ancho_columnas):
     end_col = get_column_letter(ancho_columnas)
@@ -46,7 +123,6 @@ def auto_ajustar_columnas(ws, min_width=10, max_width=50):
             max(max_length + 2, min_width),
             max_width
         )
-
 
 def configurar_impresion(ws):
     ws.page_setup.orientation = ws.ORIENTATION_LANDSCAPE
@@ -122,8 +198,25 @@ tab.tableStyleInfo = TableStyleInfo(
 ws_data.add_table(tab)
 ws_data.freeze_panes = "A4"
 
-auto_ajustar_columnas(ws_data)
+ajustar_columnas_clave(ws_data)
+ajustar_texto(ws_data, desde_fila=3)
+ajustar_altura_filas(ws_data)
 configurar_impresion(ws_data)
+
+# filas reales de datos (incluye header)
+first_row = 2   # header
+last_row = ws_data.max_row
+first_col = 1
+last_col = 6
+
+aplicar_bordes_tabla(
+    ws_data,
+    start_row=first_row,
+    end_row=last_row,
+    start_col=first_col,
+    end_col=last_col
+)
+resaltar_header(ws_data)
 
 
 # =====================================================
@@ -159,7 +252,7 @@ chart.set_categories(cats)
 chart.width = 22
 chart.height = 12
 
-ws_areas_chart.add_chart(chart, "B3")
+ws_areas_chart.add_chart(chart, "A3")
 configurar_impresion(ws_areas_chart)
 
 
@@ -196,7 +289,7 @@ chart2.set_categories(cats2)
 chart2.width = 22
 chart2.height = 12
 
-ws_averias_chart.add_chart(chart2, "B3")
+ws_averias_chart.add_chart(chart2, "A3")
 configurar_impresion(ws_averias_chart)
 
 
@@ -233,7 +326,7 @@ chart3.set_categories(cats3)
 chart3.width = 22
 chart3.height = 12
 
-ws_evo_chart.add_chart(chart3, "B3")
+ws_evo_chart.add_chart(chart3, "A3")
 configurar_impresion(ws_evo_chart)
 
 
@@ -241,7 +334,7 @@ configurar_impresion(ws_evo_chart)
 # GUARDAR
 # =====================================================
 
-excel_path = output_base.with_suffix(".xlsx")
+excel_path = output_base
 wb.save(excel_path)
 
 print(f"Excel generado correctamente en: {excel_path}")
