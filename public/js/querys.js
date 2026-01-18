@@ -778,22 +778,22 @@ document.getElementById("btnExportPdf").addEventListener("click", async () => {
   });
 
   const blob = await res.blob();
-  
-    let fileName = "reporte.pdf";
+  const disposition = res.headers.get("Content-Disposition");
+  let fileName = "reporte.pdf";
 
-    if (disposition) {
-      const match = disposition.match(/filename="(.+)"/);
-      if (match?.[1]) fileName = match[1];
-    }
+  if (disposition) {
+    const match = disposition.match(/filename="(.+)"/);
+    if (match?.[1]) fileName = match[1];
+  }
 
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
 
-    a.href = url;
-    a.download = fileName;
-    a.click();
+  a.href = url;
+  a.download = fileName;
+  a.click();
 
-    URL.revokeObjectURL(url);
+  URL.revokeObjectURL(url);
 });
 
 document
@@ -808,7 +808,7 @@ document
     });
 
     const blob = await res.blob();
-       // 👇 leer filename real
+    // 👇 leer filename real
     const disposition = res.headers.get("Content-Disposition");
     let fileName = "reporte.xlsx";
 

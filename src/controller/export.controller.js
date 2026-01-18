@@ -2,10 +2,9 @@ import path from "path";
 import fs from "fs";
 import { execFile } from "child_process";
 
-let fileNameEnding;
-let fileName;
-let fileNamePDF;
-let PDFoutputPath;
+//let fileNameEnding;
+//let fileName;
+//let fileNamePDF;
 
 const excelHelper = async (datos) => {
   return new Promise((resolve, reject) => {
@@ -17,13 +16,13 @@ const excelHelper = async (datos) => {
     const minutos = ahora.getMinutes().toString().padStart(2, "0");
     const segundos = ahora.getSeconds().toString().padStart(2, "0");
 
-    fileNameEnding = `${año}-${mes}-${dia}-${horas}${minutos}${segundos}`;
-    fileName = `reporte_danios_${fileNameEnding}.xlsx`;
-    fileNamePDF = `reporte_danios_${fileNameEnding}.pdf`;
+    const fileNameEnding = `${año}-${mes}-${dia}-${horas}${minutos}${segundos}`;
+    const fileName = `reporte_danios_${fileNameEnding}.xlsx`;
+    const fileNamePDF = `reporte_danios_${fileNameEnding}.pdf`;
 
     const scriptPath = path.resolve("./src/python/export_report.py");
     const outputPath = path.resolve("exports", fileName);
-    PDFoutputPath = path.resolve("exports", fileNamePDF);
+    const PDFoutputPath = path.resolve("exports", fileNamePDF);
 
     execFile(
       "python3",
@@ -34,7 +33,7 @@ const excelHelper = async (datos) => {
           return res.status(500).json({ error: "Error generando Excel" });
         }
         console.log(stdout);
-        resolve(outputPath, PDFoutputPath);
+        resolve({ outputPath, PDFoutputPath, fileName, fileNamePDF });
       }
     );
   });
@@ -42,9 +41,9 @@ const excelHelper = async (datos) => {
 
 export async function generarReportesExcel(req, res) {
   try {
-    const excelPath = await excelHelper(req.body);
+    const { outputPath, fileName } = await excelHelper(req.body);
 
-    if (!fs.existsSync(excelPath)) {
+    if (!fs.existsSync(outputPath)) {
       return res
         .status(500)
         .json({ error: "El archivo excel no se generó correctamente" });
@@ -56,7 +55,7 @@ export async function generarReportesExcel(req, res) {
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     );
 
-    res.sendFile(excelPath);
+    res.sendFile(outputPath);
   } catch (error) {
     console.error("Error en generarReportesExcel:", error);
     res.status(500).json({ error: "Error generando el reporte Excel" });
@@ -64,31 +63,40 @@ export async function generarReportesExcel(req, res) {
 }
 
 export async function generarReportesPDF(req, res) {
-  await excelHelper(req.body);
+  try {
+    const { outputPath, PDFoutputPath, fileNamePDF } = await excelHelper(
+      req.body
+    );
+    console.log(PDFoutputPath, "///", fileNamePDF);
 
-  const excelPath = path.resolve(
-    `./exports/reporte_danios_${fileNameEnding}.xlsx`
-  );
+    execFile(
+      "python3",
+      ["src/python/export_pdf.py", outputPath],
+      (err, stdout, stderr) => {
+        if (err) {
+          console.error("STDERR:", stderr);
+          return res.status(500).json({ error: "Error generando el PDF" });
+        }
 
-  execFile(
-    "python3",
-    ["src/python/export_pdf.py", excelPath],
-    (err, stdout, stderr) => {
-      if (err) {
-        console.error(stderr);
-        return;
+        console.log(stdout);
+
+        if (!fs.existsSync(PDFoutputPath)) {
+          return res.status(500).json({ error: "El archivo PDF no se generó" });
+        }
+
+        // 🔑 CLAVE para fetch
+        res.setHeader(
+          "Content-Disposition",
+          `attachment; filename="${fileNamePDF}"`
+        );
+
+        res.setHeader("Content-Type", "application/pdf");
+
+        res.sendFile(PDFoutputPath);
       }
-      console.log(stdout);
-      console.log(fileNamePDF, "///", PDFoutputPath);
-
-      res.setHeader(
-        "Content-Disposition",
-        `attachment; filename="${fileNamePDF}"`
-      );
-
-      res.setHeader("Content-Type", "application/pdf");
-
-      res.sendFile(PDFoutputPath);
-    }
-  );
+    );
+  } catch (error) {
+    console.error("Error en generarReportesPDF:", error);
+    res.status(500).json({ error: "Error generando el reporte PDF" });
+  }
 }
