@@ -772,48 +772,20 @@ document.getElementById("btnLimpiarFiltros").addEventListener("click", () => {
 });
 
 document.getElementById("btnExportPdf").addEventListener("click", async () => {
-  const payload = buildExportPayload();
+  const btn = document.getElementById("btnExportPdf");
 
-  const res = await fetch("/api/export/reportesPDF", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-
-  const blob = await res.blob();
-  const disposition = res.headers.get("Content-Disposition");
-  let fileName = "reporte.pdf";
-
-  if (disposition) {
-    const match = disposition.match(/filename="(.+)"/);
-    if (match?.[1]) fileName = match[1];
-  }
-
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-
-  a.href = url;
-  a.download = fileName;
-  a.click();
-
-  URL.revokeObjectURL(url);
-});
-
-document
-  .getElementById("btnExportExcel")
-  .addEventListener("click", async () => {
+  await withBootstrapButtonLock(btn, async () => {
     const payload = buildExportPayload();
 
-    const res = await fetch("/api/export/reportesExcel", {
+    const res = await fetch("/api/export/reportesPDF", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
 
     const blob = await res.blob();
-    // 👇 leer filename real
     const disposition = res.headers.get("Content-Disposition");
-    let fileName = "reporte.xlsx";
+    let fileName = "reporte.pdf";
 
     if (disposition) {
       const match = disposition.match(/filename="(.+)"/);
@@ -828,6 +800,42 @@ document
     a.click();
 
     URL.revokeObjectURL(url);
+  });
+});
+
+document
+  .getElementById("btnExportExcel")
+  .addEventListener("click", async () => {
+    const btn = document.getElementById("btnExportExcel");
+
+    withBootstrapButtonLock(btn, async () => {
+      const payload = buildExportPayload();
+
+      const res = await fetch("/api/export/reportesExcel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const blob = await res.blob();
+      // 👇 leer filename real
+      const disposition = res.headers.get("Content-Disposition");
+      let fileName = "reporte.xlsx";
+
+      if (disposition) {
+        const match = disposition.match(/filename="(.+)"/);
+        if (match?.[1]) fileName = match[1];
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+
+      a.href = url;
+      a.download = fileName;
+      a.click();
+
+      URL.revokeObjectURL(url);
+    });
   });
 
 function buildStats(data) {
@@ -893,4 +901,28 @@ function mostrarAccionesPostTabla() {
   });
 
   accionesPostTablaMostradas = true;
+}
+
+async function withBootstrapButtonLock(button, action) {
+  if (button.disabled) return;
+
+  const originalHtml = button.innerHTML;
+
+  button.disabled = true;
+  button.classList.add("disabled");
+  button.innerHTML = `
+    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+    Generando...
+  `;
+
+  try {
+    await action();
+  } catch (err) {
+    console.error(err);
+    alert("Error al generar el archivo");
+  } finally {
+    button.disabled = false;
+    button.classList.remove("disabled");
+    button.innerHTML = originalHtml;
+  }
 }
