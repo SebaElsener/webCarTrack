@@ -7,18 +7,19 @@
         </li>
       </ul>
       <div class="dropdown">
+        <% if (userName === 'admin@admin.com') { %>
         <ul class="navList cartLink" style="margin: 0px 20px">
           <li class="navItem">Administrador</li>
         </ul>
         <div class="dropdown-content">
-          <% if (userName === 'admin@admin.com') { %>
+          
           <a class="itemLink" href="/api/userdata/usersadmin"
             >Administrar usuarios</a
           >
           <% } %> <% if (userData.admin === 'true') { %>
-          <a class="itemLink" href="/api/productos/form">Tablas</a>
-          <% } %>
+          <!-- <a class="itemLink" href="/api/productos/form">Tablas</a> -->
           <a class="itemLink" href="/api/userdata">Mis datos</a>
+          <% } %>
           <a class="itemLink" href="/api/logout">Logout</a>
         </div>
       </div>

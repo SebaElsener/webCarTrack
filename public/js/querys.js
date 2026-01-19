@@ -14,7 +14,6 @@ document.getElementById("form-fechas").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const fechas = document.getElementById("rangoFechas").value.split(" a ");
-  console.log(fechas);
   if (fechas.length !== 2) {
     alert("Seleccioná un rango válido");
     return;
@@ -24,7 +23,21 @@ document.getElementById("form-fechas").addEventListener("submit", async (e) => {
   cargarDatos(desde, hasta);
 });
 
-const FILAS_POR_PAGINA = 10;
+function renderTablaConPaginacion(data) {
+  renderTabla();
+
+  requestAnimationFrame(() => {
+    renderPaginacion();
+  });
+}
+
+function renderInicialTabla(data) {
+  datosFiltrados = data;
+  paginaActual = 1;
+  renderTablaConPaginacion();
+}
+
+const FILAS_POR_PAGINA = 15;
 let paginaActual = 1;
 let datosGlobales = [];
 let datosBaseFiltrados = [];
@@ -250,8 +263,8 @@ function renderTabla() {
         <thead>
           <tr>
             <th class="dateTh">Fecha</th>
-            <th>Marca</th>
-            <th>Modelo</th>
+            <th id="marcaTh">Marca</th>
+            <th id="modeloTh">Modelo</th>
             <th class="VINth">VIN</th>
             <th class="areaTh">Area</th>
             <th class="averiaTh">Avería</th>
@@ -290,6 +303,12 @@ function renderTabla() {
 // Render de paginación
 function renderPaginacion() {
   const totalPaginas = Math.ceil(datosFiltrados.length / FILAS_POR_PAGINA);
+
+  if (totalPaginas <= 1) {
+    document.getElementById("paginacion").innerHTML = "";
+    return;
+  }
+
   let html = `<nav><ul class="pagination justify-content-center">`;
 
   html += `
@@ -344,8 +363,7 @@ function cambiarPagina(nuevaPagina) {
 
   setTimeout(() => {
     // 🔹 Render de tabla y paginación de la nueva página
-    renderTabla();
-    renderPaginacion();
+    renderTablaConPaginacion();
 
     // 🔹 Entrada animada
     tabla.classList.remove("fade-out");
@@ -543,8 +561,7 @@ function aplicarFiltros() {
 
     // 🔹 Render
     renderEstadisticas(datosBaseFiltrados);
-    renderTablaFiltrada(datosTabla);
-    renderPaginacionFiltrada(datosTabla);
+    renderInicialTabla(datosTabla);
     renderEvolucion(datosBaseFiltrados);
 
     // 🔹 Entrada animada
@@ -702,7 +719,7 @@ let datosFiltrados = [];
 
 function renderTablaFiltrada(data) {
   datosFiltrados = data;
-  renderTabla();
+  renderTablaConPaginacion();
 }
 
 function renderPaginacionFiltrada(data) {

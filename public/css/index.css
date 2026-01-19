@@ -1009,20 +1009,19 @@ tbody tr:nth-child(even) {
 
 .CarTrackContainer {
   display: flex;
-  margin: 0px auto;
   justify-content: center;
-  margin-top: 20rem;
 }
 
 .CarTrackP {
-  color: #21212126;
-  font-size: 6rem;
-  font-weight: 600;
+  color: #2121215e;
+  font-size: 4rem;
+  font-weight: 500;
+  user-select: none;
 }
 
 .CarTrackSpan {
   font-style: italic;
-  color: #ed62462e;
+  color: #ed62467a;
 }
 
 #inputGroup {
@@ -1543,4 +1542,26 @@ thead {
   text-align: center;
   font-size: larger;
   font-weight: 600;
+}
+
+#paginacion {
+  position: static;
+  clear: both;
+}
+
+.tabla-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.tabla-scroll {
+  max-height: 60vh; /* 🔑 ajustá según tu layout */
+  overflow-y: auto; /* 🔑 scroll vertical */
+  overflow-x: auto;
+}
+
+#marcaTh,
+#modeloTh {
+  width: 130px;
 }
