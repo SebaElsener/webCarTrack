@@ -26,8 +26,8 @@
       href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css"
     />
     <link
-      href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
       rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"
     />
   </head>
 
@@ -56,7 +56,7 @@
       </form>
     </div>
 
-    <div class="card mb-3 shadow-sm" id="filtersCard">
+    <div class="card mb-3 shadow-sm post-table-action" id="filtersCard">
       <div class="card-body">
         <div
           class="row g-3 align-items-top"
@@ -112,6 +112,7 @@
 
     <div
       class="justify-content-start align-items-center mt-2 mx-5 post-table-action"
+      id="actionsBar"
     >
       <button
         id="btnLimpiarFiltros"
@@ -143,14 +144,17 @@
     <div id="evolucion" class="mt-4 mb-5"></div>
 
     <script type="module" src="../../js/querys.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
     <script>
       const rangoPicker = flatpickr("#rangoFechas", {
         mode: "range",
-        dateFormat: "Y-m-d",
-        locale: {
-          firstDayOfWeek: 1,
-        },
+        dateFormat: "Y-m-d", // valor real
+        altInput: true,
+        altFormat: "d/m/Y", // visible
+        locale: flatpickr.l10ns.es,
+        appendTo: document.body, // 🔥 clave
       });
     </script>
     <script
@@ -165,23 +169,25 @@
 
     <!-- Excel -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script>
-      $(document).ready(() => {
-        $("#filtroMarca").select2({
-          theme: "bootstrap-5",
-          placeholder: "Seleccionar marcas",
-          width: "100%",
-          closeOnSelect: false,
-        });
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
-        $("#filtroModelo").select2({
-          theme: "bootstrap-5",
-          placeholder: "Seleccionar modelos",
-          width: "100%",
-          closeOnSelect: false,
-        });
+    <script>
+      const choicesMarca = new Choices("#filtroMarca", {
+        removeItemButton: true,
+        placeholder: true,
+        placeholderValue: "Buscar marca...",
+        searchPlaceholderValue: "Buscar...",
+        shouldSort: true,
+        searchEnabled: true,
+      });
+
+      const choicesModelo = new Choices("#filtroModelo", {
+        removeItemButton: true,
+        placeholder: true,
+        placeholderValue: "Buscar modelo...",
+        searchPlaceholderValue: "Buscar...",
+        shouldSort: true,
+        searchEnabled: true,
       });
     </script>
   </body>

@@ -13,14 +13,14 @@ let accionesPostTablaMostradas = false;
 document.getElementById("form-fechas").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const fechas = document.getElementById("rangoFechas").value.split(" to ");
+  const fechas = document.getElementById("rangoFechas").value.split(" a ");
+  console.log(fechas);
   if (fechas.length !== 2) {
     alert("Seleccioná un rango válido");
     return;
   }
 
   const [desde, hasta] = fechas;
-
   cargarDatos(desde, hasta);
 });
 
@@ -35,20 +35,16 @@ function cargarMarcas() {
     ...new Set(datosGlobales.map((d) => d.marca).filter(Boolean)),
   ].sort();
 
-  const $select = $("#filtroMarca");
-  $select.empty();
-
-  marcas.forEach((m) => {
-    $select.append(new Option(m, m, false, false));
-  });
-
-  $select.trigger("change");
+  choicesMarca.clearChoices();
+  choicesMarca.setChoices(
+    marcas.map((m) => ({ value: m, label: m })),
+    "value",
+    "label",
+    true,
+  );
 }
 
 function cargarModelos(marcasSeleccionadas = []) {
-  const $select = $("#filtroModelo");
-  $select.empty();
-
   let modelos;
 
   if (marcasSeleccionadas.length) {
@@ -64,15 +60,18 @@ function cargarModelos(marcasSeleccionadas = []) {
     modelos = [...new Set(datosGlobales.map((d) => d.modelo).filter(Boolean))];
   }
 
-  modelos.sort().forEach((m) => {
-    $select.append(new Option(m, m, false, false));
-  });
-
-  $select.trigger("change");
+  choicesModelo.clearChoices();
+  choicesModelo.setChoices(
+    modelos.sort().map((m) => ({ value: m, label: m })),
+    "value",
+    "label",
+    true,
+  );
 }
 
 // Función para mostrar spinner
 function mostrarSpinner() {
+  document.getElementById("evolucion").style.display = "none";
   document.getElementById("resultados").innerHTML = `
         <div class="d-flex justify-content-center align-items-center my-3">
             <div class="spinner-border text-primary" role="status">
@@ -109,9 +108,17 @@ async function cargarDatos(desde, hasta) {
       if (!Array.isArray(data) || data.length === 0) {
         document.getElementById("resultados").innerHTML =
           "<p class='text-muted'>No se encontraron datos</p>";
+
         document.getElementById("paginacion").innerHTML = "";
+        document.getElementById("filtersCard").style.display = "none";
+        document.getElementById("estadisticas").style.display = "none";
+        document.getElementById("evolucion").style.display = "none";
+        document.getElementById("actionsBar").style.display = "none";
+        accionesPostTablaMostradas = false;
+
         return;
       }
+
       const transformScans = data.map((scan) => ({
         ...scan,
         damages: scan.damages.map((d) => ({
@@ -428,12 +435,12 @@ let filtros = {
   averiaSeleccionada: null,
 };
 
-$("#filtroMarca").on("change", function () {
-  filtros.marca = $(this).val() || [];
-  filtros.modelo = [];
+document.getElementById("filtroMarca").addEventListener("change", (e) => {
+  filtros.marca = Array.from(e.target.selectedOptions).map((o) => o.value);
 
+  filtros.modelo = [];
   cargarModelos(filtros.marca);
-  $("#filtroModelo").val(null).trigger("change");
+  choicesModelo.removeActiveItems();
 
   filtros.areaSeleccionada = null;
   filtros.averiaSeleccionada = null;
@@ -441,8 +448,8 @@ $("#filtroMarca").on("change", function () {
   aplicarFiltros();
 });
 
-$("#filtroModelo").on("change", function () {
-  filtros.modelo = $(this).val() || [];
+document.getElementById("filtroModelo").addEventListener("change", (e) => {
+  filtros.modelo = Array.from(e.target.selectedOptions).map((o) => o.value);
 
   filtros.areaSeleccionada = null;
   filtros.averiaSeleccionada = null;
@@ -717,6 +724,8 @@ function agruparPorFecha(scans) {
 }
 
 function renderEvolucion(data) {
+  document.getElementById("evolucion").style.display = "block";
+
   const cont = document.getElementById("evolucion");
   cont.innerHTML = "";
 
@@ -801,6 +810,10 @@ document.addEventListener("click", (e) => {
 });
 
 document.getElementById("btnLimpiarFiltros").addEventListener("click", () => {
+  limpiarFiltros();
+});
+
+const limpiarFiltros = () => {
   // 🔹 Reset filtros
   filtros.marca = [];
   filtros.modelo = [];
@@ -811,8 +824,8 @@ document.getElementById("btnLimpiarFiltros").addEventListener("click", () => {
   filtros.topAverias = false;
 
   // 🔹 Reset elementos del DOM
-  $("#filtroMarca").val(null).trigger("change");
-  $("#filtroModelo").val(null).trigger("change");
+  choicesMarca.removeActiveItems();
+  choicesModelo.removeActiveItems();
   document.getElementById("chkSoloConDanio").checked = false;
   document.getElementById("chkTopAreas").checked = false;
   document.getElementById("chkTopAverias").checked = false;
@@ -821,7 +834,7 @@ document.getElementById("btnLimpiarFiltros").addEventListener("click", () => {
     .forEach((r) => r.classList.remove("active"));
 
   aplicarFiltros();
-});
+};
 
 document.getElementById("btnExportPdf").addEventListener("click", async () => {
   const btn = document.getElementById("btnExportPdf");
@@ -942,14 +955,24 @@ function buildExportPayload() {
 
 function mostrarAccionesPostTabla() {
   if (accionesPostTablaMostradas) return;
+  document.getElementById("filtersCard").style.display = "flex";
+  document.getElementById("estadisticas").style.display = "flex";
+  document.getElementById("actionsBar").style.display = "flex";
+  document.getElementById("evolucion").style.display = "block";
+
   const acciones = document.querySelectorAll(".post-table-action");
+  const delayBase = 500; // ⏱️ delay inicial
+  const delayStep = 600; // escalonado entre acciones
 
   acciones.forEach((el) => el.classList.remove("show"));
 
   acciones.forEach((el, i) => {
-    setTimeout(() => {
-      el.classList.add("show");
-    }, 500); // delay escalonado
+    setTimeout(
+      () => {
+        el.classList.add("show");
+      },
+      delayBase + i * delayStep,
+    );
   });
 
   accionesPostTablaMostradas = true;

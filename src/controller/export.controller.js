@@ -34,7 +34,7 @@ const excelHelper = async (datos) => {
         }
         console.log(stdout);
         resolve({ outputPath, PDFoutputPath, fileName, fileNamePDF });
-      }
+      },
     );
   });
 };
@@ -52,7 +52,7 @@ export async function generarReportesExcel(req, res) {
 
     res.setHeader(
       "Content-Type",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     );
 
     res.sendFile(outputPath);
@@ -65,7 +65,7 @@ export async function generarReportesExcel(req, res) {
 export async function generarReportesPDF(req, res) {
   try {
     const { outputPath, PDFoutputPath, fileNamePDF } = await excelHelper(
-      req.body
+      req.body,
     );
     console.log(PDFoutputPath, "///", fileNamePDF);
 
@@ -87,13 +87,13 @@ export async function generarReportesPDF(req, res) {
         // 🔑 CLAVE para fetch
         res.setHeader(
           "Content-Disposition",
-          `attachment; filename="${fileNamePDF}"`
+          `attachment; filename="${fileNamePDF}"`,
         );
 
         res.setHeader("Content-Type", "application/pdf");
 
         res.sendFile(PDFoutputPath);
-      }
+      },
     );
   } catch (error) {
     console.error("Error en generarReportesPDF:", error);
