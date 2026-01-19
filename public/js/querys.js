@@ -1,6 +1,6 @@
-import areas from "../utils/areas.json" with { type: "json" }
-import averias from "../utils/averias.json" with { type: "json" }
-import gravedades from "../utils/gravedades.json" with { type: "json" }
+import areas from "../utils/areas.json" with { type: "json" };
+import averias from "../utils/averias.json" with { type: "json" };
+import gravedades from "../utils/gravedades.json" with { type: "json" };
 
 const indexById = (arr) =>
   Object.fromEntries(arr.map((i) => [i.id, i.descripcion]));
@@ -8,6 +8,7 @@ const indexById = (arr) =>
 const areasMap = indexById(areas);
 const averiasMap = indexById(averias);
 const gravedadesMap = indexById(gravedades);
+let accionesPostTablaMostradas = false;
 
 document.getElementById("form-fechas").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -108,6 +109,8 @@ async function cargarDatos(desde, hasta) {
 
 // Render de tabla
 function renderTabla() {
+  mostrarAccionesPostTabla();
+
   const inicio = (paginaActual - 1) * FILAS_POR_PAGINA;
   const fin = inicio + FILAS_POR_PAGINA;
   const paginaDatos = datosFiltrados.slice(inicio, fin);
@@ -144,7 +147,7 @@ function renderTabla() {
                               : ""
                           }
                         </a>
-                      `
+                      `,
                     )
                     .join("")
                 : ""
@@ -177,8 +180,8 @@ function renderTabla() {
                             class="glightbox"
                             data-gallery="gallery-${scan.scan_id}"
                             data-title="Imagen ${idx + 1} de ${
-                          scan.fotos.length
-                        }"
+                              scan.fotos.length
+                            }"
                             ${idx > 0 ? 'style="display:none"' : ""}
                           >
                             ${
@@ -187,7 +190,7 @@ function renderTabla() {
                                 : ""
                             }
                           </a>
-                        `
+                        `,
                       )
                       .join("")
                   : ""
@@ -452,7 +455,7 @@ function aplicarFiltros() {
       dataTablaLocal = dataTablaLocal
         .map((scan) => {
           const filteredDamages = scan.damages?.filter(
-            (d) => d.area === filtros.areaSeleccionada
+            (d) => d.area === filtros.areaSeleccionada,
           );
           if (filteredDamages && filteredDamages.length) {
             return { ...scan, damages: filteredDamages };
@@ -466,7 +469,7 @@ function aplicarFiltros() {
       dataTablaLocal = dataTablaLocal
         .map((scan) => {
           const filteredDamages = scan.damages?.filter(
-            (d) => d.averia === filtros.averiaSeleccionada
+            (d) => d.averia === filtros.averiaSeleccionada,
           );
           if (filteredDamages && filteredDamages.length) {
             return { ...scan, damages: filteredDamages };
@@ -532,7 +535,7 @@ function renderEstadisticas(data) {
       "Top 5 Áreas dañadas",
       top,
       Object.values(totalAreas).reduce((acc, item) => acc + item.value, 0),
-      "area"
+      "area",
     );
   }
 
@@ -562,7 +565,7 @@ function renderEstadisticas(data) {
       "Top 5 Tipos de daño",
       top,
       Object.values(totalAverias).reduce((acc, item) => acc + item.value, 0),
-      "averia"
+      "averia",
     );
   }
 
@@ -875,4 +878,19 @@ function buildExportPayload() {
       value,
     })),
   };
+}
+
+function mostrarAccionesPostTabla() {
+  if (accionesPostTablaMostradas) return;
+  const acciones = document.querySelectorAll(".post-table-action");
+
+  acciones.forEach((el) => el.classList.remove("show"));
+
+  acciones.forEach((el, i) => {
+    setTimeout(() => {
+      el.classList.add("show");
+    }, 500); // delay escalonado
+  });
+
+  accionesPostTablaMostradas = true;
 }

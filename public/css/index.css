@@ -782,7 +782,9 @@ tbody tr:nth-child(even) {
   left: 50%;
   position: absolute;
   background: #9c6db9;
-  transition: width 0.3s ease 0s, left 0.3s ease 0s;
+  transition:
+    width 0.3s ease 0s,
+    left 0.3s ease 0s;
   width: 0;
 }
 
@@ -1185,7 +1187,9 @@ thead {
 .fade-out {
   opacity: 0;
   transform: translateY(-6px);
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 
 .fade-in {
@@ -1270,7 +1274,10 @@ thead {
   width: 0%;
   background: linear-gradient(90deg, #0d6efd, #4dabf7);
   border-radius: 7px;
-  transition: width 0.45s ease, filter 0.15s ease, box-shadow 0.15s ease,
+  transition:
+    width 0.45s ease,
+    filter 0.15s ease,
+    box-shadow 0.15s ease,
     height 0.15s ease;
 }
 
@@ -1302,7 +1309,9 @@ thead {
 .fade-slide {
   opacity: 0;
   transform: translateY(10px);
-  transition: opacity 0.3s, transform 0.3s;
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
 }
 
 .fade-slide.fade-in {
@@ -1325,7 +1334,9 @@ thead {
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
   z-index: 9999;
 }
 
@@ -1375,7 +1386,9 @@ thead {
 } */
 
 .badge {
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .badge.show {
@@ -1424,4 +1437,20 @@ thead {
   padding: 8px;
   font-size: 0.9rem;
   width: 8rem;
+}
+
+.post-table-action {
+  display: flex;
+  opacity: 0;
+  transform: translateY(10px);
+  visibility: hidden;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+.post-table-action.show {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
 }
