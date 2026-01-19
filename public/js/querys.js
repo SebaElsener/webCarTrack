@@ -30,6 +30,47 @@ let datosGlobales = [];
 let datosBaseFiltrados = [];
 let datosTabla = [];
 
+function cargarMarcas() {
+  const marcas = [
+    ...new Set(datosGlobales.map((d) => d.marca).filter(Boolean)),
+  ].sort();
+
+  const $select = $("#filtroMarca");
+  $select.empty();
+
+  marcas.forEach((m) => {
+    $select.append(new Option(m, m, false, false));
+  });
+
+  $select.trigger("change");
+}
+
+function cargarModelos(marcasSeleccionadas = []) {
+  const $select = $("#filtroModelo");
+  $select.empty();
+
+  let modelos;
+
+  if (marcasSeleccionadas.length) {
+    modelos = [
+      ...new Set(
+        datosGlobales
+          .filter((d) => marcasSeleccionadas.includes(d.marca))
+          .map((d) => d.modelo)
+          .filter(Boolean),
+      ),
+    ];
+  } else {
+    modelos = [...new Set(datosGlobales.map((d) => d.modelo).filter(Boolean))];
+  }
+
+  modelos.sort().forEach((m) => {
+    $select.append(new Option(m, m, false, false));
+  });
+
+  $select.trigger("change");
+}
+
 // Función para mostrar spinner
 function mostrarSpinner() {
   document.getElementById("resultados").innerHTML = `
@@ -46,7 +87,8 @@ async function cargarDatos(desde, hasta) {
   mostrarSpinner();
   datosFiltrados = [];
   filtros = {
-    marca: "",
+    marca: [],
+    modelo: [],
     topAreas: false,
     topAverias: false,
     soloConDanio: false,
@@ -64,17 +106,6 @@ async function cargarDatos(desde, hasta) {
       return res.json();
     })
     .then((data) => {
-      function cargarMarcas() {
-        const select = document.getElementById("filtroMarca");
-        const marcas = [
-          ...new Set(datosGlobales.map((d) => d.marca).filter(Boolean)),
-        ];
-
-        select.innerHTML =
-          `<option value="">Todas</option>` +
-          marcas.map((m) => `<option value="${m}">${m}</option>`).join("");
-      }
-
       if (!Array.isArray(data) || data.length === 0) {
         document.getElementById("resultados").innerHTML =
           "<p class='text-muted'>No se encontraron datos</p>";
@@ -94,6 +125,7 @@ async function cargarDatos(desde, hasta) {
       datosGlobales = transformScans;
       paginaActual = 1;
       cargarMarcas();
+      cargarModelos();
       aplicarFiltros();
       // renderTabla();
       // renderPaginacion();
@@ -387,7 +419,8 @@ function renderClimaIcon(clima) {
 }
 
 let filtros = {
-  marca: "",
+  marca: [],
+  modelo: [],
   topAreas: false,
   topAverias: false,
   soloConDanio: false,
@@ -395,14 +428,25 @@ let filtros = {
   averiaSeleccionada: null,
 };
 
-document.getElementById("filtroMarca").addEventListener("change", (e) => {
-  filtros.marca = e.target.value;
-  // 🔹 Limpiar selección de barras
+$("#filtroMarca").on("change", function () {
+  filtros.marca = $(this).val() || [];
+  filtros.modelo = [];
+
+  cargarModelos(filtros.marca);
+  $("#filtroModelo").val(null).trigger("change");
+
   filtros.areaSeleccionada = null;
   filtros.averiaSeleccionada = null;
-  document
-    .querySelectorAll(".mini-bar-row")
-    .forEach((r) => r.classList.remove("active"));
+
+  aplicarFiltros();
+});
+
+$("#filtroModelo").on("change", function () {
+  filtros.modelo = $(this).val() || [];
+
+  filtros.areaSeleccionada = null;
+  filtros.averiaSeleccionada = null;
+
   aplicarFiltros();
 });
 
@@ -427,9 +471,15 @@ function aplicarFiltros() {
   setTimeout(() => {
     let dataBase = [...datosGlobales];
 
-    // 🔹 Filtro marca
-    if (filtros.marca)
-      dataBase = dataBase.filter((d) => d.marca === filtros.marca);
+    //filtro marca
+    if (filtros.marca.length) {
+      dataBase = dataBase.filter((d) => filtros.marca.includes(d.marca));
+    }
+
+    // filtro modelo
+    if (filtros.modelo.length) {
+      dataBase = dataBase.filter((d) => filtros.modelo.includes(d.modelo));
+    }
 
     // 🔹 Solo VIN con daño
     if (filtros.soloConDanio)
@@ -752,7 +802,8 @@ document.addEventListener("click", (e) => {
 
 document.getElementById("btnLimpiarFiltros").addEventListener("click", () => {
   // 🔹 Reset filtros
-  filtros.marca = "";
+  filtros.marca = [];
+  filtros.modelo = [];
   filtros.soloConDanio = false;
   filtros.areaSeleccionada = null;
   filtros.averiaSeleccionada = null;
@@ -760,7 +811,8 @@ document.getElementById("btnLimpiarFiltros").addEventListener("click", () => {
   filtros.topAverias = false;
 
   // 🔹 Reset elementos del DOM
-  document.getElementById("filtroMarca").value = "";
+  $("#filtroMarca").val(null).trigger("change");
+  $("#filtroModelo").val(null).trigger("change");
   document.getElementById("chkSoloConDanio").checked = false;
   document.getElementById("chkTopAreas").checked = false;
   document.getElementById("chkTopAverias").checked = false;

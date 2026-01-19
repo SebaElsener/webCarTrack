@@ -1454,3 +1454,160 @@ thead {
   transform: translateY(0);
   visibility: visible;
 }
+
+/* 🔹 Contenedor Select2 con look Bootstrap */
+.select2-container--bootstrap-5 .select2-selection {
+  min-height: 38px;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 0.375rem;
+  background-color: #fff;
+}
+
+/* 🔹 Hover */
+.select2-container--bootstrap-5 .select2-selection:hover {
+  border-color: #86b7fe;
+}
+
+/* 🔹 Focus */
+.select2-container--bootstrap-5
+  .select2-selection--multiple.select2-selection--focus {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* 🔹 Contenedor de chips */
+.select2-container--bootstrap-5
+  .select2-selection--multiple
+  .select2-selection__rendered {
+  display: flex;
+  flex-wrap: wrap; /* 🔥 horizontal + salto de línea */
+  gap: 0.25rem;
+  padding: 0;
+}
+
+/* 🔹 Chip individual */
+.select2-container--bootstrap-5
+  .select2-selection--multiple
+  .select2-selection__choice {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.5rem;
+  margin: 0;
+  font-size: 0.85rem;
+  border-radius: 0.375rem;
+  background-color: #e9ecef;
+  border: 1px solid #ced4da;
+}
+
+/* ❌ Quitar ancho 100% que rompe la fila */
+.select2-container--bootstrap-5 .select2-selection__choice {
+  width: auto !important;
+}
+
+.select2-container--bootstrap-5 .select2-selection__choice__remove {
+  margin-right: 0.25rem;
+  font-weight: bold;
+  color: #6c757d;
+}
+
+.select2-container--bootstrap-5 .select2-selection__choice__remove:hover {
+  color: #dc3545;
+}
+
+.select2-container--bootstrap-5 .select2-selection--multiple {
+  max-height: 90px;
+  overflow-y: auto;
+}
+
+/* 🔹 Input de búsqueda dentro del dropdown */
+.select2-container--bootstrap-5
+  .select2-search--dropdown
+  .select2-search__field {
+  min-height: 38px; /* igual a form-control */
+  padding: 0.375rem 0.75rem 0.375rem 2.25rem; /* espacio para la lupa */
+  font-size: 0.95rem;
+  border-radius: 0.375rem;
+}
+
+/* 🔹 Wrapper del search */
+/* .select2-container--bootstrap-5 .select2-search--dropdown {
+  position: relative;
+} */
+
+/* 🔍 Icono lupa */
+.select2-container--bootstrap-5 .select2-search--dropdown,
+.select2-container--bootstrap-5 .select2-search--inline {
+  position: relative;
+}
+
+.select2-container--bootstrap-5 .select2-search--dropdown::before,
+.select2-container--bootstrap-5 .select2-search--inline::before {
+  content: "\f52a"; /* bi-search */
+  font-family: "bootstrap-icons";
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+  font-size: 0.9rem;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* 🔹 SEARCH INPUT (INLINE + DROPDOWN) */
+.select2-container--bootstrap-5 .select2-search__field {
+  height: 30px !important;
+  min-height: 30px !important;
+  line-height: 30px !important;
+  padding: 0.375rem 0.75rem 0.375rem 2.25rem !important;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.select2-container--bootstrap-5
+  .select2-selection--multiple
+  .select2-search--inline {
+  display: flex;
+  align-items: center;
+}
+
+/* 🔹 Select2 siempre ocupa todo el ancho */
+.select2-container {
+  width: 100% !important;
+}
+
+.select2-container--bootstrap-5 {
+  width: 100% !important;
+}
+
+.select2-container--bootstrap-5 .select2-selection {
+  width: 100% !important;
+}
+
+/* 🔹 Contenedor renderizado */
+.select2-container--bootstrap-5
+  .select2-selection--multiple
+  .select2-selection__rendered {
+  display: flex;
+  align-items: center; /* 🔥 CENTRA VERTICAL */
+  min-height: 38px;
+}
+
+/* 🔹 Input search centrado vertical */
+.select2-container--bootstrap-5 .select2-search--inline {
+  display: flex;
+  align-items: center;
+}
+
+.select2-container--bootstrap-5 .select2-search__field {
+  height: 38px !important;
+  line-height: 38px !important;
+}
+
+/* 🔹 Placeholder visual */
+.select2-container--bootstrap-5 .select2-selection__placeholder {
+  color: #6c757d;
+  margin-left: 2px;
+}

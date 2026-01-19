@@ -25,6 +25,10 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css"
     />
+    <link
+      href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
+      rel="stylesheet"
+    />
   </head>
 
   <body>
@@ -59,10 +63,17 @@
           style="justify-content: center; gap: 3rem"
         >
           <!-- Marca -->
-          <div class="col-md-5">
+          <div class="col-md-3">
             <label class="form-label fw-semibold">Marca</label>
-            <select id="filtroMarca" class="form-select">
+            <select id="filtroMarca" class="form-select" multiple>
               <option value="">Todas</option>
+            </select>
+          </div>
+          <!-- Modelo -->
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Modelo</label>
+            <select id="filtroModelo" class="form-select" multiple>
+              <option value="">Todos</option>
             </select>
           </div>
 
@@ -77,7 +88,7 @@
                   id="chkTopAreas"
                 />
                 <label class="form-check-label" for="chkTopAreas">
-                  Top 5 Áreas dañadas
+                  Top 5 Areas dañadas
                 </label>
               </div>
 
@@ -154,5 +165,24 @@
 
     <!-- Excel -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+      $(document).ready(() => {
+        $("#filtroMarca").select2({
+          theme: "bootstrap-5",
+          placeholder: "Seleccionar marcas",
+          width: "100%",
+          closeOnSelect: false,
+        });
+
+        $("#filtroModelo").select2({
+          theme: "bootstrap-5",
+          placeholder: "Seleccionar modelos",
+          width: "100%",
+          closeOnSelect: false,
+        });
+      });
+    </script>
   </body>
 </html>
