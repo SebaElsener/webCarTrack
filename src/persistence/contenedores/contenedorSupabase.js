@@ -8,7 +8,7 @@ import { readUsedSize } from "chart.js/helpers";
 
 export const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
+  process.env.SUPABASE_KEY,
 );
 
 class ContenedorSupabase {
@@ -38,7 +38,7 @@ class ContenedorSupabase {
       pictures (
         pictureurl
       )
-    `
+    `,
         )
         .order("supabase_id", { ascending: false })
         .range(offset, offset + limit - 1);
@@ -66,7 +66,7 @@ class ContenedorSupabase {
             d.averia !== null ||
             d.grav !== null ||
             d.obs !== null ||
-            d.codigo !== null
+            d.codigo !== null,
         );
 
         return {
@@ -138,7 +138,7 @@ class ContenedorSupabase {
             pictures (
               pictureurl
             )
-        `
+        `,
         )
         .gte("date", startDate)
         .lte("date", endDate)
@@ -157,7 +157,7 @@ class ContenedorSupabase {
             d.area !== null ||
             d.averia !== null ||
             d.grav !== null ||
-            d.obs !== null
+            d.obs !== null,
         ),
         fotos: (s.pictures ?? []).map((p) => p.pictureurl).filter(Boolean),
       }));
@@ -200,13 +200,18 @@ class ContenedorSupabase {
         supabase_id,
         vin,
         date,
+        marca,
+        modelo,
+        clima,
+        user,
+        batea,
         damages (
-          id, area, averia, grav, obs, codigo, date
+          id, area, averia, grav, obs, date
         ),
         pictures (
           pictureurl
         )
-      `
+      `,
         )
         .like("vin", `%${vin}%`) // búsqueda parcial
         .order("date", { ascending: true });
@@ -224,6 +229,11 @@ class ContenedorSupabase {
         scan_id: s.supabase_id,
         vin: s.vin,
         scan_date: s.date,
+        marca: s.marca,
+        modelo: s.modelo,
+        user: s.user,
+        clima: s.clima,
+        batea: s.batea,
         damages: s.damages ?? [],
         fotos: s.pictures?.map((p) => p.pictureurl) ?? [],
       }));

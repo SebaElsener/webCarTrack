@@ -16,11 +16,11 @@
   </head>
 
   <body>
-    <h2 class="formTitle">Consulta chasis / VIN</h2>
+    <div class="container mt-5" id="title-VIN-input">
+      <h3 class="formTitle">Consulta chasis / VIN</h3>
 
-    <div class="container mt-4">
       <form id="form-vin">
-        <div id="inputGroup" class="input-group">
+        <div id="VINinputGroup" class="input-group">
           <!-- <span class="input-group-text">📅</span> -->
           <input
             type="text"
@@ -37,8 +37,7 @@
       </form>
     </div>
 
-    <div id="resultados" class="container mt-4"></div>
-    <div id="paginacion"></div>
+    <div id="resultadosVIN"></div>
 
     <div class="container mt-4">
       <a class="formBackLink" href="/api/productos"

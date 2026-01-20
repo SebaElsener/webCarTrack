@@ -660,11 +660,11 @@ tbody tr:nth-child(even) {
   font-size: 1rem;
 }
 
-.formTitle {
+/* .formTitle {
   text-align: center;
   margin: 1.5rem 0;
   margin-top: 4rem;
-}
+} */
 
 .tableTd {
   text-align: left;
@@ -1564,4 +1564,22 @@ thead {
 #marcaTh,
 #modeloTh {
   width: 130px;
+}
+
+#vinInput {
+  max-width: 300px;
+}
+
+#VINinputGroup {
+  justify-content: center;
+}
+
+#title-VIN-input,
+#title-date-input {
+  flex-direction: row;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  justify-content: center;
+  margin-top: 4rem !important;
 }

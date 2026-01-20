@@ -147,9 +147,6 @@ async function cargarDatos(desde, hasta) {
       cargarMarcas();
       cargarModelos();
       aplicarFiltros();
-      // renderTabla();
-      // renderPaginacion();
-      // enableColumnResize("tabla-resultados");
     })
     .catch((err) => {
       console.error(err);
@@ -716,16 +713,6 @@ function animateMiniCharts() {
 }
 
 let datosFiltrados = [];
-
-function renderTablaFiltrada(data) {
-  datosFiltrados = data;
-  renderTablaConPaginacion();
-}
-
-function renderPaginacionFiltrada(data) {
-  datosFiltrados = data;
-  renderPaginacion();
-}
 
 function agruparPorFecha(scans) {
   const map = {};

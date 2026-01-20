@@ -34,9 +34,9 @@
   <body>
     <%- include('./partials/nav') %>
 
-    <h2 class="formTitle">Consulta por rango de fechas</h2>
+    <div class="container mt-5" id="title-date-input">
+      <h3 class="formTitle">Consulta por rango de fechas</h3>
 
-    <div class="container mt-4">
       <form id="form-fechas">
         <div id="inputGroup" class="input-group">
           <span class="input-group-text">📅</span>
@@ -44,7 +44,7 @@
             type="text"
             id="rangoFechas"
             class="form-control"
-            placeholder="Seleccionar rango de fechas"
+            placeholder="Seleccionar fechas"
             readonly
           />
           <div class="btnFormContainer">
