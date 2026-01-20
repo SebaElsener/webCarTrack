@@ -1,0 +1,24 @@
+footer {
+  display: flex;
+  flex-direction: row;
+  padding: 0 32px;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+  height: 60px;
+  min-width: 1150px;
+}
+
+.footerLogo {
+  width: 120px !important;
+}
+
+.footeLogoImg {
+  width: 100%;
+}
+
+.footerDescription,
+.copyRight {
+  font-size: 0.9rem;
+  color: #616161;
+}

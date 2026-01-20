@@ -29,11 +29,11 @@ const cards = [
 function Home({ user, admin }) {
   return (
     <div className="home-container">
-      <div className="CarTrackContainer">
+      {/* <div className="CarTrackContainer">
         <p className="CarTrackP">
           Car<span className="CarTrackSpan">Track</span>
         </p>
-      </div>
+      </div> */}
       <section className="cards-grid">
         {cards
           .filter((card) => !card.adminOnly || admin === "true")

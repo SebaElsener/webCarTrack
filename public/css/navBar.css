@@ -1,0 +1,112 @@
+/* Navbar */
+.navbar {
+  height: 72px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  position: absolute;
+  top: 100px;
+  width: 100%;
+  min-width: 1150px;
+}
+
+/* Left */
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Center */
+.navbar-center {
+  list-style: none;
+  display: flex;
+  gap: 32px;
+  padding: 0;
+  margin: 0;
+}
+
+.navbar-center li {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  font-size: 15px;
+  font-weight: 500;
+  color: #616161;
+  cursor: pointer;
+  position: relative;
+  padding-bottom: 6px;
+}
+
+.navbar-center li:hover {
+  color: #1e88e5;
+}
+
+.navbar-center li.active {
+  color: #1e88e5;
+}
+
+.navbar-center li:hover::after {
+  left: 0;
+  width: 100%;
+}
+
+.navbar-center li::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0px;
+  width: 0;
+  height: 2px;
+  background: #1e88e5;
+  transition:
+    width 0.25s ease,
+    left 0.25s ease;
+}
+
+.navbar-center li.active::after {
+  left: 0;
+  width: 100%;
+}
+
+/* Right */
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: #424242;
+}
+
+.user-icon {
+  font-size: 28px;
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.CarTrackContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.CarTrackP {
+  color: #2121215e;
+  font-size: 25px;
+  font-weight: 500;
+  user-select: none;
+}
+
+.CarTrackSpan {
+  font-style: italic;
+  color: #ed62467a;
+}
+
+.VINshortQuery {
+  margin-left: 1rem;
+}

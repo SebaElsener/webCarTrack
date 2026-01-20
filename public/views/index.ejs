@@ -14,7 +14,7 @@
   </head>
 
   <body>
-    <%- include('./partials/nav') %>
+    <%- include('./partials/navMin') %>
 
     <main id="main">
       <div
@@ -23,7 +23,7 @@
         data-admin="<%= JSON.stringify(userData.admin) %>"
       ></div>
       <!-- <%- include('./partials/cards') %> -->
-      <%- include('./partials/messages') %>
+      <!-- <%- include('./partials/messages') %> -->
     </main>
 
     <!-- Script toastify
@@ -32,6 +32,8 @@
       src="https://cdn.jsdelivr.net/npm/toastify-js"
     ></script> -->
     <!-- React CDN -->
+    <%- include('./partials/footer') %>
+
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <!-- Babel para JSX -->
