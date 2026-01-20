@@ -6,15 +6,16 @@ import { mainPage } from "../business/ProductsBusiness.js";
 
 const queryByDateRender = async (req, res) => {
   const userName = req.session.passport.user;
-  const data = await mainPage(userName);
   res.render("../views/queryByDate", {
     userName: userName,
-    userData: data.userData,
   });
 };
 
 const queryByVINRender = async (req, res) => {
-  res.render("../views/queryByVIN");
+  const userName = req.session.passport.user;
+  res.render("../views/queryByVIN", {
+    userName: userName,
+  });
 };
 
 const queryByDatePost = async (req, res) => {

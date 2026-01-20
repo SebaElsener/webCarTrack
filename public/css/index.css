@@ -8,14 +8,49 @@ body {
   padding: 0;
   display: flex;
   flex-direction: column;
-  background: #f5f6f8;
+  background-color: #f5f6f8 !important;
   margin: 0;
   min-width: 1150px;
   min-height: 100vh;
+  opacity: 0;
+  animation: pageFadeIn 0.45s ease forwards;
+}
+
+/* cuando salimos */
+body.fade-out {
+  animation: pageFadeOut 0.35s ease forwards;
+}
+
+body.no-scroll {
+  overflow: hidden;
+}
+
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pageFadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.98);
+  }
 }
 
 html {
   height: 100%;
+  scrollbar-gutter: stable;
+  overflow-y: auto;
 }
 
 h2,
@@ -832,7 +867,7 @@ tbody tr:nth-child(even) {
   background-color: #f7f7f7;
   border-radius: 0px 3px 3px 3px;
   padding: 8px;
-  margin-top: -10px;
+  /* margin-top: -10px; */
   border-radius: 5px;
   /* transition: all 0.5s ease; */
 }

@@ -10,6 +10,11 @@ const averiasMap = indexById(averias);
 const gravedadesMap = indexById(gravedades);
 let accionesPostTablaMostradas = false;
 
+const navBarMin = document.getElementById("navBarMin");
+navBarMin.style.top = "0";
+const dropdownContent = document.getElementById("dropdownContent");
+dropdownContent.style.marginTop = "0";
+
 document.getElementById("form-fechas").addEventListener("submit", async (e) => {
   e.preventDefault();
 

@@ -29,30 +29,29 @@ const cards = [
 function Home({ user, admin }) {
   return (
     <div className="home-container">
-      {/* <div className="CarTrackContainer">
-        <p className="CarTrackP">
-          Car<span className="CarTrackSpan">Track</span>
-        </p>
-      </div> */}
       <section className="cards-grid">
         {cards
           .filter((card) => !card.adminOnly || admin === "true")
           .map((card) => (
-            <div
-              className="homeCard"
-              key={card.title}
-              onClick={() => (window.location.href = card.href)}
-              style={{ cursor: "pointer" }}
+            <a
+              href={card.href}
+              style={{ textDecoration: "none", color: "#6b7280" }}
             >
-              <img
-                src={card.icon}
-                alt={card.title}
-                className="card-icon"
-                draggable="false"
-              />
-              <h3 className="cardTitle">{card.title}</h3>
-              <p className="pCard">{card.description}</p>
-            </div>
+              <div
+                className="homeCard"
+                key={card.title}
+                style={{ cursor: "pointer" }}
+              >
+                <img
+                  src={card.icon}
+                  alt={card.title}
+                  className="card-icon"
+                  draggable="false"
+                />
+                <h3 className="cardTitle">{card.title}</h3>
+                <p className="pCard">{card.description}</p>
+              </div>
+            </a>
           ))}
       </section>
     </div>

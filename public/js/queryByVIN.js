@@ -4,6 +4,11 @@ let paginaActual = 1;
 let lightboxInstance = null;
 let accionesPostTablaMostradas = false;
 
+const navBarMin = document.getElementById("navBarMin");
+navBarMin.style.top = "0";
+const dropdownContent = document.getElementById("dropdownContent");
+dropdownContent.style.marginTop = "0";
+
 // Submit del formulario
 document.getElementById("form-vin").addEventListener("submit", async (e) => {
   e.preventDefault();

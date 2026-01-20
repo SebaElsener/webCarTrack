@@ -1,4 +1,4 @@
-<nav class="navbar">
+<nav class="navbar" id="navBarMin">
   <div class="navbar-left">
     <div class="CarTrackContainer">
       <p class="CarTrackP">Car<span class="CarTrackSpan">Track</span></p>
@@ -6,14 +6,14 @@
   </div>
 
   <ul class="navbar-center">
-    <li>Inicio</li>
-    <li>Vehículos</li>
-    <li>Daños</li>
-    <li>Reportes</li>
+    <li><a style="text-decoration: none; color: #616161;" href="/api/productos">Inicio</a></li>
+    <li><a style="text-decoration: none; color: #616161;" href="/api/querys/queryByVIN">Vehículos</a></li>
+    <li><a style="text-decoration: none; color: #616161;" href="/api/querys/queryByDate">Consultas</a></li>
+    <li><a style="text-decoration: none; color: #616161;" href="#">Reportes</a></li>
   </ul>
   <div class="navbar-right">
     <div class="dropdown">
-      <ul>
+      <ul style="margin: 0 !important;">
         <li style="list-style-type: none;">
           <span class="material-symbols-outlined user-icon">
             account_circle
@@ -21,7 +21,7 @@
           <span class="user-name"><%= userName %></span>
         </li>
       </ul>
-      <div class="dropdown-content">
+      <div class="dropdown-content" id="dropdownContent">
         <% if (userName === 'admin@admin.com') { %>
             <a class="itemLink" href="/api/userdata/usersadmin">Usuarios</a>
         <% } %>
