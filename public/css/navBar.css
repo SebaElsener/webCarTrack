@@ -45,6 +45,12 @@
   color: #1e88e5;
 }
 
+.navbar-right:hover .user-icon,
+.navbar-right:hover .user-name,
+.navbar-right:hover .material-symbols-outlined {
+  color: #1e88e5;
+}
+
 .navbar-center li.active {
   color: #1e88e5;
 }
@@ -88,6 +94,7 @@
 .user-name {
   font-size: 14px;
   font-weight: 500;
+  vertical-align: super;
 }
 
 .CarTrackContainer {

@@ -11,10 +11,23 @@
     <li>Daños</li>
     <li>Reportes</li>
   </ul>
-
   <div class="navbar-right">
-    <span class="material-symbols-outlined user-icon"> account_circle </span>
-    <span class="user-name">Diego</span>
-    <span class="material-symbols-outlined"> expand_more </span>
+    <div class="dropdown">
+      <ul>
+        <li style="list-style-type: none;">
+          <span class="material-symbols-outlined user-icon">
+            account_circle
+          </span>
+          <span class="user-name"><%= userName %></span>
+        </li>
+      </ul>
+      <div class="dropdown-content">
+        <% if (userName === 'admin@admin.com') { %>
+            <a class="itemLink" href="/api/userdata/usersadmin">Usuarios</a>
+        <% } %>
+        <a class="itemLink" href="/api/userdata">Mis datos</a>
+        <a class="itemLink" href="/api/logout">Logout</a>
+      </div>
+    </div>
   </div>
 </nav>

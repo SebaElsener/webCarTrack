@@ -823,33 +823,36 @@ tbody tr:nth-child(even) {
 
 .dropdown-content {
   visibility: collapse;
-  opacity: 0;
+  /* opacity: 0; */
   transition: all 0.5s;
-  margin-top: 13px;
-  margin-left: 18px;
   position: absolute;
+  right: -20px;
   width: 180px;
-  box-shadow: 0px 10px 10px 0px rgba(0, 0, 0, 0.4);
-  background-color: #eaeaea;
+  box-shadow: 0px 1px 6px 1px rgb(179 173 173 / 40%);
+  background-color: #f7f7f7;
   border-radius: 0px 3px 3px 3px;
   padding: 8px;
-  margin-top: 0;
+  margin-top: -10px;
+  border-radius: 5px;
+  /* transition: all 0.5s ease; */
 }
 .dropdown:hover .dropdown-content {
   visibility: visible;
-  opacity: 1;
+  /* opacity: 1; */
 }
 
 .dropdown-content a {
   display: block;
-  color: rgb(10, 102, 130);
+  font-size: 0.9rem;
+  color: rgb(127, 125, 125);
   padding: 5px;
   text-decoration: none;
+  border-radius: 3px;
 }
 
 .dropdown-content a:hover {
   color: #ffffff;
-  background-color: #00a4bd;
+  background-color: #a8d3daf0;
 }
 
 #chatLink {
