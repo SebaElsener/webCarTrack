@@ -170,17 +170,17 @@ if (clusterMode === "CLUSTER" && cluster.isPrimary) {
   }
   cluster.on("exit", (worker) => {
     infoLogger.info(
-      `Worker ${worker.process.pid} died on ${new Date().toLocaleString()}`
+      `Worker ${worker.process.pid} died on ${new Date().toLocaleString()}`,
     );
     cluster.fork();
   });
 } else {
   const connectedServer = httpServer.listen(PORT, () => {
     infoLogger.info(
-      `http server escuchando en puerto ${connectedServer.address().port}`
+      `http server escuchando en puerto ${connectedServer.address().port}`,
     );
   });
   connectedServer.on("error", (error) =>
-    errorLogger.error(`Error en servidor ${error}`)
+    errorLogger.error(`Error en servidor ${error}`),
   );
 }

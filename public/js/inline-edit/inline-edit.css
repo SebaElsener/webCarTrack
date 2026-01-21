@@ -1,0 +1,34 @@
+.editable-cell {
+  cursor: pointer;
+}
+
+.editable-cell:hover {
+  background-color: #f8f9fa;
+}
+
+.editable-cell.editing {
+  padding: 0.25rem;
+}
+
+.inline-editor .dropdown-toggle {
+  font-size: 0.85rem;
+}
+
+.dropdown-menu {
+  position: fixed !important;
+  z-index: 1055; /* arriba de modals y tablas */
+}
+
+/* dropdown inline-edit */
+.dropdown-menu {
+  max-height: 260px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 380px !important;
+  min-width: 220px;
+}
+
+.editable-cell.editing input {
+  font-size: 0.85rem;
+  padding: 0.25rem;
+}

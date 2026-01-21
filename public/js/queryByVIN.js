@@ -12,9 +12,9 @@ const gravedadesMap = indexById(gravedades);
 const FILAS_POR_PAGINA = 10;
 let datosGlobales = [];
 let paginaActual = 1;
-let lightboxInstance = null;
 let accionesPostTablaMostradas = false;
 let vin = "";
+let areaInputEnabled = false;
 
 const navBarMin = document.getElementById("navBarMin");
 navBarMin.style.top = "0";
@@ -77,7 +77,6 @@ async function cargarDatos(vin) {
     }));
 
     datosGlobales = transformScans;
-    console.log(datosGlobales);
 
     paginaActual = 1;
     renderTabla();
@@ -172,13 +171,34 @@ function renderTabla() {
             <td>${scan.modelo ?? ""}</td>
             <td>${scan.vin ?? ""}</td>
   
-            <td>
-              <input id='areaInput' type="text" required placeholder="Modificar área, avería y/o gravedad.  ENTER para guardar cambios" value=${damage.area_desc}>
-
+            <td
+              class="editable-cell"
+              data-field="area"
+              data-damage-id="${damage.id}"
+            >
+              <span class="cell-value">${damage.area + " - " + damage.area_desc}</span>
             </td>
-            <td>${damage.averia_desc ?? ""}</td>
-            <td>${damage.grav_desc ?? ""}</td>
-            <td class="wrap">${damage.obs ?? ""}</td>
+            <td
+              class="editable-cell"
+              data-field="averia"
+              data-damage-id="${damage.id}"
+            >
+              <span class="cell-value">${damage.averia + " - " + damage.averia_desc}</span>
+            </td>
+            <td
+              class="editable-cell"
+              data-field="gravedad"
+              data-damage-id="${damage.id}"
+            >
+              <span class="cell-value">${damage.grav_desc}</span>
+            </td>
+            <td
+              class="editable-cell"
+              data-field="observacion"
+              data-damage-id="${damage.id}"
+            >
+              <span class="cell-value">${damage.obs}</span>            
+            </td>
             <td>${renderClimaIcon(scan.clima)}</td>
             <td>${scan.user ?? ""}</td>
             <td class="text-center">
@@ -328,8 +348,27 @@ function enableColumnResize(tableId) {
 }
 
 /// Listeners action buttons
-document
-  .getElementById("btnUpdateDamages")
-  .addEventListener("click", async (e) => {
-    e.preventDefault();
-  });
+// document
+//   .getElementById("btnUpdateDamages")
+//   .addEventListener("click", async (e) => {
+//     e.preventDefault();
+//     areaInputEnabled = true;
+//     renderTabla();
+//   });
+
+// Listener celdas tabla para modificar daños
+document.addEventListener("click", (e) => {
+  const cell = e.target.closest(".editable-cell");
+  if (!cell || cell.classList.contains("editing")) return;
+});
+
+// cerrar dropdown al scrollear
+// document.addEventListener(
+//   "scroll",
+//   () => {
+//     document
+//       .querySelectorAll(".dropdown-toggle.show")
+//       .forEach((btn) => bootstrap.Dropdown.getInstance(btn)?.hide());
+//   },
+//   true,
+// );
