@@ -1,8 +1,20 @@
+import areas from "../utils/areas.json" with { type: "json" };
+import averias from "../utils/averias.json" with { type: "json" };
+import gravedades from "../utils/gravedades.json" with { type: "json" };
+
+const indexById = (arr) =>
+  Object.fromEntries(arr.map((i) => [i.id, i.descripcion]));
+
+const areasMap = indexById(areas);
+const averiasMap = indexById(averias);
+const gravedadesMap = indexById(gravedades);
+
 const FILAS_POR_PAGINA = 10;
 let datosGlobales = [];
 let paginaActual = 1;
 let lightboxInstance = null;
 let accionesPostTablaMostradas = false;
+let vin = "";
 
 const navBarMin = document.getElementById("navBarMin");
 navBarMin.style.top = "0";
@@ -20,7 +32,7 @@ document.getElementById("form-vin").addEventListener("submit", async (e) => {
     el.style.display = "none";
   });
 
-  const vin = document.getElementById("vinInput").value.trim();
+  vin = document.getElementById("vinInput").value.trim();
   if (!vin) return alert("Ingrese un VIN válido");
 
   await cargarDatos(vin);
@@ -54,18 +66,18 @@ async function cargarDatos(vin) {
       return;
     }
 
-    // Guardar los scans completos
-    datosGlobales = data.map((s) => ({
-      scan_id: s.scan_id,
-      vin: s.vin,
-      marca: s.marca,
-      modelo: s.modelo,
-      clima: s.clima,
-      user: s.user,
-      scan_date: s.scan_date,
-      damages: s.damages ?? [],
-      fotos: s.fotos ?? [], // ya vienen como URLs
+    const transformScans = data.map((scan) => ({
+      ...scan,
+      damages: scan.damages.map((d) => ({
+        ...d,
+        area_desc: areasMap[d.area] ?? null,
+        averia_desc: averiasMap[d.averia] ?? null,
+        grav_desc: gravedadesMap[d.grav] ?? null,
+      })),
     }));
+
+    datosGlobales = transformScans;
+    console.log(datosGlobales);
 
     paginaActual = 1;
     renderTabla();
@@ -159,7 +171,11 @@ function renderTabla() {
             <td>${scan.marca ?? ""}</td>
             <td>${scan.modelo ?? ""}</td>
             <td>${scan.vin ?? ""}</td>
-            <td>${damage.area_desc ?? ""}</td>
+  
+            <td>
+              <input id='areaInput' type="text" required placeholder="Modificar área, avería y/o gravedad.  ENTER para guardar cambios" value=${damage.area_desc}>
+
+            </td>
             <td>${damage.averia_desc ?? ""}</td>
             <td>${damage.grav_desc ?? ""}</td>
             <td class="wrap">${damage.obs ?? ""}</td>
@@ -310,3 +326,10 @@ function enableColumnResize(tableId) {
     });
   });
 }
+
+/// Listeners action buttons
+document
+  .getElementById("btnUpdateDamages")
+  .addEventListener("click", async (e) => {
+    e.preventDefault();
+  });
