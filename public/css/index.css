@@ -461,8 +461,12 @@ label {
   margin-bottom: 30px;
 }
 
+#actionsBar {
+  margin-bottom: 20px;
+}
+
 table {
-  padding: 20px;
+  padding: 0px 20px;
   min-width: 340px;
   table-layout: fixed;
   /* border-collapse: collapse; */
@@ -700,11 +704,9 @@ tbody tr:nth-child(even) {
   font-size: 1rem;
 }
 
-/* .formTitle {
-  text-align: center;
-  margin: 1.5rem 0;
-  margin-top: 4rem;
-} */
+.formTitle {
+  margin: 0;
+}
 
 .tableTd {
   text-align: left;
@@ -1480,6 +1482,27 @@ thead {
   visibility: visible;
 }
 
+.post-table-action-buttons {
+  opacity: 0;
+  transform: translateX(-30px) scale(0.9);
+}
+
+/* se anima cuando se agrega esta clase */
+.post-table-action-buttons.animate-in {
+  animation: slideFadeIn 420ms cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+}
+
+@keyframes slideFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-30px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
 /* ////////////////////////////////// */
 .choices {
   width: 100%;
@@ -1608,4 +1631,16 @@ thead {
   gap: 2rem;
   justify-content: center;
   margin-top: 4rem !important;
+}
+
+#title-VIN-input {
+  margin-bottom: 20px;
+}
+
+.actionBtnsWrapper {
+  display: flex;
+  gap: 40px;
+  margin-top: 25px;
+  justify-content: center;
+  margin-bottom: 25px;
 }

@@ -12,8 +12,17 @@ dropdownContent.style.marginTop = "0";
 // Submit del formulario
 document.getElementById("form-vin").addEventListener("submit", async (e) => {
   e.preventDefault();
+  accionesPostTablaMostradas = false;
+  const acciones = document.querySelectorAll(".post-table-action-buttons");
+
+  // Reset visual
+  acciones.forEach((el) => {
+    el.style.display = "none";
+  });
+
   const vin = document.getElementById("vinInput").value.trim();
   if (!vin) return alert("Ingrese un VIN válido");
+
   await cargarDatos(vin);
 });
 
@@ -39,11 +48,9 @@ async function cargarDatos(vin) {
     });
 
     const data = await res.json();
-
     if (!data || data.length === 0) {
       document.getElementById("resultadosVIN").innerHTML =
         "<p class='text-muted'>No se encontraron datos</p>";
-      // document.getElementById("paginacion").innerHTML = "";
       return;
     }
 
@@ -62,28 +69,34 @@ async function cargarDatos(vin) {
 
     paginaActual = 1;
     renderTabla();
-    // renderPaginacion();
   } catch (err) {
     console.error(err);
     document.getElementById("resultadosVIN").innerHTML =
       "<p class='text-danger'>Error al obtener los datos</p>";
-    // document.getElementById("paginacion").innerHTML = "";
   }
 }
 
 function mostrarAccionesPostTabla() {
   if (accionesPostTablaMostradas) return;
 
-  const acciones = document.querySelectorAll(".post-table-action");
-  const delayBase = 500; // ⏱️ delay inicial
-  const delayStep = 600; // escalonado entre acciones
+  const acciones = document.querySelectorAll(".post-table-action-buttons");
+  const delayBase = 200;
+  const delayStep = 180;
 
-  acciones.forEach((el) => el.classList.remove("show"));
+  // Reset visual
+  acciones.forEach((el) => {
+    el.style.display = "block";
+  });
+
+  acciones.forEach((el) => {
+    el.classList.remove("animate-in");
+    el.style.opacity = "0";
+  });
 
   acciones.forEach((el, i) => {
     setTimeout(
       () => {
-        el.classList.add("show");
+        el.classList.add("animate-in");
       },
       delayBase + i * delayStep,
     );
@@ -94,8 +107,6 @@ function mostrarAccionesPostTabla() {
 
 // Render de tabla
 function renderTabla() {
-  mostrarAccionesPostTabla();
-
   const inicio = (paginaActual - 1) * FILAS_POR_PAGINA;
   const fin = inicio + FILAS_POR_PAGINA;
   const paginaDatos = datosGlobales.slice(inicio, fin);
@@ -213,6 +224,11 @@ function renderTabla() {
     </div>
   `;
 
+  // esperar un frame
+  requestAnimationFrame(() => {
+    mostrarAccionesPostTabla();
+  });
+
   // 🔹 Ajuste automático inicial de ancho según contenido
   const table = document.getElementById("tabla-resultadosVIN");
   table.querySelectorAll("th").forEach((th) => {
@@ -232,51 +248,6 @@ function renderTabla() {
     returnFocus: false,
   });
 }
-
-// // Render de paginación
-// function renderPaginacion() {
-//   const totalPaginas = Math.ceil(datosGlobales.length / FILAS_POR_PAGINA);
-//   let html = `<nav><ul class="pagination justify-content-center">`;
-
-//   html += `
-//     <li class="page-item ${paginaActual === 1 ? "disabled" : ""}">
-//       <button class="page-link" onclick="cambiarPagina(${
-//         paginaActual - 1
-//       })">Anterior</button>
-//     </li>
-//   `;
-
-//   for (let i = 1; i <= totalPaginas; i++) {
-//     html += `
-//       <li class="page-item ${paginaActual === i ? "active" : ""}">
-//         <button class="page-link" onclick="cambiarPagina(${i})">${i}</button>
-//       </li>
-//     `;
-//   }
-
-//   html += `
-//     <li class="page-item ${paginaActual === totalPaginas ? "disabled" : ""}">
-//       <button class="page-link" onclick="cambiarPagina(${
-//         paginaActual + 1
-//       })">Siguiente</button>
-//     </li>
-//   `;
-
-//   html += `</ul></nav>`;
-//   document.getElementById("paginacion").innerHTML = html;
-// }
-
-// // Cambiar página
-// function cambiarPagina(nuevaPagina) {
-//   const totalPaginas = Math.ceil(datosGlobales.length / FILAS_POR_PAGINA);
-//   if (nuevaPagina < 1 || nuevaPagina > totalPaginas) return;
-//   paginaActual = nuevaPagina;
-//   mostrarSpinner();
-//   setTimeout(() => {
-//     renderTabla();
-//     renderPaginacion();
-//   }, 100);
-// }
 
 function renderClimaIcon(clima) {
   if (!clima) return "";

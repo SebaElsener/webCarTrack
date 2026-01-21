@@ -5,6 +5,7 @@ dotenv.config();
 
 import { createClient } from "@supabase/supabase-js";
 import { readUsedSize } from "chart.js/helpers";
+import { json } from "express";
 
 export const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -219,10 +220,7 @@ class ContenedorSupabase {
       if (error) throw error;
 
       if (!scans || scans.length === 0) {
-        document.getElementById("resultados").innerHTML =
-          "<p class='text-muted'>No se encontraron datos</p>";
-        document.getElementById("paginacion").innerHTML = "";
-        return;
+        return [];
       }
 
       const result = scans.map((s) => ({
