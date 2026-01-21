@@ -127,41 +127,82 @@ function renderTabla() {
   paginaDatos.forEach((scan) => {
     if (!scan.damages || scan.damages.length === 0) {
       rows += `
-        <tr>
-          <td>${new Date(scan.scan_date).toLocaleString("es-AR")}</td>
-          <td>${scan.marca ?? ""}</td>
-          <td>${scan.modelo ?? ""}</td>
-          <td>${scan.vin ?? ""}</td>
-          <td colspan="4" class="text-center">Sin daños</td>
-          <td>${renderClimaIcon(scan.clima)}</td>
-          <td>${scan.user ?? ""}</td>
-          <td class="text-center">
-            ${
-              scan.fotos?.length
-                ? scan.fotos
-                    .map(
-                      (f, idx) => `
-                        <a
-                          href="${f}"
-                          class="glightbox"
-                          data-gallery="gallery-${scan.scan_id}"
-                          data-title="Imagen ${idx + 1} de ${scan.fotos.length}"
-                          ${idx > 0 ? 'style="display:none"' : ""}
-                        >
-                          ${
-                            idx === 0
-                              ? `<i class="bi bi-camera-fill" style="font-size:1.2rem;color:#007bff;"></i>`
-                              : ""
-                          }
-                        </a>
-                      `,
-                    )
-                    .join("")
-                : ""
-            }
-          </td>
-        </tr>
-      `;
+      <tr>
+        <td>${new Date(scan.scan_date).toLocaleString("es-AR")}</td>
+        <td>${scan.marca ?? ""}</td>
+        <td>${scan.modelo ?? ""}</td>
+        <td>${scan.vin ?? ""}</td>
+
+        <!-- ÁREA -->
+        <td
+          class="editable-cell text-center"
+          data-field="area"
+          data-scan-id="${scan.scan_id}"
+          data-damage-id=""
+        >
+          <span class="cell-value text-muted-table">—</span>
+        </td>
+
+        <!-- AVERÍA -->
+        <td
+          class="editable-cell text-center"
+          data-field="averia"
+          data-scan-id="${scan.scan_id}"
+          data-damage-id=""
+        >
+          <span class="cell-value text-muted-table">—</span>
+        </td>
+
+        <!-- GRAVEDAD -->
+        <td
+          class="editable-cell text-center"
+          data-field="gravedad"
+          data-scan-id="${scan.scan_id}"
+          data-damage-id=""
+        >
+          <span class="cell-value text-muted-table">—</span>
+        </td>
+
+        <!-- OBSERVACIÓN -->
+        <td
+          class="editable-cell text-center"
+          data-field="observacion"
+          data-scan-id="${scan.scan_id}"
+          data-damage-id=""
+        >
+          <span class="cell-value text-muted-table">Sin daños</span>
+        </td>
+
+        <td>${renderClimaIcon(scan.clima)}</td>
+        <td>${scan.user ?? ""}</td>
+
+        <td class="text-center">
+          ${
+            scan.fotos?.length
+              ? scan.fotos
+                  .map(
+                    (f, idx) => `
+                      <a
+                        href="${f}"
+                        class="glightbox"
+                        data-gallery="gallery-${scan.scan_id}"
+                        data-title="Imagen ${idx + 1} de ${scan.fotos.length}"
+                        ${idx > 0 ? 'style="display:none"' : ""}
+                      >
+                        ${
+                          idx === 0
+                            ? `<i class="bi bi-camera-fill" style="font-size:1.2rem;color:#007bff;"></i>`
+                            : ""
+                        }
+                      </a>
+                    `,
+                  )
+                  .join("")
+              : ""
+          }
+        </td>
+      </tr>
+    `;
     } else {
       scan.damages.forEach((damage) => {
         rows += `

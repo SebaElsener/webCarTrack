@@ -6,10 +6,6 @@
   background-color: #f8f9fa;
 }
 
-.editable-cell.editing {
-  padding: 0.25rem;
-}
-
 .inline-editor .dropdown-toggle {
   font-size: 0.85rem;
 }
@@ -31,4 +27,14 @@
 .editable-cell.editing input {
   font-size: 0.85rem;
   padding: 0.25rem;
+}
+
+.editable-cell.text-center:hover {
+  background-color: #f8f9fa;
+  cursor: pointer;
+}
+
+.editable-cell .text-muted-table {
+  font-style: italic;
+  font-size: large;
 }
