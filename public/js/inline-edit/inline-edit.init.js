@@ -13,7 +13,7 @@ export const inlineEditor = new InlineEditableDropdown({
     console.log("Actualizado:", item);
   },
   onError: () => {
-    alert("Error al guardar");
+    toastError("Error al guardar");
   },
 });
 

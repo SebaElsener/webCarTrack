@@ -20,7 +20,7 @@ document.getElementById("form-fechas").addEventListener("submit", async (e) => {
 
   const fechas = document.getElementById("rangoFechas").value.split(" a ");
   if (fechas.length !== 2) {
-    alert("Seleccioná un rango válido");
+    toastError("Seleccioná un rango válido");
     return;
   }
 
@@ -1003,7 +1003,7 @@ async function withBootstrapButtonLock(button, action) {
     await action();
   } catch (err) {
     console.error(err);
-    alert("Error al generar el archivo");
+    toastError("Error al generar el archivo");
   } finally {
     button.disabled = false;
     button.classList.remove("disabled");
