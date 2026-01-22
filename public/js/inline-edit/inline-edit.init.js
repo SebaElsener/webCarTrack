@@ -2,19 +2,27 @@ import areas from "../../utils/areas.json" with { type: "json" };
 import averias from "../../utils/averias.json" with { type: "json" };
 import gravedades from "../../utils/gravedades.json" with { type: "json" };
 
-const inlineEditor = new InlineEditableDropdown({
+export const inlineEditor = new InlineEditableDropdown({
   dataSources: {
     area: areas,
     averia: averias,
     gravedad: gravedades,
   },
-  updateUrl: "/api/damages/update",
+  updateUrl: "/api/updates/damages",
   onSuccess: (item) => {
     console.log("Actualizado:", item);
   },
   onError: () => {
     alert("Error al guardar");
   },
+});
+
+// 🔒 PROTEGER NAVEGACIÓN
+window.addEventListener("beforeunload", (e) => {
+  if (inlineEditor.pendingChanges.size > 0) {
+    e.preventDefault();
+    e.returnValue = "";
+  }
 });
 
 document.addEventListener("shown.bs.dropdown", (e) => {

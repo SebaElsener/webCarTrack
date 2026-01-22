@@ -1,6 +1,7 @@
 import areas from "../utils/areas.json" with { type: "json" };
 import averias from "../utils/averias.json" with { type: "json" };
 import gravedades from "../utils/gravedades.json" with { type: "json" };
+import { inlineEditor } from "./inline-edit/inline-edit.init.js";
 
 const indexById = (arr) =>
   Object.fromEntries(arr.map((i) => [i.id, i.descripcion]));
@@ -389,13 +390,9 @@ function enableColumnResize(tableId) {
 }
 
 /// Listeners action buttons
-// document
-//   .getElementById("btnUpdateDamages")
-//   .addEventListener("click", async (e) => {
-//     e.preventDefault();
-//     areaInputEnabled = true;
-//     renderTabla();
-//   });
+document
+  .getElementById("btnUpdateDamages")
+  .addEventListener("click", () => inlineEditor.saveAll());
 
 // Listener celdas tabla para modificar daños
 document.addEventListener("click", (e) => {

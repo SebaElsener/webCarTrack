@@ -38,3 +38,12 @@
   font-style: italic;
   font-size: large;
 }
+
+.editable-cell.pending-change {
+  background-color: #fff3cd; /* amarillo suave */
+}
+
+.editable-cell.saving {
+  opacity: 0.6;
+  pointer-events: none;
+}

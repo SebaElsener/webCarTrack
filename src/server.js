@@ -28,6 +28,7 @@ import chartsRoute from "./router/chartsRouter.js";
 import statsRoute from "./router/statsRouter.js";
 import querysRouter from "./router/querysRouter.js";
 import exportRouter from "./router/exportRouter.js";
+import updatesRouter from "./router/updatesRouter.js";
 
 dotenv.config();
 
@@ -66,6 +67,7 @@ app.use("/api/carrito", userLoginWatcher, routeCart);
 app.use("/api/userdata", userLoginWatcher, userData);
 app.use("/api/querys", userLoginWatcher, querysRouter);
 app.use("/api/export", userLoginWatcher, exportRouter);
+app.use("/api/updates", updatesRouter);
 app.use("/api/scans", scansRoute);
 app.use("/api/login", userLogin);
 app.use("/api/logout", userLogout);

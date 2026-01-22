@@ -5,6 +5,8 @@ class InlineEditableDropdown {
     this.onSuccess = onSuccess;
     this.onError = onError;
 
+    this.pendingChanges = new Map();
+
     document.addEventListener("click", this.handleClick.bind(this));
   }
 
@@ -13,6 +15,48 @@ class InlineEditableDropdown {
     if (!cell || cell.classList.contains("editing")) return;
 
     this.activate(cell);
+  }
+
+  saveAll() {
+    if (!this.pendingChanges.size) return;
+
+    const payload = Array.from(this.pendingChanges.values()).map((c) => ({
+      scanId: c.scanId,
+      damageId: c.damageId || null,
+      field: c.field,
+      value: c.newValue,
+    }));
+
+    // feedback visual
+    this.pendingChanges.forEach((c) => {
+      c.cell.classList.add("saving");
+    });
+
+    fetch(this.updateUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ changes: payload }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
+      .then(() => {
+        // limpiar estado
+        this.pendingChanges.forEach((c) => {
+          c.cell.classList.remove("pending-change", "saving");
+        });
+        this.pendingChanges.clear();
+      })
+      .catch(() => {
+        // rollback completo
+        this.pendingChanges.forEach((c) => {
+          c.cell.innerHTML = `<span class="cell-value">${c.originalText}</span>`;
+          c.cell.classList.remove("pending-change", "saving");
+        });
+        this.pendingChanges.clear();
+        alert("No se pudieron guardar los cambios");
+      });
   }
 
   activate(cell) {
@@ -63,31 +107,23 @@ class InlineEditableDropdown {
     document.addEventListener("keydown", esc);
   }
 
-  async commit({ cell, field, scanId, damageId, item, originalText }) {
+  commit({ cell, field, scanId, damageId, item, originalText }) {
     cell.classList.remove("editing");
-    cell.innerHTML = `<span class="cell-value">${item.id + " - " + item.descripcion}</span>`;
+    cell.innerHTML = `<span class="cell-value">${item.descripcion}</span>`;
 
-    await fetch(this.updateUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        scanId,
-        damageId,
-        field,
-        value: item.id,
-      }),
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
-      .then((data) => {
-        this.onSuccess?.(data);
-      })
-      .catch(() => {
-        this.cancel(cell, originalText);
-        this.onError?.();
-      });
+    const key = `${scanId}_${damageId}_${field}`;
+
+    this.pendingChanges.set(key, {
+      scanId,
+      damageId,
+      field,
+      newValue: item.id,
+      originalText,
+      cell,
+      displayValue: item.descripcion,
+    });
+
+    cell.classList.add("pending-change");
   }
 
   cancel(cell, text) {
@@ -96,17 +132,21 @@ class InlineEditableDropdown {
   }
 
   activateTextInput({ cell, scanId, damageId, originalText }) {
+    let committed = false;
+
     const input = document.createElement("input");
     input.type = "text";
     input.className = "form-control form-control-sm";
     input.value = originalText;
-    input.autofocus = true;
 
     cell.innerHTML = "";
     cell.appendChild(input);
     input.focus();
 
-    const commit = () => {
+    const commitOnce = () => {
+      if (committed) return;
+      committed = true;
+
       const newValue = input.value.trim();
 
       if (newValue === originalText) {
@@ -124,47 +164,32 @@ class InlineEditableDropdown {
     };
 
     input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") commit();
-      if (e.key === "Escape") this.cancel(cell, originalText);
+      if (e.key === "Enter") commitOnce();
+      if (e.key === "Escape") {
+        committed = true;
+        this.cancel(cell, originalText);
+      }
     });
 
-    input.addEventListener("blur", commit);
+    input.addEventListener("blur", commitOnce);
   }
 
   async commitText({ cell, scanId, damageId, value, originalText }) {
-    cell.innerHTML = `<span class="spinner-border spinner-border-sm"></span>`;
+    cell.classList.remove("editing");
+    cell.innerHTML = `<span class="cell-value">${value}</span>`;
 
-    await fetch(this.updateUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        scanId,
-        damageId,
-        field: "observacion",
-        value,
-      }),
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
-      .then((data) => {
-        this.onSuccess?.(data);
-      })
-      .catch(() => {
-        this.cancel(cell, originalText);
-        this.onError?.();
-      });
-    //   .then((res) => {
-    //     if (!res.ok) throw new Error();
-    //     return res.json();
-    //   })
-    //   .then(() => {
-    //     cell.classList.remove("editing");
-    //     cell.innerHTML = `<span class="cell-value">${value}</span>`;
-    //   })
-    //   .catch(() => {
-    //     this.cancel(cell, originalText);
-    //   });
+    const key = `${scanId}_${damageId}_obs`;
+
+    this.pendingChanges.set(key, {
+      scanId,
+      damageId,
+      field: "obs",
+      newValue: value,
+      originalText,
+      cell,
+      displayValue: value,
+    });
+
+    cell.classList.add("pending-change");
   }
 }
