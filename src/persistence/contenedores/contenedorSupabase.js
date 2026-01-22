@@ -4,8 +4,6 @@ import { infoLogger } from "../../logger.js";
 dotenv.config();
 
 import { createClient } from "@supabase/supabase-js";
-import { readUsedSize } from "chart.js/helpers";
-import { json } from "express";
 
 export const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -81,6 +79,24 @@ class ContenedorSupabase {
       return result;
     } catch (error) {
       infoLogger.info("Error al consultar DB", error);
+    }
+  }
+
+  async updateDamages(infoToUpdate) {
+    try {
+      const { data, error } = await supabase.rpc("update_damages", {
+        ...infoToUpdate,
+      });
+
+      if (error) {
+        console.error("Error al actualizar datos", error);
+      } else {
+        return data;
+      }
+    } catch (error) {
+      console.log("Error al consultar areas", error);
+      infoLogger.info("Error al consultar areas", error);
+      return [];
     }
   }
 

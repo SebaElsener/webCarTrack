@@ -15,7 +15,6 @@ let datosGlobales = [];
 let paginaActual = 1;
 let accionesPostTablaMostradas = false;
 let vin = "";
-let areaInputEnabled = false;
 
 const navBarMin = document.getElementById("navBarMin");
 navBarMin.style.top = "0";
@@ -34,7 +33,7 @@ document.getElementById("form-vin").addEventListener("submit", async (e) => {
   });
 
   vin = document.getElementById("vinInput").value.trim();
-  if (!vin) return alert("Ingrese un VIN válido");
+  if (!vin) return toastError("Ingrese un VIN válido");
 
   await cargarDatos(vin);
 });
@@ -216,6 +215,7 @@ function renderTabla() {
             <td
               class="editable-cell"
               data-field="area"
+              data-scan-id="${scan.scan_id}"
               data-damage-id="${damage.id}"
             >
               <span class="cell-value">${damage.area + " - " + damage.area_desc}</span>
@@ -223,6 +223,7 @@ function renderTabla() {
             <td
               class="editable-cell"
               data-field="averia"
+              data-scan-id="${scan.scan_id}"
               data-damage-id="${damage.id}"
             >
               <span class="cell-value">${damage.averia + " - " + damage.averia_desc}</span>
@@ -230,6 +231,7 @@ function renderTabla() {
             <td
               class="editable-cell"
               data-field="gravedad"
+              data-scan-id="${scan.scan_id}"
               data-damage-id="${damage.id}"
             >
               <span class="cell-value">${damage.grav_desc}</span>
@@ -237,6 +239,7 @@ function renderTabla() {
             <td
               class="editable-cell"
               data-field="observacion"
+              data-scan-id="${scan.scan_id}"
               data-damage-id="${damage.id}"
             >
               <span class="cell-value">${damage.obs}</span>            

@@ -35,13 +35,10 @@ function Home({ user, admin }) {
           .map((card) => (
             <a
               href={card.href}
+              key={card.title}
               style={{ textDecoration: "none", color: "#6b7280" }}
             >
-              <div
-                className="homeCard"
-                key={card.title}
-                style={{ cursor: "pointer" }}
-              >
+              <div className="homeCard" style={{ cursor: "pointer" }}>
                 <img
                   src={card.icon}
                   alt={card.title}

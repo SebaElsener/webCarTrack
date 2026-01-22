@@ -17,8 +17,13 @@ class InlineEditableDropdown {
     this.activate(cell);
   }
 
-  saveAll() {
-    if (!this.pendingChanges.size) return;
+  async saveAll() {
+    if (!this.pendingChanges.size) {
+      toastInfo("No hay cambios para guardar");
+      return;
+    }
+
+    const btn = document.getElementById("btnUpdateDamages");
 
     const payload = Array.from(this.pendingChanges.values()).map((c) => ({
       scanId: c.scanId,
@@ -32,7 +37,10 @@ class InlineEditableDropdown {
       c.cell.classList.add("saving");
     });
 
-    fetch(this.updateUrl, {
+    // 🔄 BOTÓN → loading
+    setButtonLoading(btn, true);
+
+    await fetch(this.updateUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ changes: payload }),
@@ -41,12 +49,14 @@ class InlineEditableDropdown {
         if (!res.ok) throw new Error();
         return res.json();
       })
-      .then(() => {
+      .then((json) => {
         // limpiar estado
         this.pendingChanges.forEach((c) => {
           c.cell.classList.remove("pending-change", "saving");
         });
         this.pendingChanges.clear();
+
+        toastSuccess(json.message || "Cambios guardados correctamente");
       })
       .catch(() => {
         // rollback completo
@@ -55,7 +65,11 @@ class InlineEditableDropdown {
           c.cell.classList.remove("pending-change", "saving");
         });
         this.pendingChanges.clear();
-        alert("No se pudieron guardar los cambios");
+        toastError("No se pudieron guardar los cambios");
+      })
+      .finally(() => {
+        // 🔁 BOTÓN → normal
+        setButtonLoading(btn, false);
       });
   }
 
@@ -63,13 +77,14 @@ class InlineEditableDropdown {
     cell.classList.add("editing");
 
     const field = cell.dataset.field;
-    //const scanId = cell.dataset.scanId;
+    const scanId = cell.dataset.scanId;
     const damageId = cell.dataset.damageId;
     const originalText = cell.textContent.trim();
 
     if (field === "observacion") {
       this.activateTextInput({
         cell,
+        scanId,
         damageId,
         originalText,
       });
@@ -87,6 +102,7 @@ class InlineEditableDropdown {
         this.commit({
           cell,
           field,
+          scanId,
           damageId,
           item,
           originalText,
@@ -193,3 +209,22 @@ class InlineEditableDropdown {
     cell.classList.add("pending-change");
   }
 }
+
+// const getToast = (text) => {
+//   Toastify({
+//     text: text,
+//     offset: {
+//       x: 150,
+//       y: 150,
+//     },
+//     duration: 3000,
+//     newWindow: false,
+//     close: false,
+//     gravity: "top", // `top` or `bottom`
+//     position: "left", // `left`, `center` or `right`
+//     stopOnFocus: true, // Prevents dismissing of toast on hover
+//     style: {
+//       background: "linear-gradient(to right, #00b09b, #96c93d)",
+//     },
+//   }).showToast();
+// };
