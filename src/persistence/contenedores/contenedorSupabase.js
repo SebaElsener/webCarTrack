@@ -4,6 +4,7 @@ import { infoLogger } from "../../logger.js";
 dotenv.config();
 
 import { createClient } from "@supabase/supabase-js";
+import { deleteDamages } from "../../business/deleteDamagesBusiness.js";
 
 export const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -94,9 +95,26 @@ class ContenedorSupabase {
         return data;
       }
     } catch (error) {
-      console.log("Error al consultar areas", error);
-      infoLogger.info("Error al consultar areas", error);
+      console.log("Error al actualizar la información en DB", error);
+      infoLogger.error("Error al actualizar la información en DB", error);
       return [];
+    }
+  }
+
+  async deleteDamages(vinReference) {
+    try {
+      const { data, error } = await supabase.rpc("delete_damages_by_vin", {
+        p_vin: vinReference,
+      });
+
+      if (error) {
+        console.error("Error al eliminar daños", error);
+      } else {
+        return data;
+      }
+    } catch (error) {
+      console.log("Error al eliminar daños en DB", error);
+      infoLogger.error("Error al eliminar daños en DB", error);
     }
   }
 

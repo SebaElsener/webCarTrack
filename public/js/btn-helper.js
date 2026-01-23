@@ -1,14 +1,22 @@
-function setButtonLoading(button, loading, text = "Guardando...") {
-  const textSpan = button.querySelector(".btn-text");
+function setButtonLoading(button, loading, loadingText = "Procesando...") {
+  if (!button) return;
 
   if (loading) {
+    // guardar texto original solo una vez
+    if (!button.dataset.originalText) {
+      button.dataset.originalText = button.innerHTML;
+    }
+
     button.disabled = true;
     button.innerHTML = `
       <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-      ${text}
+      ${loadingText}
     `;
   } else {
     button.disabled = false;
-    button.innerHTML = `<span class="btn-text">Guardar cambios</span>`;
+    if (button.dataset.originalText) {
+      button.innerHTML = button.dataset.originalText;
+      delete button.dataset.originalText;
+    }
   }
 }

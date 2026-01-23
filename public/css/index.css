@@ -1017,29 +1017,29 @@ tbody tr:nth-child(even) {
   padding: 0;
 }
 
-.panel {
+/* .panel {
   background: #f4f4f4;
   padding: 20px;
   width: 250px;
   border-radius: 8px;
   margin-top: 10px;
   border: 1px solid #ccc;
-}
+} */
 
 /* Animación fade */
-.fade {
+/* .fade {
   opacity: 0;
   transition: opacity 0.35s ease;
 }
 
 .fade.mostrar {
   opacity: 1;
-}
+} */
 
 /* Oculto por defecto */
-.oculto {
+/* .oculto {
   display: none;
-}
+} */
 
 #graphStat {
   margin: 0 auto;
@@ -1692,4 +1692,30 @@ thead {
 
 .toast-warn {
   border-left-color: var(--toast-warn);
+}
+
+#btnUpdateDamages,
+#btnDeletePicts,
+#btnDeleteVIN,
+#btnDeleteDamages {
+  min-width: 155px;
+}
+
+/* transición base de las filas */
+.resultadosVINtr {
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease,
+    height 220ms ease;
+}
+
+/* estado de colapso */
+.row-collapsing {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+/* fade de celdas */
+.cell-fade {
+  transition: opacity 160ms ease;
 }

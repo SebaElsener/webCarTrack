@@ -208,23 +208,47 @@ class InlineEditableDropdown {
 
     cell.classList.add("pending-change");
   }
-}
 
-// const getToast = (text) => {
-//   Toastify({
-//     text: text,
-//     offset: {
-//       x: 150,
-//       y: 150,
-//     },
-//     duration: 3000,
-//     newWindow: false,
-//     close: false,
-//     gravity: "top", // `top` or `bottom`
-//     position: "left", // `left`, `center` or `right`
-//     stopOnFocus: true, // Prevents dismissing of toast on hover
-//     style: {
-//       background: "linear-gradient(to right, #00b09b, #96c93d)",
-//     },
-//   }).showToast();
-// };
+  async deleteDamages() {
+    const btn = document.getElementById("btnDeleteDamages");
+
+    const payload = Array.from(this.pendingChanges.values()).map((c) => ({
+      damageId: c.damageId || null,
+    }));
+
+    // 🔄 BOTÓN → loading
+    setButtonLoading(btn, true);
+
+    await fetch(this.updateUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ changes: payload }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
+      .then((json) => {
+        // limpiar estado
+        this.pendingChanges.forEach((c) => {
+          c.cell.classList.remove("pending-change", "saving");
+        });
+        this.pendingChanges.clear();
+
+        toastSuccess(json.message || "Cambios guardados correctamente");
+      })
+      .catch(() => {
+        // rollback completo
+        this.pendingChanges.forEach((c) => {
+          c.cell.innerHTML = `<span class="cell-value">${c.originalText}</span>`;
+          c.cell.classList.remove("pending-change", "saving");
+        });
+        this.pendingChanges.clear();
+        toastError("No se pudieron guardar los cambios");
+      })
+      .finally(() => {
+        // 🔁 BOTÓN → normal
+        setButtonLoading(btn, false);
+      });
+  }
+}

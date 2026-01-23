@@ -15,6 +15,7 @@ let datosGlobales = [];
 let paginaActual = 1;
 let accionesPostTablaMostradas = false;
 let vin = "";
+let tableTdVIN = "";
 
 const navBarMin = document.getElementById("navBarMin");
 navBarMin.style.top = "0";
@@ -127,11 +128,11 @@ function renderTabla() {
   paginaDatos.forEach((scan) => {
     if (!scan.damages || scan.damages.length === 0) {
       rows += `
-      <tr>
+      <tr class="resultadosVINtr">
         <td>${new Date(scan.scan_date).toLocaleString("es-AR")}</td>
         <td>${scan.marca ?? ""}</td>
         <td>${scan.modelo ?? ""}</td>
-        <td>${scan.vin ?? ""}</td>
+        <td id="tableTdVIN">${scan.vin ?? ""}</td>
 
         <!-- ÁREA -->
         <td
@@ -206,11 +207,11 @@ function renderTabla() {
     } else {
       scan.damages.forEach((damage) => {
         rows += `
-          <tr>
+          <tr class="resultadosVINtr">
             <td>${new Date(scan.scan_date).toLocaleString("es-AR")}</td>
             <td>${scan.marca ?? ""}</td>
             <td>${scan.modelo ?? ""}</td>
-            <td>${scan.vin ?? ""}</td>
+            <td id="tableTdVIN">${scan.vin ?? ""}</td>
   
             <td
               class="editable-cell"
@@ -305,6 +306,8 @@ function renderTabla() {
     </div>
   `;
 
+  tableTdVIN = document.getElementById("tableTdVIN");
+
   // esperar un frame
   requestAnimationFrame(() => {
     mostrarAccionesPostTabla();
@@ -396,6 +399,24 @@ function enableColumnResize(tableId) {
 document
   .getElementById("btnUpdateDamages")
   .addEventListener("click", () => inlineEditor.saveAll());
+
+// (btn, textConfirm, textSuccess, textError, fetchUrl);
+
+document.getElementById("btnDeleteDamages").addEventListener("click", () => {
+  const cellValue = document.querySelectorAll(".cell-value");
+  if (cellValue[0]?.innerText === "—" || cellValue[0]?.innerText == undefined) {
+    toastInfo("No hay daños para eliminar");
+    return;
+  }
+  const btnDeleteDamages = document.getElementById("btnDeleteDamages");
+  vinAction(
+    btnDeleteDamages,
+    "Confirma ELIMINAR DAÑOS?",
+    "Daños eliminados: ",
+    "Error al eliminar daños",
+    `/api/damages/deletedamages/${tableTdVIN.innerText}`,
+  );
+});
 
 // Listener celdas tabla para modificar daños
 document.addEventListener("click", (e) => {
