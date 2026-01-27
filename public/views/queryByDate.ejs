@@ -70,43 +70,50 @@
             style="justify-content: center; gap: 3rem"
           >
             <!-- Marca -->
-            <div class="col-md-3">
+            <div class="col-md-2 filterContainer">
               <label class="form-label fw-semibold">Marca</label>
               <select id="filtroMarca" class="form-select" multiple>
                 <option value="">Todas</option>
               </select>
             </div>
             <!-- Modelo -->
-            <div class="col-md-3">
+            <div class="col-md-2 filterContainer">
               <label class="form-label fw-semibold">Modelo</label>
               <select id="filtroModelo" class="form-select" multiple>
                 <option value="">Todos</option>
               </select>
             </div>
+            <!-- Batea -->
+            <div class="col-md-2 filterContainer">
+              <label class="form-label fw-semibold">Batea</label>
+              <select id="filtroBatea" class="form-select" multiple>
+                <option value="">Todas</option>
+              </select>
+            </div>
 
             <!-- Checks -->
-            <div class="col-md-5">
+            <div class="col-md-4 filterContainer">
               <label class="form-label fw-semibold">Estadísticas</label>
               <div class="d-flex gap-4 flex-wrap">
-                <div class="form-check form-switch">
+                <div class="form-check form-switch form-chkTop">
                   <input
                     class="form-check-input"
                     type="checkbox"
                     id="chkTopAreas"
                   />
                   <label class="form-check-label" for="chkTopAreas">
-                    Top 5 Areas dañadas
+                    Top 5 Areas
                   </label>
                 </div>
 
-                <div class="form-check form-switch">
+                <div class="form-check form-switch form-chkTop">
                   <input
                     class="form-check-input"
                     type="checkbox"
                     id="chkTopAverias"
                   />
                   <label class="form-check-label" for="chkTopAverias">
-                    Top 5 Tipos de daño
+                    Top 5 daños
                   </label>
                 </div>
               </div>
@@ -118,7 +125,7 @@
       <div id="estadisticas" class="row g-3 mb-3"></div>
 
       <div
-        class="justify-content-start align-items-center mt-2 mx-5 post-table-action"
+        class="justify-content-between align-items-center post-table-action"
         id="actionsBar"
       >
         <button
@@ -134,11 +141,18 @@
             id="chkSoloConDanio"
           />
           <label class="form-check-label fw-semibold" for="chkSoloConDanio">
-            Solo VIN con daño
+            Sólo VIN con daño
           </label>
           <span id="badgeConDanio" class="badge bg-primary d-none"></span>
         </div>
-        <div class="d-flex justify-content-end gap-3 mx-4">
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="chkMovimiento" />
+          <label class="form-check-label fw-semibold" for="chkMovimiento">
+            Movimiento
+          </label>
+          <span id="badgeMovimiento" class="badge bg-primary d-none"></span>
+        </div>
+        <div class="d-flex justify-content-end gap-3">
           <button id="btnExportPdf" class="btn btn-outline-danger btn-sm">
             📄 PDF
           </button>
@@ -204,6 +218,15 @@
         removeItemButton: true,
         placeholder: true,
         placeholderValue: "Buscar modelo...",
+        searchPlaceholderValue: "Buscar...",
+        shouldSort: true,
+        searchEnabled: true,
+      });
+
+      const choicesBatea = new Choices("#filtroBatea", {
+        removeItemButton: true,
+        placeholder: true,
+        placeholderValue: "Buscar batea...",
         searchPlaceholderValue: "Buscar...",
         shouldSort: true,
         searchEnabled: true,

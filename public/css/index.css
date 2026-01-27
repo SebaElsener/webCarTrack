@@ -462,7 +462,7 @@ label {
 }
 
 #actionsBar {
-  margin-bottom: 20px;
+  margin: 2rem;
 }
 
 table {
@@ -1130,7 +1130,7 @@ thead {
 }
 
 .dateTh {
-  width: 122px;
+  width: 145px !important;
 }
 
 .mdi {
@@ -1139,15 +1139,15 @@ thead {
 }
 
 .areaTh {
-  width: 240px;
+  width: 240px !important;
 }
 
 .averiaTh {
-  width: 200px;
+  width: 170px !important;
 }
 
 .gravTh {
-  width: 120px;
+  width: 120px !important;
 }
 
 .climaTh {
@@ -1161,6 +1161,14 @@ thead {
 .form-check-input:checked {
   background-color: #0d6efd;
   border-color: #0d6efd;
+}
+
+.form-check-input {
+  margin-top: 0;
+}
+
+.form-switch .form-check-input {
+  margin: 0 !important;
 }
 
 .card-title {
@@ -1435,11 +1443,17 @@ thead {
 .form-check {
   display: FLEX !important;
   align-items: CENTER;
-  gap: 15px;
+  padding: 0px 20px !important;
+  gap: 8px;
+  background-color: #ffffff;
+  margin: 0 !important;
+  box-shadow: 3px 3px 7px 0px #e2e2e2;
+  justify-content: center;
+  display: flex;
 }
 
 .form-check-label {
-  margin-right: 15px;
+  margin-right: 5px;
 }
 
 .col-md-8 {
@@ -1459,11 +1473,21 @@ thead {
   border-radius: 6px;
 }
 
+.filterContainer {
+  margin-top: 0 !important;
+  padding: 0 !important;
+}
+
+.form-chkTop {
+  height: 47px !important;
+}
+
 #btnLimpiarFiltros {
-  margin-right: 2rem;
-  padding: 8px;
+  margin: 0 !important;
+  padding: 15px;
   font-size: 0.9rem;
   width: 8rem;
+  border-radius: 0;
 }
 
 .post-table-action {
@@ -1612,7 +1636,7 @@ thead {
 
 #marcaTh,
 #modeloTh {
-  width: 130px;
+  width: 120px !important;
 }
 
 #vinInput {
@@ -1635,6 +1659,12 @@ thead {
 
 #title-VIN-input {
   margin-bottom: 20px;
+}
+
+#btnExportPdf,
+#btnExportExcel {
+  width: 7rem;
+  height: 3.5rem;
 }
 
 .actionBtnsWrapper {

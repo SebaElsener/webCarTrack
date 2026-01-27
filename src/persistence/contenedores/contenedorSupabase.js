@@ -160,6 +160,8 @@ class ContenedorSupabase {
             date,
             marca,
             modelo,
+            batea,
+            movimiento,
             clima,
             user,
             damages (
@@ -185,6 +187,8 @@ class ContenedorSupabase {
         scan_date: s.date,
         marca: s.marca,
         modelo: s.modelo,
+        batea: s.batea,
+        movimiento: s.movimiento,
         user: s.user,
         clima: s.clima,
         damages: (s.damages ?? []).filter(

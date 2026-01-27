@@ -9,6 +9,16 @@ const areasMap = indexById(areas);
 const averiasMap = indexById(averias);
 const gravedadesMap = indexById(gravedades);
 let accionesPostTablaMostradas = false;
+let filtros = {
+  marca: [],
+  modelo: [],
+  batea: [],
+  topAreas: false,
+  topAverias: false,
+  soloConDanio: false,
+  areaSeleccionada: null,
+  averiaSeleccionada: null,
+};
 
 const navBarMin = document.getElementById("navBarMin");
 navBarMin.style.top = "0";
@@ -87,6 +97,20 @@ function cargarModelos(marcasSeleccionadas = []) {
   );
 }
 
+function cargarBateas() {
+  const bateas = [
+    ...new Set(datosGlobales.map((d) => d.batea).filter(Boolean)),
+  ].sort();
+
+  choicesBatea.clearChoices();
+  choicesBatea.setChoices(
+    bateas.map((m) => ({ value: m, label: m })),
+    "value",
+    "label",
+    true,
+  );
+}
+
 // Función para mostrar spinner
 function mostrarSpinner() {
   document.getElementById("evolucion").style.display = "none";
@@ -103,15 +127,7 @@ function mostrarSpinner() {
 async function cargarDatos(desde, hasta) {
   mostrarSpinner();
   datosFiltrados = [];
-  filtros = {
-    marca: [],
-    modelo: [],
-    topAreas: false,
-    topAverias: false,
-    soloConDanio: false,
-    areaSeleccionada: null,
-    averiaSeleccionada: null,
-  };
+
   document.getElementById("chkTopAreas").checked = false;
   document.getElementById("chkTopAverias").checked = false;
   await fetch("/api/querys/queryByDate", {
@@ -151,6 +167,7 @@ async function cargarDatos(desde, hasta) {
       paginaActual = 1;
       cargarMarcas();
       cargarModelos();
+      cargarBateas();
       aplicarFiltros();
     })
     .catch((err) => {
@@ -180,6 +197,7 @@ function renderTabla() {
           <td>${scan.modelo ?? ""}</td>
           <td>${scan.vin ?? ""}</td>
           <td colspan="4" class="text-center">Sin daños</td>
+          <td>${scan.batea ?? ""}</td>
           <td>${renderClimaIcon(scan.clima)}</td>
           <td>${scan.user ?? ""}</td>
           <td class="text-center">
@@ -221,6 +239,7 @@ function renderTabla() {
             <td>${damage.averia_desc ?? ""}</td>
             <td>${damage.grav_desc ?? ""}</td>
             <td class="wrap">${damage.obs ?? ""}</td>
+            <td>${scan.batea ?? ""}</td>
             <td>${renderClimaIcon(scan.clima)}</td>
             <td>${scan.user ?? ""}</td>
             <td class="text-center">
@@ -272,6 +291,7 @@ function renderTabla() {
             <th class="averiaTh">Avería</th>
             <th class="gravTh">Gravedad</th>
             <th>Observación</th>
+            <th class="bateaTh">Batea</th>
             <th class="climaTh">Clima</th>
             <th>Usuario</th>
             <th class="fotosTh">Fotos</th>
@@ -445,16 +465,6 @@ function renderClimaIcon(clima) {
   }
 }
 
-let filtros = {
-  marca: [],
-  modelo: [],
-  topAreas: false,
-  topAverias: false,
-  soloConDanio: false,
-  areaSeleccionada: null,
-  averiaSeleccionada: null,
-};
-
 document.getElementById("filtroMarca").addEventListener("change", (e) => {
   filtros.marca = Array.from(e.target.selectedOptions).map((o) => o.value);
 
@@ -470,6 +480,15 @@ document.getElementById("filtroMarca").addEventListener("change", (e) => {
 
 document.getElementById("filtroModelo").addEventListener("change", (e) => {
   filtros.modelo = Array.from(e.target.selectedOptions).map((o) => o.value);
+
+  filtros.areaSeleccionada = null;
+  filtros.averiaSeleccionada = null;
+
+  aplicarFiltros();
+});
+
+document.getElementById("filtroBatea").addEventListener("change", (e) => {
+  filtros.batea = Array.from(e.target.selectedOptions).map((o) => o.value);
 
   filtros.areaSeleccionada = null;
   filtros.averiaSeleccionada = null;
@@ -506,6 +525,11 @@ function aplicarFiltros() {
     // filtro modelo
     if (filtros.modelo.length) {
       dataBase = dataBase.filter((d) => filtros.modelo.includes(d.modelo));
+    }
+
+    // filtro batea
+    if (filtros.batea.length) {
+      dataBase = dataBase.filter((d) => filtros.batea.includes(d.batea));
     }
 
     // 🔹 Solo VIN con daño
@@ -826,6 +850,7 @@ const limpiarFiltros = () => {
   // 🔹 Reset filtros
   filtros.marca = [];
   filtros.modelo = [];
+  filtros.batea = [];
   filtros.soloConDanio = false;
   filtros.areaSeleccionada = null;
   filtros.averiaSeleccionada = null;
@@ -835,6 +860,7 @@ const limpiarFiltros = () => {
   // 🔹 Reset elementos del DOM
   choicesMarca.removeActiveItems();
   choicesModelo.removeActiveItems();
+  choicesBatea.removeActiveItems();
   document.getElementById("chkSoloConDanio").checked = false;
   document.getElementById("chkTopAreas").checked = false;
   document.getElementById("chkTopAverias").checked = false;
@@ -949,6 +975,8 @@ function buildExportPayload() {
       fecha: s.scan_date,
       marca: s.marca,
       modelo: s.modelo,
+      batea: s.batea,
+      movimiento: s.movimiento,
       vin: s.vin,
       areas: s.damages?.map((d) => d.area_desc).join(", "),
       averias: s.damages?.map((d) => d.averia_desc).join(", "),
