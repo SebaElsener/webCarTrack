@@ -37,142 +37,187 @@
   </head>
 
   <body>
-    <%- include('./partials/navMin') %>
-    <div class="navBarSeparator"></div>
+    <div id="app-root">
+      <%- include('./partials/navMin') %>
+      <div class="navBarSeparator"></div>
 
-    <main id="main">
-      <div class="container mt-5" id="title-date-input">
-        <h3 class="formTitle">Consulta por rango de fechas</h3>
+      <main id="main">
+        <div class="container mt-5" id="title-date-input">
+          <h3 class="formTitle">Consulta por rango de fechas</h3>
 
-        <form id="form-fechas">
-          <div id="inputGroup" class="input-group">
-            <span class="input-group-text">📅</span>
-            <input
-              type="text"
-              id="rangoFechas"
-              class="form-control"
-              placeholder="Seleccionar fechas"
-              readonly
-            />
-            <div class="btnFormContainer">
-              <button id="btnFormSubmit" class="btn btn-primary" type="submit">
-                Consultar
-              </button>
+          <form id="form-fechas">
+            <div id="inputGroup" class="input-group">
+              <span class="input-group-text">📅</span>
+              <input
+                type="text"
+                id="rangoFechas"
+                class="form-control"
+                placeholder="Seleccionar fechas"
+                readonly
+              />
+              <div class="btnFormContainer">
+                <button
+                  id="btnFormSubmit"
+                  class="btn btn-primary"
+                  type="submit"
+                >
+                  Consultar
+                </button>
+              </div>
             </div>
-          </div>
-        </form>
-      </div>
+          </form>
+        </div>
 
-      <div class="card mb-3 shadow-sm post-table-action" id="filtersCard">
-        <div class="card-body">
-          <div
-            class="row g-3 align-items-top"
-            style="justify-content: center; gap: 3rem"
-          >
-            <!-- Marca -->
-            <div class="col-md-2 filterContainer">
-              <label class="form-label fw-semibold">Marca</label>
-              <select id="filtroMarca" class="form-select" multiple>
-                <option value="">Todas</option>
-              </select>
-            </div>
-            <!-- Modelo -->
-            <div class="col-md-2 filterContainer">
-              <label class="form-label fw-semibold">Modelo</label>
-              <select id="filtroModelo" class="form-select" multiple>
-                <option value="">Todos</option>
-              </select>
-            </div>
-            <!-- Batea -->
-            <div class="col-md-2 filterContainer">
-              <label class="form-label fw-semibold">Batea</label>
-              <select id="filtroBatea" class="form-select" multiple>
-                <option value="">Todas</option>
-              </select>
-            </div>
+        <div class="card mb-3 shadow-sm post-table-action" id="filtersCard">
+          <div class="card-body">
+            <div
+              class="row g-3 align-items-top"
+              style="justify-content: center; gap: 3rem"
+            >
+              <!-- Marca -->
+              <div class="col-md-2 filterContainer">
+                <label class="form-label fw-semibold">Marca</label>
+                <select id="filtroMarca" class="form-select" multiple>
+                  <option value="">Todas</option>
+                </select>
+              </div>
+              <!-- Modelo -->
+              <div class="col-md-2 filterContainer">
+                <label class="form-label fw-semibold">Modelo</label>
+                <select id="filtroModelo" class="form-select" multiple>
+                  <option value="">Todos</option>
+                </select>
+              </div>
+              <!-- Batea -->
+              <div class="col-md-2 filterContainer">
+                <label class="form-label fw-semibold">Batea</label>
+                <select id="filtroBatea" class="form-select" multiple>
+                  <option value="">Todas</option>
+                </select>
+              </div>
 
-            <!-- Checks -->
-            <div class="col-md-4 filterContainer">
-              <label class="form-label fw-semibold">Estadísticas</label>
-              <div class="d-flex gap-4 flex-wrap">
-                <div class="form-check form-switch form-chkTop">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    id="chkTopAreas"
-                  />
-                  <label class="form-check-label" for="chkTopAreas">
-                    Top 5 Areas
-                  </label>
-                </div>
+              <!-- Checks -->
+              <div class="col-md-4 filterContainer">
+                <label class="form-label fw-semibold">Estadísticas</label>
+                <div class="d-flex gap-4 flex-wrap">
+                  <div class="form-check form-switch form-chkTop">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="chkTopAreas"
+                    />
+                    <label class="form-check-label" for="chkTopAreas">
+                      Top 5 Areas
+                    </label>
+                  </div>
 
-                <div class="form-check form-switch form-chkTop">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    id="chkTopAverias"
-                  />
-                  <label class="form-check-label" for="chkTopAverias">
-                    Top 5 daños
-                  </label>
+                  <div class="form-check form-switch form-chkTop">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="chkTopAverias"
+                    />
+                    <label class="form-check-label" for="chkTopAverias">
+                      Top 5 daños
+                    </label>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div id="estadisticas" class="row g-3 mb-3"></div>
+        <div id="estadisticas" class="row g-3 mb-3"></div>
 
-      <div
-        class="justify-content-between align-items-center post-table-action"
-        id="actionsBar"
-      >
-        <button
-          id="btnLimpiarFiltros"
-          class="btn btn-sm btn-outline-secondary ms-2"
+        <div
+          class="justify-content-between align-items-center post-table-action"
+          id="actionsBar"
         >
-          Limpiar filtros
-        </button>
-        <div class="form-check form-switch">
-          <input
-            class="form-check-input"
-            type="checkbox"
-            id="chkSoloConDanio"
-          />
-          <label class="form-check-label fw-semibold" for="chkSoloConDanio">
-            Sólo VIN con daño
-          </label>
-          <span id="badgeConDanio" class="badge bg-primary d-none"></span>
-        </div>
-        <div class="form-check form-switch">
-          <input class="form-check-input" type="checkbox" id="chkMovimiento" />
-          <label class="form-check-label fw-semibold" for="chkMovimiento">
-            Movimiento
-          </label>
-          <span id="badgeMovimiento" class="badge bg-primary d-none"></span>
-        </div>
-        <div class="d-flex justify-content-end gap-3">
-          <button id="btnExportPdf" class="btn btn-outline-danger btn-sm">
-            📄 PDF
+          <button
+            id="btnLimpiarFiltros"
+            class="btn btn-sm btn-outline-secondary ms-2"
+          >
+            Limpiar filtros
           </button>
-          <button id="btnExportExcel" class="btn btn-outline-success btn-sm">
-            📊 Excel
-          </button>
+          <div class="form-check form-switch" id="soloVINConDanio">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="chkSoloConDanio"
+            />
+            <label class="form-check-label fw-semibold" for="chkSoloConDanio">
+              Sólo VIN con daño
+            </label>
+            <span id="badgeConDanio" class="badge bg-primary d-none"></span>
+          </div>
+          <div class="btn-group" role="group" id="movimientoContainer">
+            <div>
+              <label class="form-check-label fw-semibold movimientoLabel"
+                >Filtrar movimientos</label
+              >
+            </div>
+            <div>
+              <input
+                type="radio"
+                class="btn-check"
+                name="movimiento"
+                id="movAll"
+                checked
+              />
+              <label
+                class="btn btn-outline-secondary movimientoLabel"
+                for="movAll"
+                >Todos</label
+              >
+
+              <input
+                type="radio"
+                class="btn-check"
+                name="movimiento"
+                id="movIngreso"
+              />
+              <label
+                class="btn btn-outline-success movimientoLabel"
+                for="movIngreso"
+                >Ingreso</label
+              >
+
+              <input
+                type="radio"
+                class="btn-check"
+                name="movimiento"
+                id="movDespacho"
+              />
+              <label
+                class="btn btn-outline-primary movimientoLabel"
+                for="movDespacho"
+                >Despacho</label
+              >
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end gap-3">
+            <button id="btnExportPdf" class="btn btn-outline-danger btn-sm">
+              📄 PDF
+            </button>
+            <button id="btnExportExcel" class="btn btn-outline-success btn-sm">
+              📊 Excel
+            </button>
+          </div>
         </div>
-      </div>
 
-      <div id="tabla-wrapper" class="tabla-wrapper">
-        <div id="tabla-scroll" class="tabla-scroll">
-          <div id="resultados" class="container-fluid"></div>
+        <div id="tabla-wrapper" class="tabla-wrapper">
+          <div id="tabla-scroll" class="tabla-scroll">
+            <div id="resultados" class="container-fluid"></div>
+          </div>
+          <div id="paginacion" class="mt-3"></div>
         </div>
-        <div id="paginacion" class="mt-3"></div>
-      </div>
 
-      <div id="evolucion" class="mt-4 mb-5"></div>
-    </main>
+        <div id="evolucion" class="mt-4 mb-5"></div>
+      </main>
 
-    <%- include('./partials/footer') %>
+      <%- include('./partials/footer') %>
+    </div>
 
     <script type="module" src="/js/querys.js"></script>
     <script src="/js/pageAnimation.js"></script>
@@ -230,6 +275,18 @@
         searchPlaceholderValue: "Buscar...",
         shouldSort: true,
         searchEnabled: true,
+      });
+    </script>
+
+    <script>
+      document.addEventListener("glightbox_open", () => {
+        document.documentElement.style.overflow = "hidden";
+        document.body.style.overflow = "hidden";
+      });
+
+      document.addEventListener("glightbox_close", () => {
+        document.documentElement.style.overflow = "";
+        document.body.style.overflow = "";
       });
     </script>
   </body>

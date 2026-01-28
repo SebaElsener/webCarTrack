@@ -11,7 +11,8 @@ document.addEventListener("click", (e) => {
     return;
 
   e.preventDefault();
-  document.body.classList.add("fade-out", "no-scroll");
+  const appRoot = document.getElementById("app-root");
+  appRoot.classList.add("fade-out", "no-scroll");
 
   setTimeout(() => {
     window.location.href = href;
@@ -19,6 +20,6 @@ document.addEventListener("click", (e) => {
 });
 
 window.addEventListener("pageshow", () => {
-  document.body.classList.remove("fade-out", "no-scroll");
-  document.body.style.opacity = "1";
+  appRoot.classList.remove("fade-out", "no-scroll");
+  appRoot.style.opacity = "1";
 });

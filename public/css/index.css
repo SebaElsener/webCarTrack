@@ -12,14 +12,27 @@ body {
   margin: 0;
   min-width: 1150px;
   min-height: 100vh;
+}
+
+#app-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   opacity: 0;
   animation: pageFadeIn 0.45s ease forwards;
 }
 
-/* cuando salimos */
-body.fade-out {
+#app-root.fade-out {
   animation: pageFadeOut 0.35s ease forwards;
 }
+
+/* #app-root.animate-in {
+  animation: appFadeIn 0.45s ease forwards;
+}
+
+#app-root.animate-out {
+  animation: appFadeOut 0.35s ease forwards;
+} */
 
 body.no-scroll {
   overflow: hidden;
@@ -28,22 +41,22 @@ body.no-scroll {
 @keyframes pageFadeIn {
   from {
     opacity: 0;
-    transform: translateY(4px);
+    translate: 0 4px;
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    translate: 0 0;
   }
 }
 
 @keyframes pageFadeOut {
   from {
     opacity: 1;
-    transform: translateY(0);
+    scale: 1;
   }
   to {
     opacity: 0;
-    transform: scale(0.98);
+    scale: 0.98;
   }
 }
 
@@ -463,6 +476,7 @@ label {
 
 #actionsBar {
   margin: 2rem;
+  margin-top: 1rem;
 }
 
 table {
@@ -1478,16 +1492,34 @@ thead {
   padding: 0 !important;
 }
 
+.movimientoLabel {
+  margin: 0 !important;
+}
+
+.movimientoLabelBtn {
+  margin: 0 !important;
+}
+
 .form-chkTop {
   height: 47px !important;
+}
+
+#movimientoContainer {
+  flex-direction: column;
+  height: 63px;
 }
 
 #btnLimpiarFiltros {
   margin: 0 !important;
   padding: 15px;
   font-size: 0.9rem;
+  height: 63px;
   width: 8rem;
   border-radius: 0;
+}
+
+#soloVINConDanio {
+  height: 63px;
 }
 
 .post-table-action {
@@ -1664,7 +1696,7 @@ thead {
 #btnExportPdf,
 #btnExportExcel {
   width: 7rem;
-  height: 3.5rem;
+  height: 63px;
 }
 
 .actionBtnsWrapper {
@@ -1748,4 +1780,47 @@ thead {
 /* fade de celdas */
 .cell-fade {
   transition: opacity 160ms ease;
+}
+
+/* Overlay siempre full viewport */
+.glightbox-container {
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(0, 0, 0, 0.92) !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 9999 !important;
+}
+
+/* Centrado real del contenido */
+.glightbox-content {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 100% !important;
+  max-height: 100vh !important;
+}
+
+/* Imagen nunca desbordada */
+.glightbox-content img {
+  max-width: 95vw !important;
+  max-height: 95vh !important;
+  object-fit: contain !important;
+}
+
+body > .glightbox-container {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  z-index: 99999 !important;
+}
+
+.glightbox-container,
+.glightbox-overlay,
+.glightbox-content {
+  transform: none !important;
+  will-change: auto !important;
 }

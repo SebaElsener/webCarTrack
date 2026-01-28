@@ -8,6 +8,7 @@ const indexById = (arr) =>
 const areasMap = indexById(areas);
 const averiasMap = indexById(averias);
 const gravedadesMap = indexById(gravedades);
+const fotosPorVin = {};
 let accionesPostTablaMostradas = false;
 let filtros = {
   marca: [],
@@ -16,6 +17,7 @@ let filtros = {
   topAreas: false,
   topAverias: false,
   soloConDanio: false,
+  movimiento: null,
   areaSeleccionada: null,
   averiaSeleccionada: null,
 };
@@ -164,6 +166,23 @@ async function cargarDatos(desde, hasta) {
       }));
 
       datosGlobales = transformScans;
+
+      datosGlobales.forEach((scan) => {
+        if (!scan.vin || !scan.fotos?.length) return;
+
+        if (!fotosPorVin[scan.vin]) {
+          fotosPorVin[scan.vin] = [];
+        }
+
+        scan.fotos.forEach((url) => {
+          fotosPorVin[scan.vin].push({
+            href: url,
+            type: "image",
+            title: `VIN ${scan.vin}`,
+          });
+        });
+      });
+
       paginaActual = 1;
       cargarMarcas();
       cargarModelos();
@@ -188,6 +207,32 @@ function renderTabla() {
 
   let rows = "";
 
+  // <td class="text-center">
+  //   ${
+  //     scan.fotos?.length
+  //       ? scan.fotos
+  //           .map(
+  //             (f, idx) => `
+  //               <a
+  //                 href="${f}"
+  //                 class="glightbox"
+  //                 data-gallery="gallery-${scan.scan_id}"
+  //                 data-title="Imagen ${idx + 1} de ${scan.fotos.length}"
+  //                 ${idx > 0 ? 'style="display:none"' : ""}
+  //               >
+  //                 ${
+  //                   idx === 0
+  //                     ? `<i class="bi bi-camera-fill" style="font-size:1.2rem;color:#007bff;"></i>`
+  //                     : ""
+  //                 }
+  //               </a>
+  //             `,
+  //           )
+  //           .join("")
+  //       : ""
+  //   }
+  // </td>
+
   paginaDatos.forEach((scan) => {
     if (!scan.damages || scan.damages.length === 0) {
       rows += `
@@ -203,25 +248,15 @@ function renderTabla() {
           <td class="text-center">
             ${
               scan.fotos?.length
-                ? scan.fotos
-                    .map(
-                      (f, idx) => `
-                        <a
-                          href="${f}"
-                          class="glightbox"
-                          data-gallery="gallery-${scan.scan_id}"
-                          data-title="Imagen ${idx + 1} de ${scan.fotos.length}"
-                          ${idx > 0 ? 'style="display:none"' : ""}
-                        >
-                          ${
-                            idx === 0
-                              ? `<i class="bi bi-camera-fill" style="font-size:1.2rem;color:#007bff;"></i>`
-                              : ""
-                          }
-                        </a>
-                      `,
-                    )
-                    .join("")
+                ? `
+                  <button
+                    class="btn btn-link p-0 open-gallery"
+                    data-vin="${scan.vin}"
+                    data-start="0"
+                  >
+                    <i class="bi bi-camera-fill" style="font-size:1.2rem;color:#007bff;"></i>
+                  </button>
+                `
                 : ""
             }
           </td>
@@ -242,33 +277,21 @@ function renderTabla() {
             <td>${scan.batea ?? ""}</td>
             <td>${renderClimaIcon(scan.clima)}</td>
             <td>${scan.user ?? ""}</td>
-            <td class="text-center">
-              ${
-                scan.fotos?.length
-                  ? scan.fotos
-                      .map(
-                        (f, idx) => `
-                          <a
-                            href="${f}"
-                            class="glightbox"
-                            data-gallery="gallery-${scan.scan_id}"
-                            data-title="Imagen ${idx + 1} de ${
-                              scan.fotos.length
-                            }"
-                            ${idx > 0 ? 'style="display:none"' : ""}
-                          >
-                            ${
-                              idx === 0
-                                ? `<i class="bi bi-camera-fill" style="font-size:1.2rem;color:#007bff;"></i>`
-                                : ""
-                            }
-                          </a>
-                        `,
-                      )
-                      .join("")
-                  : ""
-              }
-            </td>
+           <td class="text-center">
+            ${
+              scan.fotos?.length
+                ? `
+                  <button
+                    class="btn btn-link p-0 open-gallery"
+                    data-vin="${scan.vin}"
+                    data-start="0"
+                  >
+                    <i class="bi bi-camera-fill" style="font-size:1.2rem;color:#007bff;"></i>
+                  </button>
+                `
+                : ""
+            }
+          </td>
           </tr>
         `;
       });
@@ -312,13 +335,22 @@ function renderTabla() {
   enableColumnResize("tabla-resultados");
 
   // 🔹 Inicializar GLightbox
-  GLightbox({
+  // GLightbox({
+  //   selector: ".glightbox",
+  //   loop: true,
+  //   zoomable: true,
+  //   touchNavigation: true,
+  //   keyboardNavigation: true,
+  //   returnFocus: false,
+  // });
+  const lightbox = GLightbox({
     selector: ".glightbox",
     loop: true,
     zoomable: true,
     touchNavigation: true,
     keyboardNavigation: true,
-    returnFocus: false,
+    closeOnOutsideClick: true,
+    draggable: true,
   });
 }
 
@@ -506,6 +538,21 @@ document.getElementById("chkTopAverias").addEventListener("change", (e) => {
   aplicarFiltros();
 });
 
+document.getElementById("movAll").addEventListener("change", () => {
+  filtros.movimiento = null;
+  aplicarFiltros();
+});
+
+document.getElementById("movIngreso").addEventListener("change", () => {
+  filtros.movimiento = "INGRESO";
+  aplicarFiltros();
+});
+
+document.getElementById("movDespacho").addEventListener("change", () => {
+  filtros.movimiento = "DESPACHO";
+  aplicarFiltros();
+});
+
 function aplicarFiltros() {
   const tabla = document.getElementById("resultados");
   const stats = document.getElementById("estadisticas");
@@ -535,6 +582,13 @@ function aplicarFiltros() {
     // 🔹 Solo VIN con daño
     if (filtros.soloConDanio)
       dataBase = dataBase.filter((scan) => scan.damages?.length);
+
+    // Filtrar por ingreso o despacho
+    if (filtros.movimiento) {
+      dataBase = dataBase.filter(
+        (scan) => scan.movimiento === filtros.movimiento,
+      );
+    }
 
     // 🔹 Badge contador
     const badge = document.getElementById("badgeConDanio");
@@ -852,6 +906,7 @@ const limpiarFiltros = () => {
   filtros.modelo = [];
   filtros.batea = [];
   filtros.soloConDanio = false;
+  filtros.movimiento = null;
   filtros.areaSeleccionada = null;
   filtros.averiaSeleccionada = null;
   filtros.topAreas = false;
@@ -862,6 +917,7 @@ const limpiarFiltros = () => {
   choicesModelo.removeActiveItems();
   choicesBatea.removeActiveItems();
   document.getElementById("chkSoloConDanio").checked = false;
+  document.getElementById("movAll").checked = true;
   document.getElementById("chkTopAreas").checked = false;
   document.getElementById("chkTopAverias").checked = false;
   document
@@ -1038,3 +1094,21 @@ async function withBootstrapButtonLock(button, action) {
     button.innerHTML = originalHtml;
   }
 }
+
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".open-gallery");
+  if (!btn) return;
+
+  const vin = btn.dataset.vin;
+  if (!vin || !fotosPorVin[vin]) return;
+
+  const lightbox = GLightbox({
+    elements: fotosPorVin[vin],
+    loop: true,
+    zoomable: true,
+    draggable: true,
+    preload: true, // 🔥 clave
+  });
+
+  lightbox.open();
+});

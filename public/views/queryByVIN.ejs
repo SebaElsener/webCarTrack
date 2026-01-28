@@ -30,71 +30,76 @@
   </head>
 
   <body>
-    <%- include('./partials/navMin') %>
-    <main id="main">
-      <div class="container mt-5" id="title-VIN-input">
-        <h3 class="formTitle">Consulta chasis / VIN</h3>
+    <div id="app-root">
+      <%- include('./partials/navMin') %>
+      <main id="main">
+        <div class="container mt-5" id="title-VIN-input">
+          <h3 class="formTitle">Consulta chasis / VIN</h3>
 
-        <form id="form-vin">
-          <div id="VINinputGroup" class="input-group">
-            <!-- <span class="input-group-text">📅</span> -->
-            <input
-              type="text"
-              id="vinInput"
-              class="form-control"
-              placeholder="Ingrese chasis o VIN"
-              onInput="this.value = this.value.toUpperCase();"
-            />
-            <div class="btnFormContainer">
-              <button id="btnFormSubmit" class="btn btn-primary" type="submit">
-                Consultar
-              </button>
+          <form id="form-vin">
+            <div id="VINinputGroup" class="input-group">
+              <!-- <span class="input-group-text">📅</span> -->
+              <input
+                type="text"
+                id="vinInput"
+                class="form-control"
+                placeholder="Ingrese chasis o VIN"
+                onInput="this.value = this.value.toUpperCase();"
+              />
+              <div class="btnFormContainer">
+                <button
+                  id="btnFormSubmit"
+                  class="btn btn-primary"
+                  type="submit"
+                >
+                  Consultar
+                </button>
+              </div>
             </div>
-          </div>
-        </form>
-      </div>
-
-      <div id="tabla-wrapper" class="tabla-wrapper">
-        <div id="tabla-scroll" class="tabla-scroll">
-          <div id="resultadosVIN" class="container-fluid"></div>
+          </form>
         </div>
-        <div id="paginacion" class="mt-3"></div>
-      </div>
 
-      <div class="actionBtnsWrapper">
-        <button
-          id="btnUpdateDamages"
-          class="btn btn-primary post-table-action-buttons"
-          type="button"
-        >
-          <span class="btn-text">Guardar cambios</span>
-        </button>
-        <button
-          id="btnDeleteDamages"
-          class="btn btn-primary post-table-action-buttons"
-          type="button"
-        >
-          Eliminar daños
-        </button>
-        <button
-          id="btnDeletePicts"
-          class="btn btn-primary post-table-action-buttons"
-          type="button"
-        >
-          Eliminar fotos
-        </button>
-        <button
-          id="btnDeleteVIN"
-          class="btn btn-primary post-table-action-buttons"
-          type="button"
-        >
-          Eliminar VIN
-        </button>
-      </div>
-    </main>
+        <div id="tabla-wrapper" class="tabla-wrapper">
+          <div id="tabla-scroll" class="tabla-scroll">
+            <div id="resultadosVIN" class="container-fluid"></div>
+          </div>
+          <div id="paginacion" class="mt-3"></div>
+        </div>
 
-    <%- include('./partials/footer') %>
+        <div class="actionBtnsWrapper">
+          <button
+            id="btnUpdateDamages"
+            class="btn btn-primary post-table-action-buttons"
+            type="button"
+          >
+            <span class="btn-text">Guardar cambios</span>
+          </button>
+          <button
+            id="btnDeleteDamages"
+            class="btn btn-primary post-table-action-buttons"
+            type="button"
+          >
+            Eliminar daños
+          </button>
+          <button
+            id="btnDeletePicts"
+            class="btn btn-primary post-table-action-buttons"
+            type="button"
+          >
+            Eliminar fotos
+          </button>
+          <button
+            id="btnDeleteVIN"
+            class="btn btn-primary post-table-action-buttons"
+            type="button"
+          >
+            Eliminar VIN
+          </button>
+        </div>
+      </main>
 
+      <%- include('./partials/footer') %>
+    </div>
     <script type="module" src="/js/queryByVIN.js"></script>
     <script src="/js/pageAnimation.js"></script>
     <script src="/js/inline-edit/createSearchableDropdown.js"></script>

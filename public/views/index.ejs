@@ -14,18 +14,19 @@
   </head>
 
   <body>
-    <%- include('./partials/navMin') %>
+    <div id="app-root">
+      <%- include('./partials/navMin') %>
 
-    <main id="main">
-      <div
-        id="root"
-        data-user="<%= JSON.stringify(userName) %>"
-        data-admin="<%= JSON.stringify(userData.admin) %>"
-      ></div>
-      <!-- <%- include('./partials/cards') %> -->
-      <!-- <%- include('./partials/messages') %> -->
-    </main>
-
+      <main id="main">
+        <div
+          id="root"
+          data-user="<%= JSON.stringify(userName) %>"
+          data-admin="<%= JSON.stringify(userData.admin) %>"
+        ></div>
+        <!-- <%- include('./partials/cards') %> -->
+        <!-- <%- include('./partials/messages') %> -->
+      </main>
+    </div>
     <!-- Script toastify -->
     <script
       type="text/javascript"
