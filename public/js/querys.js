@@ -450,20 +450,20 @@ function renderClimaIcon(clima) {
   const c = clima.toLowerCase();
 
   switch (c) {
-    case "sunny":
-      return `<i class="mdi mdi-weather-sunny text-warning" title="Sunny"></i>`;
+    case "sol":
+      return `<i class="mdi mdi-weather-sunny text-warning" title="Sol"></i>`;
 
-    case "night":
-      return `<i class="mdi mdi-weather-night text-dark" title="Night"></i>`;
+    case "noche":
+      return `<i class="mdi mdi-weather-night text-dark" title="Noche"></i>`;
 
-    case "rain":
-      return `<i class="mdi mdi-weather-rainy text-primary" title="Rain"></i>`;
+    case "lluvia":
+      return `<i class="mdi mdi-weather-rainy text-primary" title="Lluvia"></i>`;
 
-    case "frost":
-      return `<i class="mdi mdi-snowflake text-info" title="Frost"></i>`;
+    case "hielo":
+      return `<i class="mdi mdi-snowflake text-info" title="Hielo"></i>`;
 
-    case "dew":
-      return `<i class="mdi mdi-water-outline text-secondary" title="Dew"></i>`;
+    case "rocío":
+      return `<i class="mdi mdi-water-outline text-secondary" title="Rocío"></i>`;
 
     default:
       return `<i class="mdi mdi-help-circle-outline text-muted" title="${clima}"></i>`;
