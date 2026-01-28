@@ -1008,7 +1008,10 @@ function buildExportPayload() {
       areas: s.damages?.map((d) => d.area_desc).join(", "),
       averias: s.damages?.map((d) => d.averia_desc).join(", "),
       gravedades: s.damages?.map((d) => d.grav_desc).join(", "),
-      obs: s.damages?.map((d) => d.obs).join(", "),
+      obs: s.damages
+        ?.map((d) => d.obs?.trim())
+        .filter(Boolean)
+        .join(" | "),
       batea: s.batea,
       clima: s.clima,
       movimiento: s.movimiento,

@@ -184,16 +184,22 @@ for d in datos_tabla:
         pass
 
     # lista de daños (puede venir vacía)
+    damages = d.get("damages") or []
+
+# VIN sin daños (opcional)
     areas = (d.get("areas") or "").split(", ")
     averias = (d.get("averias") or "").split(", ")
     gravedades = (d.get("gravedades") or "").split(", ")
-    observaciones = (d.get("obs") or "").split(" | ")
+    observaciones = [
+    o.strip()
+    for o in (d.get("obs") or "").split("|")
+    if o.strip()
+    ]
 
     max_len = max(
         len(areas),
         len(averias),
         len(gravedades),
-        len(observaciones),
         1
     )
 
