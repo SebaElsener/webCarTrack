@@ -8,29 +8,22 @@ from datetime import datetime
 
 from openpyxl import Workbook
 from openpyxl.worksheet.table import Table, TableStyleInfo
-from openpyxl.chart import BarChart, Reference, LineChart
+from openpyxl.chart import PieChart, Reference, LineChart
 from openpyxl.styles import Font, Alignment
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Border, Side, Font
-from openpyxl.styles import Alignment
-from openpyxl.utils import get_column_letter
+from openpyxl.chart.label import DataLabelList
+
+HEADERS_DATOS = [
+    "Fecha", "Marca", "Modelo", "VIN",
+    "Area", "Avería", "Gravedad",
+    "Observación", "Batea", "Clima",
+    "Movimiento", "Usuario"
+]
 
 # =====================================================
 # UTILIDADES
 # =====================================================
-def aplicar_bordes_tabla(ws, start_row, end_row, start_col, end_col):
-    thin = Side(style="thin")
-    border = Border(left=thin, right=thin, top=thin, bottom=thin)
-
-    for row in ws.iter_rows(
-        min_row=start_row,
-        max_row=end_row,
-        min_col=start_col,
-        max_col=end_col
-    ):
-        for cell in row:
-            cell.border = border
-
 def resaltar_header(ws, row=2, start_col=1, end_col=6):
     thick = Side(style="medium")
     border = Border(bottom=thick)
@@ -47,8 +40,14 @@ def ajustar_columnas_clave(ws):
         2: 8,  # Marca
         3: 10,  # Modelo
         4: 22,  # VIN
-        5: 40,  # Área
-        6: 40,  # Avería
+        5: 35,  # Area
+        6: 22,  # Avería
+        7: 20,  # Gravedad
+        8: 40,  # Observación
+        9: 20,  # Batea
+        10: 20,  # Clima
+        11: 20,  # Movimiento
+        12: 20,  # User
     }
 
     for col_idx, width in widths.items():
@@ -162,10 +161,11 @@ wb = Workbook()
 
 ws_data = wb.active
 ws_data.title = "Datos"
+headers = HEADERS_DATOS
 
-agregar_titulo_hoja(ws_data, ancho_columnas=6)
+agregar_titulo_hoja(ws_data, ancho_columnas=len(headers))
 
-headers = ["Fecha", "Marca", "Modelo", "VIN", "Área", "Avería"]
+# headers = ["Fecha", "Marca", "Modelo", "VIN", "Area", "Avería", "Gravedad", "Observación", "Batea", "Clima", "Movimiento", "Usuario"]
 ws_data.append([])            # fila 2 vacía
 ws_data.append(headers)       # fila 3
 
@@ -182,17 +182,30 @@ for d in datos_tabla:
         d.get("modelo", ""),
         d.get("vin", ""),
         d.get("areas", ""),
-        d.get("averias", "")
+        d.get("averias", ""),
+        d.get("gravedades", ""),
+        d.get("obs", ""),
+        d.get("batea", ""),
+        d.get("clima", ""),
+        d.get("movimiento", ""),
+        d.get("user", ""),
     ])
+
+last_col_letter = get_column_letter(len(headers))
+start_row = 3
+end_row = ws_data.max_row
 
 tab = Table(
     displayName="TablaDatos",
-    ref=f"A3:F{ws_data.max_row}"
+    ref=f"A{start_row}:{last_col_letter}{end_row}"
 )
 
 tab.tableStyleInfo = TableStyleInfo(
-    name="TableStyleMedium9",
-    showRowStripes=True
+    name="TableStyleMedium2",
+    showFirstColumn=False,
+    showLastColumn=False,
+    showRowStripes=True,
+    showColumnStripes=False
 )
 
 ws_data.add_table(tab)
@@ -209,13 +222,14 @@ last_row = ws_data.max_row
 first_col = 1
 last_col = 6
 
-aplicar_bordes_tabla(
-    ws_data,
-    start_row=first_row,
-    end_row=last_row,
-    start_col=first_col,
-    end_col=last_col
-)
+# aplicar_bordes_tabla(
+#     ws_data,
+#     start_row=first_row,
+#     end_row=last_row,
+#     start_col=first_col,
+#     end_col=last_col
+# )
+
 resaltar_header(ws_data)
 
 
@@ -227,7 +241,7 @@ ws_areas = wb.create_sheet("Top Areas")
 agregar_titulo_hoja(ws_areas, ancho_columnas=2)
 
 ws_areas.append([])
-ws_areas.append(["Área", "Casos"])
+ws_areas.append(["Area", "Casos"])
 
 for t in top_areas:
     ws_areas.append([t["label"], t["value"]])
@@ -237,22 +251,42 @@ configurar_impresion(ws_areas)
 
 
 ws_areas_chart = wb.create_sheet("Top Areas - Gráfico")
-agregar_titulo_hoja(ws_areas_chart, ancho_columnas=12)
+agregar_titulo_hoja(ws_areas_chart, ancho_columnas=6)
 
-chart = BarChart()
-chart.title = "Top 5 Áreas dañadas"
-chart.y_axis.title = "Casos"
-chart.x_axis.title = "Área"
+chart = PieChart()
+chart.title = None
+chart.style = 10  # look moderno
+chart.height = 15
+chart.width = 25
 
-data = Reference(ws_areas, min_col=2, min_row=4, max_row=ws_areas.max_row)
-cats = Reference(ws_areas, min_col=1, min_row=4, max_row=ws_areas.max_row)
+labels = Reference(
+    ws_areas,
+    min_col=1,
+    min_row=4,
+    max_row=ws_areas.max_row
+)
 
-chart.add_data(data, titles_from_data=False)
-chart.set_categories(cats)
-chart.width = 22
-chart.height = 12
+data = Reference(
+    ws_areas,
+    min_col=2,
+    min_row=3,
+    max_row=ws_areas.max_row
+)
 
-ws_areas_chart.add_chart(chart, "A3")
+chart.add_data(data, titles_from_data=True)
+chart.set_categories(labels)
+
+chart.dataLabels = DataLabelList()
+chart.dataLabels.showCatName = True
+chart.dataLabels.showPercent = True
+# chart.dataLabels.showLeaderLines = True
+chart.dataLabels.showVal = False
+
+
+# solo crear gráfico si hay datos reales
+if ws_areas.max_row > 3:   # header + al menos 1 fila de datos
+    ws_areas_chart.add_chart(chart, "A3")
+
 configurar_impresion(ws_areas_chart)
 
 
@@ -274,22 +308,41 @@ configurar_impresion(ws_averias)
 
 
 ws_averias_chart = wb.create_sheet("Top Averías - Gráfico")
-agregar_titulo_hoja(ws_averias_chart, ancho_columnas=12)
+agregar_titulo_hoja(ws_averias_chart, ancho_columnas=6)
 
-chart2 = BarChart()
-chart2.title = "Top 5 Averías"
-chart2.y_axis.title = "Casos"
-chart2.x_axis.title = "Avería"
+chart2 = PieChart()
+chart2.title = None
+chart2.style = 10
+chart2.height = 15
+chart2.width = 25
 
-data2 = Reference(ws_averias, min_col=2, min_row=4, max_row=ws_averias.max_row)
-cats2 = Reference(ws_averias, min_col=1, min_row=4, max_row=ws_averias.max_row)
+labels2 = Reference(
+    ws_averias,
+    min_col=1,
+    min_row=4,
+    max_row=ws_averias.max_row
+)
 
-chart2.add_data(data2, titles_from_data=False)
-chart2.set_categories(cats2)
-chart2.width = 22
-chart2.height = 12
+data2 = Reference(
+    ws_averias,
+    min_col=2,
+    min_row=3,
+    max_row=ws_averias.max_row
+)
 
-ws_averias_chart.add_chart(chart2, "A3")
+chart2.add_data(data2, titles_from_data=True)
+chart2.set_categories(labels2)
+
+chart2.dataLabels = DataLabelList()
+chart2.dataLabels.showCatName = True
+chart2.dataLabels.showPercent = True
+# chart2.dataLabels.showLeaderLines = True
+chart2.dataLabels.showVal = False
+
+# solo crear gráfico si hay datos reales
+if ws_averias.max_row > 3:   # header + al menos 1 fila de datos
+    ws_averias_chart.add_chart(chart2, "A3")
+
 configurar_impresion(ws_averias_chart)
 
 

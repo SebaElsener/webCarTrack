@@ -2,10 +2,6 @@ import path from "path";
 import fs from "fs";
 import { execFile } from "child_process";
 
-//let fileNameEnding;
-//let fileName;
-//let fileNamePDF;
-
 const excelHelper = async (datos) => {
   return new Promise((resolve, reject) => {
     const ahora = new Date();
@@ -30,7 +26,7 @@ const excelHelper = async (datos) => {
       (err, stdout, stderr) => {
         if (err) {
           console.error("STDERR: ", stderr);
-          return res.status(500).json({ error: "Error generando Excel" });
+          return { error: "Error generando Excel" };
         }
         console.log(stdout);
         resolve({ outputPath, PDFoutputPath, fileName, fileNamePDF });
