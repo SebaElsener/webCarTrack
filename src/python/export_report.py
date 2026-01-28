@@ -13,6 +13,7 @@ from openpyxl.styles import Font, Alignment
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Border, Side, Font
 from openpyxl.chart.label import DataLabelList
+from openpyxl.styles import PatternFill
 
 HEADERS_DATOS = [
     "Fecha", "Marca", "Modelo", "VIN",
@@ -24,7 +25,7 @@ HEADERS_DATOS = [
 # =====================================================
 # UTILIDADES
 # =====================================================
-def resaltar_header(ws, row=2, start_col=1, end_col=6):
+def resaltar_header(ws, row=3, start_col=1, end_col=12):
     thick = Side(style="medium")
     border = Border(bottom=thick)
 
@@ -36,18 +37,18 @@ def resaltar_header(ws, row=2, start_col=1, end_col=6):
 def ajustar_columnas_clave(ws):
     # Anchos óptimos por columna (A=1, B=2, ...)
     widths = {
-        1: 10,  # Fecha
-        2: 8,  # Marca
-        3: 10,  # Modelo
-        4: 22,  # VIN
-        5: 35,  # Area
-        6: 22,  # Avería
-        7: 20,  # Gravedad
-        8: 40,  # Observación
-        9: 20,  # Batea
-        10: 20,  # Clima
-        11: 20,  # Movimiento
-        12: 20,  # User
+        1: 9,  # Fecha
+        2: 7,  # Marca
+        3: 8,  # Modelo
+        4: 15,  # VIN
+        5: 17,  # Area
+        6: 11,  # Avería
+        7: 7,  # Gravedad
+        8: 25,  # Observación
+        9: 6,  # Batea
+        10: 6,  # Clima
+        11: 6,  # Movimiento
+        12: 6,  # User
     }
 
     for col_idx, width in widths.items():
@@ -79,7 +80,7 @@ def ajustar_texto(ws, desde_fila=1):
                 vertical="top"
             )
 
-def ajustar_altura_filas(ws, min_height=22):
+def ajustar_altura_filas(ws, min_height=20):
     for row in ws.iter_rows():
         max_lines = 1
         for cell in row:
@@ -99,7 +100,7 @@ def agregar_titulo_hoja(ws, ancho_columnas):
 
     cell = ws["A1"]
     cell.value = ws.title
-    cell.font = Font(bold=True, size=16)
+    cell.font = Font(name=FONT_BASE, bold=True, size=16)
     cell.alignment = Alignment(horizontal="center", vertical="center")
 
     ws.row_dimensions[1].height = 36
@@ -159,15 +160,21 @@ wb = Workbook()
 # HOJA DATOS
 # =====================================================
 
+FONT_BASE = "Calibri"
 ws_data = wb.active
 ws_data.title = "Datos"
 headers = HEADERS_DATOS
 
 agregar_titulo_hoja(ws_data, ancho_columnas=len(headers))
 
-# headers = ["Fecha", "Marca", "Modelo", "VIN", "Area", "Avería", "Gravedad", "Observación", "Batea", "Clima", "Movimiento", "Usuario"]
 ws_data.append([])            # fila 2 vacía
 ws_data.append(headers)       # fila 3
+
+header_fill = PatternFill("solid", fgColor="E9ECEF")
+ws_data.row_dimensions[3].height = 26
+
+for cell in ws_data[3]:
+    cell.fill = header_fill
 
 for d in datos_tabla:
     fecha = d.get("fecha")
@@ -204,12 +211,34 @@ tab.tableStyleInfo = TableStyleInfo(
     name="TableStyleMedium2",
     showFirstColumn=False,
     showLastColumn=False,
-    showRowStripes=True,
+    showRowStripes=False,
     showColumnStripes=False
 )
 
 ws_data.add_table(tab)
 ws_data.freeze_panes = "A4"
+
+# Header repetido en cada página del PDF
+ws_data.print_title_rows = "3:3"
+
+# 🔽 Tipografía compacta para PDF
+font_header = Font(name=FONT_BASE, size=9, bold=True)
+font_data = Font(name=FONT_BASE, size=8)
+
+for row in ws_data.iter_rows(min_row=3):  # header + datos
+    for cell in row:
+        if cell.row == 3:
+            cell.font = font_header
+        else:
+            cell.font = font_data
+
+fill_even = PatternFill("solid", fgColor="F4F6F8")  # gris claro tipo UI
+fill_odd = PatternFill("solid", fgColor="FFFFFF")
+
+for row in ws_data.iter_rows(min_row=4, max_row=ws_data.max_row):
+    fill = fill_even if row[0].row % 2 == 0 else fill_odd
+    for cell in row:
+        cell.fill = fill
 
 ajustar_columnas_clave(ws_data)
 ajustar_texto(ws_data, desde_fila=3)
@@ -222,16 +251,7 @@ last_row = ws_data.max_row
 first_col = 1
 last_col = 6
 
-# aplicar_bordes_tabla(
-#     ws_data,
-#     start_row=first_row,
-#     end_row=last_row,
-#     start_col=first_col,
-#     end_col=last_col
-# )
-
-resaltar_header(ws_data)
-
+resaltar_header(ws_data, row=3, end_col=len(headers))
 
 # =====================================================
 # TOP ÁREAS
@@ -242,6 +262,13 @@ agregar_titulo_hoja(ws_areas, ancho_columnas=2)
 
 ws_areas.append([])
 ws_areas.append(["Area", "Casos"])
+
+for cell in ws_areas[3]:
+    cell.font = Font(name=FONT_BASE, size=9, bold=True)
+
+for row in ws_areas.iter_rows(min_row=4):
+    for cell in row:
+        cell.font = Font(name=FONT_BASE, size=8)
 
 for t in top_areas:
     ws_areas.append([t["label"], t["value"]])
@@ -300,6 +327,13 @@ agregar_titulo_hoja(ws_averias, ancho_columnas=2)
 ws_averias.append([])
 ws_averias.append(["Avería", "Casos"])
 
+for cell in ws_averias[3]:
+    cell.font = Font(name=FONT_BASE, size=9, bold=True)
+
+for row in ws_averias.iter_rows(min_row=4):
+    for cell in row:
+        cell.font = Font(name=FONT_BASE, size=8)
+
 for t in top_averias:
     ws_averias.append([t["label"], t["value"]])
 
@@ -355,6 +389,13 @@ agregar_titulo_hoja(ws_evo, ancho_columnas=2)
 
 ws_evo.append([])
 ws_evo.append(["Fecha", "Casos"])
+
+for cell in ws_evo[3]:
+    cell.font = Font(name=FONT_BASE, size=9, bold=True)
+
+for row in ws_evo.iter_rows(min_row=4):
+    for cell in row:
+        cell.font = Font(name=FONT_BASE, size=8)
 
 for t in evolucion:
     ws_evo.append([t["fecha"], t["value"]])
