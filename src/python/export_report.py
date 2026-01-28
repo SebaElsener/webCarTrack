@@ -183,20 +183,35 @@ for d in datos_tabla:
     except:
         pass
 
-    ws_data.append([
-        fecha,
-        d.get("marca", ""),
-        d.get("modelo", ""),
-        d.get("vin", ""),
-        d.get("areas", ""),
-        d.get("averias", ""),
-        d.get("gravedades", ""),
-        d.get("obs", ""),
-        d.get("batea", ""),
-        d.get("clima", ""),
-        d.get("movimiento", ""),
-        d.get("user", ""),
-    ])
+    # lista de daños (puede venir vacía)
+    areas = (d.get("areas") or "").split(", ")
+    averias = (d.get("averias") or "").split(", ")
+    gravedades = (d.get("gravedades") or "").split(", ")
+    observaciones = (d.get("obs") or "").split(" | ")
+
+    max_len = max(
+        len(areas),
+        len(averias),
+        len(gravedades),
+        len(observaciones),
+        1
+    )
+
+    for i in range(max_len):
+        ws_data.append([
+            fecha if i == 0 else "",          # solo en la primera fila
+            d.get("marca", "") if i == 0 else "",
+            d.get("modelo", "") if i == 0 else "",
+            d.get("vin", ""),
+            areas[i] if i < len(areas) else "",
+            averias[i] if i < len(averias) else "",
+            gravedades[i] if i < len(gravedades) else "",
+            observaciones[i] if i < len(observaciones) else "",
+            d.get("batea", "") if i == 0 else "",
+            d.get("clima", "") if i == 0 else "",
+            d.get("movimiento", "") if i == 0 else "",
+            d.get("user", "") if i == 0 else "",
+        ])
 
 last_col_letter = get_column_letter(len(headers))
 start_row = 3
@@ -235,10 +250,41 @@ for row in ws_data.iter_rows(min_row=3):  # header + datos
 fill_even = PatternFill("solid", fgColor="F4F6F8")  # gris claro tipo UI
 fill_odd = PatternFill("solid", fgColor="FFFFFF")
 
+current_vin = None
+vin_index = -1  # contador de VIN distintos
+
 for row in ws_data.iter_rows(min_row=4, max_row=ws_data.max_row):
-    fill = fill_even if row[0].row % 2 == 0 else fill_odd
+    vin_cell = row[3]  # columna VIN (D)
+
+    if vin_cell.value != current_vin:
+        current_vin = vin_cell.value
+        vin_index += 1
+
+    fill = fill_even if vin_index % 2 == 0 else fill_odd
+
     for cell in row:
         cell.fill = fill
+
+# 🔹 Merge visual del VIN (sin merge_cells)
+current_vin = None
+first_row_of_vin = None
+
+for row_idx in range(4, ws_data.max_row + 1):
+    vin_cell = ws_data.cell(row=row_idx, column=4)  # VIN = columna D
+
+    if vin_cell.value != current_vin:
+        # nuevo VIN
+        current_vin = vin_cell.value
+        first_row_of_vin = row_idx
+
+        # centrar verticalmente el VIN
+        vin_cell.alignment = Alignment(
+            horizontal="center",
+            vertical="center"
+        )
+    else:
+        # mismo VIN → ocultar valor
+        vin_cell.value = ""
 
 ajustar_columnas_clave(ws_data)
 ajustar_texto(ws_data, desde_fila=3)
