@@ -8,8 +8,9 @@ const indexById = (arr) =>
 const areasMap = indexById(areas);
 const averiasMap = indexById(averias);
 const gravedadesMap = indexById(gravedades);
-const fotosPorVin = {};
 let accionesPostTablaMostradas = false;
+let fotosPorVin = {};
+let vinsConFotos = new Set();
 let filtros = {
   marca: [],
   modelo: [],
@@ -155,6 +156,21 @@ async function cargarDatos(desde, hasta) {
         return;
       }
 
+      fotosPorVin = {};
+      vinsConFotos.clear();
+
+      data.forEach((scan) => {
+        if (scan.fotos?.length) {
+          fotosPorVin[scan.vin] = scan.fotos.map((f, idx) => ({
+            href: f,
+            type: "image",
+            title: `VIN ${scan.vin} · Imagen ${idx + 1}`,
+          }));
+
+          vinsConFotos.add(scan.vin);
+        }
+      });
+
       const transformScans = data.map((scan) => ({
         ...scan,
         damages: scan.damages.map((d) => ({
@@ -166,22 +182,6 @@ async function cargarDatos(desde, hasta) {
       }));
 
       datosGlobales = transformScans;
-
-      datosGlobales.forEach((scan) => {
-        if (!scan.vin || !scan.fotos?.length) return;
-
-        if (!fotosPorVin[scan.vin]) {
-          fotosPorVin[scan.vin] = [];
-        }
-
-        scan.fotos.forEach((url) => {
-          fotosPorVin[scan.vin].push({
-            href: url,
-            type: "image",
-            title: `VIN ${scan.vin}`,
-          });
-        });
-      });
 
       paginaActual = 1;
       cargarMarcas();
@@ -207,32 +207,6 @@ function renderTabla() {
 
   let rows = "";
 
-  // <td class="text-center">
-  //   ${
-  //     scan.fotos?.length
-  //       ? scan.fotos
-  //           .map(
-  //             (f, idx) => `
-  //               <a
-  //                 href="${f}"
-  //                 class="glightbox"
-  //                 data-gallery="gallery-${scan.scan_id}"
-  //                 data-title="Imagen ${idx + 1} de ${scan.fotos.length}"
-  //                 ${idx > 0 ? 'style="display:none"' : ""}
-  //               >
-  //                 ${
-  //                   idx === 0
-  //                     ? `<i class="bi bi-camera-fill" style="font-size:1.2rem;color:#007bff;"></i>`
-  //                     : ""
-  //                 }
-  //               </a>
-  //             `,
-  //           )
-  //           .join("")
-  //       : ""
-  //   }
-  // </td>
-
   paginaDatos.forEach((scan) => {
     if (!scan.damages || scan.damages.length === 0) {
       rows += `
@@ -240,26 +214,29 @@ function renderTabla() {
           <td>${new Date(scan.scan_date).toLocaleString("es-AR")}</td>
           <td>${scan.marca ?? ""}</td>
           <td>${scan.modelo ?? ""}</td>
-          <td>${scan.vin ?? ""}</td>
+          <td>
+            ${
+              vinsConFotos.has(scan.vin)
+                ? `
+                  <a
+                    href="#"
+                    class="vin-link open-gallery"
+                    data-vin="${scan.vin}"
+                    title="Ver fotos"
+                  >
+                    <span>${scan.vin}</span>
+                  </a>
+                `
+                : `
+                  <span class="vin-text">${scan.vin ?? ""}</span>
+                `
+            }
+          </td>
+
           <td colspan="4" class="text-center">Sin daños</td>
           <td>${scan.batea ?? ""}</td>
           <td>${renderClimaIcon(scan.clima)}</td>
           <td>${scan.user ?? ""}</td>
-          <td class="text-center">
-            ${
-              scan.fotos?.length
-                ? `
-                  <button
-                    class="btn btn-link p-0 open-gallery"
-                    data-vin="${scan.vin}"
-                    data-start="0"
-                  >
-                    <i class="bi bi-camera-fill" style="font-size:1.2rem;color:#007bff;"></i>
-                  </button>
-                `
-                : ""
-            }
-          </td>
         </tr>
       `;
     } else {
@@ -269,7 +246,22 @@ function renderTabla() {
             <td>${new Date(scan.scan_date).toLocaleString("es-AR")}</td>
             <td>${scan.marca ?? ""}</td>
             <td>${scan.modelo ?? ""}</td>
-            <td>${scan.vin ?? ""}</td>
+            <td>
+              ${
+                vinsConFotos.has(scan.vin)
+                  ? `
+                    <a
+                      href="#"
+                      class="vin-link open-gallery"
+                      data-vin="${scan.vin}"
+                      title="Ver fotos"
+                    >
+                      <span>${scan.vin}</span>
+                    </a>
+                  `
+                  : `<span class="vin-text">${scan.vin ?? ""}</span>`
+              }
+            </td>
             <td>${damage.area_desc ?? ""}</td>
             <td>${damage.averia_desc ?? ""}</td>
             <td>${damage.grav_desc ?? ""}</td>
@@ -277,21 +269,6 @@ function renderTabla() {
             <td>${scan.batea ?? ""}</td>
             <td>${renderClimaIcon(scan.clima)}</td>
             <td>${scan.user ?? ""}</td>
-           <td class="text-center">
-            ${
-              scan.fotos?.length
-                ? `
-                  <button
-                    class="btn btn-link p-0 open-gallery"
-                    data-vin="${scan.vin}"
-                    data-start="0"
-                  >
-                    <i class="bi bi-camera-fill" style="font-size:1.2rem;color:#007bff;"></i>
-                  </button>
-                `
-                : ""
-            }
-          </td>
           </tr>
         `;
       });
@@ -313,11 +290,10 @@ function renderTabla() {
             <th class="areaTh">Area</th>
             <th class="averiaTh">Avería</th>
             <th class="gravTh">Gravedad</th>
-            <th>Observación</th>
+            <th class="obsTh">Observación</th>
             <th class="bateaTh">Batea</th>
             <th class="climaTh">Clima</th>
-            <th>Usuario</th>
-            <th class="fotosTh">Fotos</th>
+            <th class="userTh">Usuario</th>
           </tr>
         </thead>
         <tbody>${rows}</tbody>
@@ -325,33 +301,30 @@ function renderTabla() {
     </div>
   `;
 
-  // 🔹 Ajuste automático inicial de ancho según contenido
   const table = document.getElementById("tabla-resultados");
-  table.querySelectorAll("th").forEach((th) => {
-    th.style.width = th.scrollWidth + 20 + "px";
+
+  /* anchos iniciales por columna */
+  const initialWidths = {
+    dateTh: 140,
+    marcaTh: 120,
+    modeloTh: 120,
+    VINth: 210,
+    areaTh: 240,
+    averiaTh: 170,
+    gravTh: 120,
+    obsTh: 200,
+    userTh: 80,
+    bateaTh: 60,
+    climaTh: 60,
+  };
+
+  Object.entries(initialWidths).forEach(([cls, width]) => {
+    const th = table.querySelector(`th.${cls}`);
+    if (th) th.style.width = `${width}px`;
   });
 
   // 🔹 Activar resize manual
   enableColumnResize("tabla-resultados");
-
-  // 🔹 Inicializar GLightbox
-  // GLightbox({
-  //   selector: ".glightbox",
-  //   loop: true,
-  //   zoomable: true,
-  //   touchNavigation: true,
-  //   keyboardNavigation: true,
-  //   returnFocus: false,
-  // });
-  const lightbox = GLightbox({
-    selector: ".glightbox",
-    loop: true,
-    zoomable: true,
-    touchNavigation: true,
-    keyboardNavigation: true,
-    closeOnOutsideClick: true,
-    draggable: true,
-  });
 }
 
 // Render de paginación

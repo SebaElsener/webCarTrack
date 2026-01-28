@@ -20,6 +20,7 @@ document.addEventListener("click", (e) => {
 });
 
 window.addEventListener("pageshow", () => {
+  const appRoot = document.getElementById("app-root");
   appRoot.classList.remove("fade-out", "no-scroll");
   appRoot.style.opacity = "1";
 });
