@@ -18,7 +18,7 @@ let vin = "";
 let fotosPorVin = {};
 let vinsConFotos = new Set();
 // Eliminar daños
-let deleteMode = false;
+window.deleteMode = false;
 
 const navBarMin = document.getElementById("navBarMin");
 navBarMin.style.top = "0";
@@ -349,7 +349,7 @@ function renderTabla() {
   });
 
   // 🔥 reset delete mode después de re-render
-  deleteMode = false;
+  window.deleteMode = false;
   document.querySelectorAll(".damage-delete-icon").forEach((icon) => {
     icon.classList.add("d-none");
   });
@@ -422,12 +422,6 @@ function enableColumnResize(tableId) {
 
 /// Listeners action buttons
 document.getElementById("btnUpdateDamages").addEventListener("click", () => {
-  deleteMode = false;
-
-  document.querySelectorAll(".damage-delete-icon").forEach((icon) => {
-    icon.classList.add("d-none");
-  });
-
   inlineEditor.saveAll();
 });
 
