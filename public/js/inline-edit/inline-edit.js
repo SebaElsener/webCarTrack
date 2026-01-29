@@ -46,17 +46,23 @@ class InlineEditableDropdown {
       },
     });
 
-    // ESC solo cancela si no se eligió nada
     const esc = (e) => {
-      if (e.key === "Escape") {
+      // 🔒 ESC solo funciona mientras está editando
+      if (e.key === "Escape" && cell.classList.contains("editing")) {
         this.cancel(cell, originalText);
         document.removeEventListener("keydown", esc);
       }
     };
+
     document.addEventListener("keydown", esc);
   }
 
   commit({ cell, field, scanId, damageId, item, originalText }) {
+    // 🔥 matar ESC pendiente
+    if (cell._escListener) {
+      document.removeEventListener("keydown", cell._escListener);
+      delete cell._escListener;
+    }
     cell.classList.remove("editing");
     cell.innerHTML = "";
 
@@ -194,9 +200,30 @@ class InlineEditableDropdown {
       if (!res.ok) throw new Error();
       const json = await res.json();
 
+      // 🔥 cerrar cualquier edición activa y matar ESC pendientes
+      document.querySelectorAll(".editable-cell.editing").forEach((cell) => {
+        cell.classList.remove("editing");
+        this.removeEsc(cell);
+      });
+
       this.pendingChanges.forEach((c) => {
         c.cell.classList.remove("pending-change", "saving");
+
+        // 🔥 el valor guardado pasa a ser el nuevo baseline
+        const span = c.cell.querySelector(".cell-value");
+        if (span) {
+          span.textContent = c.displayValue;
+        }
+
+        c.originalText = c.displayValue;
+
+        // 🔥 eliminar ESC residual
+        if (c.cell._escListener) {
+          document.removeEventListener("keydown", c.cell._escListener);
+          delete c.cell._escListener;
+        }
       });
+
       this.pendingChanges.clear();
 
       toastSuccess(json.message || "Cambios guardados");
