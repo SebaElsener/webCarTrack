@@ -4,7 +4,6 @@ import { infoLogger } from "../../logger.js";
 dotenv.config();
 
 import { createClient } from "@supabase/supabase-js";
-import { deleteDamages } from "../../business/deleteDamagesBusiness.js";
 
 export const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -101,10 +100,10 @@ class ContenedorSupabase {
     }
   }
 
-  async deleteDamages(vinReference) {
+  async deleteDamages(damageReference) {
     try {
-      const { data, error } = await supabase.rpc("delete_damages_by_vin", {
-        p_vin: vinReference,
+      const { data, error } = await supabase.rpc("delete_damage_by_id", {
+        p_damage_id: damageReference,
       });
 
       if (error) {

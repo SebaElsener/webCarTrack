@@ -15,7 +15,10 @@ let datosGlobales = [];
 let paginaActual = 1;
 let accionesPostTablaMostradas = false;
 let vin = "";
-let tableTdVIN = "";
+let fotosPorVin = {};
+let vinsConFotos = new Set();
+// Eliminar daños
+let deleteMode = false;
 
 const navBarMin = document.getElementById("navBarMin");
 navBarMin.style.top = "0";
@@ -66,6 +69,21 @@ async function cargarDatos(vin) {
         "<p class='text-muted'>No se encontraron datos</p>";
       return;
     }
+
+    fotosPorVin = {};
+    vinsConFotos.clear();
+
+    data.forEach((scan) => {
+      if (scan.fotos?.length) {
+        fotosPorVin[scan.vin] = scan.fotos.map((f, idx) => ({
+          href: f,
+          type: "image",
+          title: `VIN ${scan.vin} · Imagen ${idx + 1}`,
+        }));
+
+        vinsConFotos.add(scan.vin);
+      }
+    });
 
     const transformScans = data.map((scan) => ({
       ...scan,
@@ -132,7 +150,24 @@ function renderTabla() {
         <td>${new Date(scan.scan_date).toLocaleString("es-AR")}</td>
         <td>${scan.marca ?? ""}</td>
         <td>${scan.modelo ?? ""}</td>
-        <td id="tableTdVIN">${scan.vin ?? ""}</td>
+          <td>
+            ${
+              vinsConFotos.has(scan.vin)
+                ? `
+                  <a
+                    href="#"
+                    class="vin-link open-gallery"
+                    data-vin="${scan.vin}"
+                    title="Ver fotos"
+                  >
+                    <span>${scan.vin}</span>
+                  </a>
+                `
+                : `
+                  <span class="vin-text">${scan.vin ?? ""}</span>
+                `
+            }
+          </td>
 
         <!-- ÁREA -->
         <td
@@ -173,53 +208,56 @@ function renderTabla() {
         >
           <span class="cell-value text-muted-table">Sin daños</span>
         </td>
-
+        <td>${scan.batea ?? ""}</td>
+        <td>${scan.movimiento ?? ""}</td>
         <td>${renderClimaIcon(scan.clima)}</td>
         <td>${scan.user ?? ""}</td>
-
-        <td class="text-center">
-          ${
-            scan.fotos?.length
-              ? scan.fotos
-                  .map(
-                    (f, idx) => `
-                      <a
-                        href="${f}"
-                        class="glightbox"
-                        data-gallery="gallery-${scan.scan_id}"
-                        data-title="Imagen ${idx + 1} de ${scan.fotos.length}"
-                        ${idx > 0 ? 'style="display:none"' : ""}
-                      >
-                        ${
-                          idx === 0
-                            ? `<i class="bi bi-camera-fill" style="font-size:1.2rem;color:#007bff;"></i>`
-                            : ""
-                        }
-                      </a>
-                    `,
-                  )
-                  .join("")
-              : ""
-          }
-        </td>
       </tr>
     `;
     } else {
       scan.damages.forEach((damage) => {
         rows += `
-          <tr class="resultadosVINtr">
+          <tr class="resultadosVINtr"
+              data-damage-id="${damage.id}"
+          >
             <td>${new Date(scan.scan_date).toLocaleString("es-AR")}</td>
             <td>${scan.marca ?? ""}</td>
             <td>${scan.modelo ?? ""}</td>
-            <td id="tableTdVIN">${scan.vin ?? ""}</td>
-  
+            <td>
+              ${
+                vinsConFotos.has(scan.vin)
+                  ? `
+                    <a
+                      href="#"
+                      class="vin-link open-gallery"
+                      data-vin="${scan.vin}"
+                      title="Ver fotos"
+                    >
+                      <span>${scan.vin}</span>
+                    </a>
+                  `
+                  : `
+                    <span class="vin-text">${scan.vin ?? ""}</span>
+                  `
+              }
+            </td>  
             <td
-              class="editable-cell"
+              class="editable-cell area-cell"
               data-field="area"
               data-scan-id="${scan.scan_id}"
               data-damage-id="${damage.id}"
             >
-              <span class="cell-value">${damage.area + " - " + damage.area_desc}</span>
+              <span
+                class="damage-delete-icon d-none"
+                title="Eliminar daño"
+                data-damage-id="${damage.id}"
+              >
+                <i class="mdi mdi-trash-can-outline"></i>
+              </span>
+
+              <span class="cell-value">
+                ${damage.area + " - " + damage.area_desc}
+              </span>
             </td>
             <td
               class="editable-cell"
@@ -245,35 +283,10 @@ function renderTabla() {
             >
               <span class="cell-value">${damage.obs}</span>            
             </td>
+            <td>${scan.batea ?? ""}</td>
+            <td>${scan.movimiento ?? ""}</td>
             <td>${renderClimaIcon(scan.clima)}</td>
             <td>${scan.user ?? ""}</td>
-            <td class="text-center">
-              ${
-                scan.fotos?.length
-                  ? scan.fotos
-                      .map(
-                        (f, idx) => `
-                          <a
-                            href="${f}"
-                            class="glightbox"
-                            data-gallery="gallery-${scan.scan_id}"
-                            data-title="Imagen ${idx + 1} de ${
-                              scan.fotos.length
-                            }"
-                            ${idx > 0 ? 'style="display:none"' : ""}
-                          >
-                            ${
-                              idx === 0
-                                ? `<i class="bi bi-camera-fill" style="font-size:1.2rem;color:#007bff;"></i>`
-                                : ""
-                            }
-                          </a>
-                        `,
-                      )
-                      .join("")
-                  : ""
-              }
-            </td>
           </tr>
         `;
       });
@@ -289,16 +302,17 @@ function renderTabla() {
         <thead>
           <tr>
             <th class="dateTh">Fecha</th>
-            <th id="marcaTh">Marca</th>
-            <th id="modeloTh">Modelo</th>
+            <th class="marcaTh">Marca</th>
+            <th class="modeloTh">Modelo</th>
             <th class="VINth">VIN</th>
             <th class="areaTh">Area</th>
             <th class="averiaTh">Avería</th>
             <th class="gravTh">Gravedad</th>
-            <th>Observación</th>
+            <th class="obsTh">Observación</th>
+            <th class="bateaTh">Batea</th>
+            <th class="movimientoTh">Movimiento</th>
             <th class="climaTh">Clima</th>
-            <th>Usuario</th>
-            <th class="fotosTh">Fotos</th>
+            <th class="userTh">Usuario</th>
           </tr>
         </thead>
         <tbody>${rows}</tbody>
@@ -306,31 +320,42 @@ function renderTabla() {
     </div>
   `;
 
-  tableTdVIN = document.getElementById("tableTdVIN");
+  const table = document.getElementById("tabla-resultadosVIN");
+
+  /* anchos iniciales por columna */
+  const initialWidths = {
+    dateTh: 140,
+    marcaTh: 100,
+    modeloTh: 120,
+    VINth: 210,
+    areaTh: 240,
+    averiaTh: 170,
+    gravTh: 120,
+    obsTh: 200,
+    userTh: 80,
+    bateaTh: 60,
+    movimientoTh: 60,
+    climaTh: 60,
+  };
+
+  Object.entries(initialWidths).forEach(([cls, width]) => {
+    const th = table.querySelector(`th.${cls}`);
+    if (th) th.style.width = `${width}px`;
+  });
 
   // esperar un frame
   requestAnimationFrame(() => {
     mostrarAccionesPostTabla();
   });
 
-  // 🔹 Ajuste automático inicial de ancho según contenido
-  const table = document.getElementById("tabla-resultadosVIN");
-  table.querySelectorAll("th").forEach((th) => {
-    th.style.width = th.scrollWidth + 20 + "px";
+  // 🔥 reset delete mode después de re-render
+  deleteMode = false;
+  document.querySelectorAll(".damage-delete-icon").forEach((icon) => {
+    icon.classList.add("d-none");
   });
 
   // 🔹 Activar resize manual
   enableColumnResize("tabla-resultadosVIN");
-
-  // 🔹 Inicializar GLightbox
-  GLightbox({
-    selector: ".glightbox",
-    loop: true,
-    zoomable: true,
-    touchNavigation: true,
-    keyboardNavigation: true,
-    returnFocus: false,
-  });
 }
 
 function renderClimaIcon(clima) {
@@ -396,26 +421,14 @@ function enableColumnResize(tableId) {
 }
 
 /// Listeners action buttons
-document
-  .getElementById("btnUpdateDamages")
-  .addEventListener("click", () => inlineEditor.saveAll());
+document.getElementById("btnUpdateDamages").addEventListener("click", () => {
+  deleteMode = false;
 
-// (btn, textConfirm, textSuccess, textError, fetchUrl);
+  document.querySelectorAll(".damage-delete-icon").forEach((icon) => {
+    icon.classList.add("d-none");
+  });
 
-document.getElementById("btnDeleteDamages").addEventListener("click", () => {
-  const cellValue = document.querySelectorAll(".cell-value");
-  if (cellValue[0]?.innerText === "—" || cellValue[0]?.innerText == undefined) {
-    toastInfo("No hay daños para eliminar");
-    return;
-  }
-  const btnDeleteDamages = document.getElementById("btnDeleteDamages");
-  vinAction(
-    btnDeleteDamages,
-    "Confirma ELIMINAR DAÑOS?",
-    "Daños eliminados: ",
-    "Error al eliminar daños",
-    `/api/damages/deletedamages/${tableTdVIN.innerText}`,
-  );
+  inlineEditor.saveAll();
 });
 
 // Listener celdas tabla para modificar daños
@@ -434,3 +447,97 @@ document.addEventListener("click", (e) => {
 //   },
 //   true,
 // );
+
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".open-gallery");
+  if (!btn) return;
+
+  const vin = btn.dataset.vin;
+  if (!vin || !fotosPorVin[vin]) return;
+
+  const lightbox = GLightbox({
+    elements: fotosPorVin[vin],
+    loop: true,
+    zoomable: true,
+    draggable: true,
+    preload: true, // 🔥 clave
+  });
+
+  lightbox.open();
+});
+
+document.getElementById("btnDeleteDamages").addEventListener("click", () => {
+  deleteMode = !deleteMode;
+
+  document.querySelectorAll(".damage-delete-icon").forEach((icon) => {
+    icon.classList.toggle("d-none", !deleteMode);
+  });
+});
+
+document.addEventListener("click", async (e) => {
+  const icon = e.target.closest(".damage-delete-icon");
+  if (!icon) return;
+
+  e.stopPropagation(); // 🔥 evita inline-edit
+
+  const damageId = icon.dataset.damageId;
+  if (!damageId) return;
+
+  const confirmed = await confirmModal({
+    title: "Eliminar daño",
+    body: `
+      <p class="mb-0">
+        ¿Eliminar este daño?<br>
+        <small class="text-muted">Esta acción no se puede deshacer</small>
+      </p>
+    `,
+    confirmText: "Eliminar",
+    confirmClass: "btn-danger",
+  });
+
+  if (!confirmed) return;
+
+  try {
+    const res = await fetch(`/api/damages/deletedamages/${damageId}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) throw new Error("Error backend");
+
+    // 🔥 eliminar del estado
+    datosGlobales = datosGlobales.map((scan) => ({
+      ...scan,
+      damages: scan.damages?.filter((d) => d.id !== damageId),
+    }));
+
+    // 🔥 eliminar fila visualmente
+    const row = document.querySelector(`tr[data-damage-id="${damageId}"]`);
+
+    if (row) {
+      const tbody = row.parentNode;
+
+      row.style.opacity = "0";
+
+      setTimeout(() => {
+        row.remove();
+
+        // 🔍 ¿quedan daños?
+        const quedanDanios =
+          tbody.querySelectorAll("tr[data-damage-id]").length > 0;
+
+        if (!quedanDanios) {
+          renderTabla();
+        }
+      }, 200);
+    }
+
+    toastSuccess("Daño eliminado");
+  } catch (err) {
+    console.error(err);
+    toastError("No se pudo eliminar el daño");
+  }
+});
+
+if (!document.querySelector(".damage-delete-icon")) {
+  deleteMode = false;
+}

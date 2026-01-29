@@ -4,6 +4,6 @@ import { deleteDamagesController } from "../controller/deleteDamagesController.j
 
 const damagesRouter = new Router();
 
-damagesRouter.delete("/deletedamages/:vin", deleteDamagesController);
+damagesRouter.delete("/deletedamages/:damageId", deleteDamagesController);
 
 export default damagesRouter;

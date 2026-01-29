@@ -17,10 +17,12 @@ let filtros = {
   batea: [],
   topAreas: false,
   topAverias: false,
+  topBateas: false,
   soloConDanio: false,
   movimiento: null,
   areaSeleccionada: null,
   averiaSeleccionada: null,
+  bateaSeleccionada: null,
 };
 
 const navBarMin = document.getElementById("navBarMin");
@@ -262,9 +264,9 @@ function renderTabla() {
                   : `<span class="vin-text">${scan.vin ?? ""}</span>`
               }
             </td>
-            <td>${damage.area_desc ?? ""}</td>
-            <td>${damage.averia_desc ?? ""}</td>
-            <td>${damage.grav_desc ?? ""}</td>
+            <td>${damage.area + " - " + damage.area_desc ?? ""}</td>
+            <td>${damage.averia + " - " + damage.averia_desc ?? ""}</td>
+            <td>${damage.grav + " - " + damage.grav_desc ?? ""}</td>
             <td class="wrap">${damage.obs ?? ""}</td>
             <td>${scan.batea ?? ""}</td>
             <td>${renderClimaIcon(scan.clima)}</td>
@@ -284,8 +286,8 @@ function renderTabla() {
         <thead>
           <tr>
             <th class="dateTh">Fecha</th>
-            <th id="marcaTh">Marca</th>
-            <th id="modeloTh">Modelo</th>
+            <th class="marcaTh">Marca</th>
+            <th class="modeloTh">Modelo</th>
             <th class="VINth">VIN</th>
             <th class="areaTh">Area</th>
             <th class="averiaTh">Avería</th>
@@ -306,7 +308,7 @@ function renderTabla() {
   /* anchos iniciales por columna */
   const initialWidths = {
     dateTh: 140,
-    marcaTh: 120,
+    marcaTh: 100,
     modeloTh: 120,
     VINth: 210,
     areaTh: 240,
@@ -503,11 +505,36 @@ document.getElementById("filtroBatea").addEventListener("change", (e) => {
 
 document.getElementById("chkTopAreas").addEventListener("change", (e) => {
   filtros.topAreas = e.target.checked;
+  if (!e.target.checked) {
+    filtros.areaSeleccionada = null;
+
+    document
+      .querySelectorAll('.mini-bar-row[data-tipo="area"]')
+      .forEach((r) => r.classList.remove("active"));
+  }
   aplicarFiltros();
 });
 
 document.getElementById("chkTopAverias").addEventListener("change", (e) => {
   filtros.topAverias = e.target.checked;
+  if (!e.target.checked) {
+    filtros.averiaSeleccionada = null;
+
+    document
+      .querySelectorAll('.mini-bar-row[data-tipo="averia"]')
+      .forEach((r) => r.classList.remove("active"));
+  }
+  aplicarFiltros();
+});
+
+document.getElementById("chkTopBateas").addEventListener("change", (e) => {
+  filtros.topBateas = e.target.checked;
+  if (!e.target.checked) {
+    filtros.bateaSeleccionada = null;
+    document
+      .querySelectorAll('.mini-bar-row[data-tipo="batea"]')
+      .forEach((r) => r.classList.remove("active"));
+  }
   aplicarFiltros();
 });
 
@@ -563,18 +590,6 @@ function aplicarFiltros() {
       );
     }
 
-    // 🔹 Badge contador
-    const badge = document.getElementById("badgeConDanio");
-    if (filtros.soloConDanio) {
-      badge.textContent = `${dataBase.length} VIN con daño`;
-      badge.classList.remove("d-none");
-    } else {
-      badge.classList.add("d-none");
-    }
-
-    badge.classList.add("show");
-    setTimeout(() => badge.classList.remove("show"), 200);
-
     datosBaseFiltrados = dataBase;
 
     let dataTablaLocal = [...datosBaseFiltrados];
@@ -607,7 +622,32 @@ function aplicarFiltros() {
         .filter(Boolean);
     }
 
+    if (filtros.bateaSeleccionada) {
+      dataTablaLocal = dataTablaLocal.filter(
+        (scan) => scan.batea === filtros.bateaSeleccionada,
+      );
+    }
+
     datosTabla = dataTablaLocal;
+
+    const badge = document.getElementById("badgeConDanio");
+
+    if (filtros.soloConDanio) {
+      // contar VIN únicos con al menos un daño visible
+      const vinConDanio = new Set(
+        dataTablaLocal
+          .filter((scan) => scan.damages?.length)
+          .map((scan) => scan.vin),
+      );
+
+      badge.textContent = `${vinConDanio.size} VIN con daño`;
+      badge.classList.remove("d-none");
+    } else {
+      badge.classList.add("d-none");
+    }
+
+    badge.classList.add("show");
+    setTimeout(() => badge.classList.remove("show"), 200);
 
     // 🔹 Reset página
     paginaActual = 1;
@@ -693,6 +733,38 @@ function renderEstadisticas(data) {
       top,
       Object.values(totalAverias).reduce((acc, item) => acc + item.value, 0),
       "averia",
+    );
+  }
+
+  if (filtros.topBateas) {
+    const totalBateas = data.reduce((acc, scan) => {
+      if (!scan.batea) return acc;
+
+      const cantDanios = scan.damages?.length || 0;
+      if (!cantDanios) return acc;
+
+      if (!acc[scan.batea]) {
+        acc[scan.batea] = {
+          id: scan.batea,
+          label: scan.batea,
+          value: 0,
+        };
+      }
+
+      acc[scan.batea].value += cantDanios;
+
+      return acc;
+    }, {});
+
+    const top = Object.values(totalBateas)
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 5);
+
+    cont.innerHTML += renderMiniChartList(
+      "Top 5 Bateas con más daños",
+      top,
+      Object.values(totalBateas).reduce((acc, item) => acc + item.value, 0),
+      "batea", // 👈 tipo
     );
   }
 
@@ -849,14 +921,17 @@ document.addEventListener("click", (e) => {
   // toggle
   const yaActivo =
     (tipo === "area" && filtros.areaSeleccionada === id) ||
-    (tipo === "averia" && filtros.averiaSeleccionada === id);
+    (tipo === "averia" && filtros.averiaSeleccionada === id) ||
+    (tipo === "batea" && filtros.bateaSeleccionada === id);
 
   filtros.areaSeleccionada = null;
   filtros.averiaSeleccionada = null;
+  filtros.bateaSeleccionada = null;
 
   if (!yaActivo) {
     if (tipo === "area") filtros.areaSeleccionada = id;
     if (tipo === "averia") filtros.averiaSeleccionada = id;
+    if (tipo === "batea") filtros.bateaSeleccionada = id;
   }
 
   // feedback visual
@@ -882,8 +957,10 @@ const limpiarFiltros = () => {
   filtros.movimiento = null;
   filtros.areaSeleccionada = null;
   filtros.averiaSeleccionada = null;
+  filtros.bateaSeleccionada = null;
   filtros.topAreas = false;
   filtros.topAverias = false;
+  filtros.topBateas = false;
 
   // 🔹 Reset elementos del DOM
   choicesMarca.removeActiveItems();
@@ -893,6 +970,8 @@ const limpiarFiltros = () => {
   document.getElementById("movAll").checked = true;
   document.getElementById("chkTopAreas").checked = false;
   document.getElementById("chkTopAverias").checked = false;
+  document.getElementById("chkTopBateas").checked = false;
+
   document
     .querySelectorAll(".mini-bar-row")
     .forEach((r) => r.classList.remove("active"));

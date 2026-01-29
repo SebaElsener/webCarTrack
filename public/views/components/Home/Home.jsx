@@ -14,7 +14,8 @@ const cards = [
   },
   {
     title: "Consultas",
-    description: "Reporte por fecha, marca y modelo - Areas y tipo de daño",
+    description:
+      "Consultas por fecha, marca, modelo, batea, movimiento - Areas y tipo de daño",
     icon: "/icons/search.png",
     href: "/api/querys/queryByDate",
   },
