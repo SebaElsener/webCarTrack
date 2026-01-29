@@ -48,7 +48,10 @@ class InlineEditableDropdown {
 
     const esc = (e) => {
       // 🔒 ESC solo funciona mientras está editando
-      if (e.key === "Escape" && cell.classList.contains("editing")) {
+      if (
+        (e.key === "Escape" && cell.classList.contains("editing")) ||
+        cell.classList.contains("pending-change")
+      ) {
         this.cancel(cell, originalText);
         document.removeEventListener("keydown", esc);
       }
@@ -187,7 +190,19 @@ class InlineEditableDropdown {
       value: c.newValue,
     }));
 
-    this.pendingChanges.forEach((c) => c.cell.classList.add("saving"));
+    this.pendingChanges.forEach((c) => {
+      // quitar estilos de pendiente
+      c.cell.classList.remove("pending-change", "saving");
+
+      // 🔑 el valor guardado pasa a ser el nuevo baseline
+      const span = c.cell.querySelector(".cell-value");
+      if (span) {
+        span.textContent = c.displayValue;
+      }
+
+      // 🔥 actualizar originalText
+      c.originalText = c.displayValue;
+    });
     setButtonLoading(btn, true);
 
     try {
