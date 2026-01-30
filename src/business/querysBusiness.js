@@ -14,6 +14,7 @@ const querysRenderBusiness = async (desde, hasta) => {
 const queryByVINBusiness = async (vin) => {
   try {
     const data = await supabaseRepo.getDataByVIN(vin);
+    console.log(...data);
     return data;
   } catch (error) {
     infoLogger.error("Error en queryByVINBusiness", error);

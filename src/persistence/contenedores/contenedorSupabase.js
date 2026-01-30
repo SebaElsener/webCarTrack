@@ -247,20 +247,19 @@ class ContenedorSupabase {
           id, area, averia, grav, obs, date
         ),
         pictures (
-          pictureurl
+          pictureurl,
+          id,
+          scan_id
         )
       `,
         )
-        .like("vin", `%${vin}%`) // búsqueda parcial
+        .ilike("vin", `%${vin}%`)
         .order("date", { ascending: true });
 
       if (error) throw error;
+      if (!scans?.length) return [];
 
-      if (!scans || scans.length === 0) {
-        return [];
-      }
-
-      const result = scans.map((s) => ({
+      return scans.map((s) => ({
         scan_id: s.supabase_id,
         vin: s.vin,
         scan_date: s.date,
@@ -270,11 +269,16 @@ class ContenedorSupabase {
         clima: s.clima,
         batea: s.batea,
         damages: s.damages ?? [],
-        fotos: s.pictures?.map((p) => p.pictureurl) ?? [],
+        fotos:
+          s.pictures?.map((p) => ({
+            pictureurl: p.pictureurl,
+            id: p.id,
+            pict_scan_id: p.scan_id,
+          })) ?? [],
       }));
-      return result;
     } catch (err) {
       console.error("Error al consultar VIN en DB", err);
+      return null;
     }
   }
 }

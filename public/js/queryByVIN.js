@@ -15,8 +15,9 @@ let datosGlobales = [];
 let paginaActual = 1;
 let accionesPostTablaMostradas = false;
 let vin = "";
-let fotosPorVin = {};
-let vinsConFotos = new Set();
+let fotosPorScan = {};
+let scansConFotos = new Set();
+
 // Eliminar daños
 window.deleteMode = false;
 
@@ -64,25 +65,27 @@ async function cargarDatos(vin) {
     });
 
     const data = await res.json();
+    console.log(data);
     if (!data || data.length === 0) {
       document.getElementById("resultadosVIN").innerHTML =
         "<p class='text-muted'>No se encontraron datos</p>";
       return;
     }
 
-    fotosPorVin = {};
-    vinsConFotos.clear();
+    fotosPorScan = {};
 
     data.forEach((scan) => {
-      if (scan.fotos?.length) {
-        fotosPorVin[scan.vin] = scan.fotos.map((f, idx) => ({
-          href: f,
-          type: "image",
-          title: `VIN ${scan.vin} · Imagen ${idx + 1}`,
-        }));
+      if (!scan.fotos?.length) return;
 
-        vinsConFotos.add(scan.vin);
-      }
+      fotosPorScan[scan.scan_id] = scan.fotos.map((f, idx) => ({
+        pict_id: f.id,
+        pict_scan_id: f.pict_scan_id,
+        href: f.pictureurl,
+        type: "image",
+        title: `VIN ${scan.vin} · Scan ${f.pict_scan_id} · Imagen ${idx + 1}`,
+      }));
+
+      scansConFotos.add(scan.scan_id);
     });
 
     const transformScans = data.map((scan) => ({
@@ -152,12 +155,12 @@ function renderTabla() {
         <td>${scan.modelo ?? ""}</td>
           <td>
             ${
-              vinsConFotos.has(scan.vin)
+              scansConFotos.has(scan.scan_id)
                 ? `
                   <a
                     href="#"
                     class="vin-link open-gallery"
-                    data-vin="${scan.vin}"
+                    data-scanid="${scan.scan_id}"
                     title="Ver fotos"
                   >
                     <span>${scan.vin}</span>
@@ -225,12 +228,12 @@ function renderTabla() {
             <td>${scan.modelo ?? ""}</td>
             <td>
               ${
-                vinsConFotos.has(scan.vin)
+                scansConFotos.has(scan.scan_id)
                   ? `
                     <a
                       href="#"
                       class="vin-link open-gallery"
-                      data-vin="${scan.vin}"
+                      data-scanid="${scan.scan_id}"
                       title="Ver fotos"
                     >
                       <span>${scan.vin}</span>
@@ -445,20 +448,143 @@ document.addEventListener("click", (e) => {
 document.addEventListener("click", (e) => {
   const btn = e.target.closest(".open-gallery");
   if (!btn) return;
-
-  const vin = btn.dataset.vin;
-  if (!vin || !fotosPorVin[vin]) return;
+  const scanId = btn.dataset.scanid;
+  if (!vin || !fotosPorScan[vin]) return;
 
   const lightbox = GLightbox({
-    elements: fotosPorVin[vin],
+    elements: fotosPorScan[scanId],
     loop: true,
     zoomable: true,
     draggable: true,
-    preload: true, // 🔥 clave
+    preload: true,
+  });
+
+  lightbox.on("open", () => {
+    injectGalleryControls(lightbox, scanId);
   });
 
   lightbox.open();
 });
+
+function injectGalleryControls(lightbox, vin) {
+  // esperar a que GLightbox exista en el DOM
+  const interval = setInterval(() => {
+    const container = document.querySelector(".glightbox-container");
+    if (!container) return;
+
+    clearInterval(interval);
+
+    if (container.querySelector(".gallery-controls")) return;
+
+    const controls = document.createElement("div");
+    controls.className = "gallery-controls";
+    controls.innerHTML = `
+      <button class="btn btn-sm btn-danger" data-action="delete-one" title="Eliminar foto">
+        <i class="mdi mdi-trash-can-outline"></i>
+      </button>
+      <button class="btn btn-sm btn-outline-danger" data-action="delete-all" title="Eliminar galería">
+        <i class="mdi mdi-delete-sweep-outline"></i>
+      </button>
+    `;
+
+    container.appendChild(controls);
+
+    controls.addEventListener("click", async (e) => {
+      e.stopPropagation();
+
+      const action = e.target.closest("button")?.dataset.action;
+      if (!action) return;
+
+      if (action === "delete-one") {
+        await deleteCurrentPhoto(lightbox, vin);
+      }
+
+      if (action === "delete-all") {
+        await deleteAllPhotos(lightbox, vin);
+      }
+    });
+
+    lightbox.on("close", () => {
+      controls.remove();
+    });
+  }, 50);
+}
+
+async function deleteCurrentPhoto(lightbox, vin) {
+  const index = lightbox.index;
+  const photo = fotosPorScan[vin][index];
+  if (!photo) return;
+
+  const confirmed = await confirmModal({
+    title: "Eliminar foto",
+    body: "¿Eliminar esta foto?",
+    confirmText: "Eliminar",
+    confirmClass: "btn-danger",
+  });
+
+  if (!confirmed) return;
+
+  try {
+    // 👉 backend (ajustá endpoint)
+    await fetch("/api/photos/delete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ vin, url: photo.href }),
+    });
+
+    // 🔥 estado
+    fotosPorScan[vin].splice(index, 1);
+
+    if (fotosPorScan[vin].length === 0) {
+      delete fotosPorScan[vin];
+      scansConFotos.delete(vin);
+      lightbox.close();
+      renderTabla();
+      return;
+    }
+
+    lightbox.destroy();
+    GLightbox({ elements: fotosPorScan[vin] }).open();
+
+    toastSuccess("Foto eliminada");
+  } catch {
+    toastError("No se pudo eliminar la foto");
+  }
+}
+
+async function deleteAllPhotos(lightbox, vin) {
+  const confirmed = await confirmModal({
+    title: "Eliminar todas las fotos",
+    body: `
+      <p class="mb-0">
+        ¿Eliminar todas las fotos del VIN <strong>${vin}</strong>?<br>
+        <small class="text-muted">Esta acción no se puede deshacer</small>
+      </p>
+    `,
+    confirmText: "Eliminar todo",
+    confirmClass: "btn-danger",
+  });
+
+  if (!confirmed) return;
+
+  try {
+    await fetch("/api/photos/delete-all", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ vin }),
+    });
+
+    delete fotosPorScan[vin];
+    scansConFotos.delete(vin);
+
+    lightbox.close();
+    renderTabla();
+
+    toastSuccess("Galería eliminada");
+  } catch {
+    toastError("No se pudo eliminar la galería");
+  }
+}
 
 document.getElementById("btnDeleteDamages").addEventListener("click", () => {
   deleteMode = !deleteMode;
