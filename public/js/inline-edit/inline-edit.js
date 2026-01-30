@@ -7,9 +7,26 @@ class InlineEditableDropdown {
     document.addEventListener("click", this.handleClick.bind(this));
   }
 
+  // handleClick(e) {
+  //   const cell = e.target.closest(".editable-cell");
+  //   if (!cell || cell.classList.contains("editing")) return;
+  //   this.activate(cell);
+  // }
   handleClick(e) {
     const cell = e.target.closest(".editable-cell");
-    if (!cell || cell.classList.contains("editing")) return;
+    if (!cell) return;
+
+    document
+      .querySelectorAll(".editable-cell.editing")
+      .forEach((editingCell) => {
+        if (editingCell !== cell) {
+          const originalText = editingCell.dataset.originalText;
+          this.cancel(editingCell, originalText);
+        }
+      });
+
+    if (cell.classList.contains("editing")) return;
+
     this.activate(cell);
   }
 
@@ -20,6 +37,7 @@ class InlineEditableDropdown {
     const scanId = cell.dataset.scanId;
     const damageId = cell.dataset.damageId;
     const originalText = cell.textContent.trim();
+    cell.dataset.originalText = originalText; // 🔑 ESTA ES LA CLAVE
 
     // OBSERVACIÓN (input texto)
     if (field === "observacion") {

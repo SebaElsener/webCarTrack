@@ -42,6 +42,23 @@ function createSearchableDropdown({
   const search = container.querySelector("input");
   const optionsEl = container.querySelector(".options");
 
+  // 🔒 AISLAR EVENTOS DEL DROPDOWN
+  menu.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+
+  search.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+
+  search.addEventListener("keydown", (e) => {
+    e.stopPropagation();
+  });
+
+  search.addEventListener("input", (e) => {
+    e.stopPropagation();
+  });
+
   renderOptions(data);
 
   search.addEventListener("input", () => {
