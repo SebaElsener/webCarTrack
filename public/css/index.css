@@ -1623,6 +1623,7 @@ thead {
   max-height: 60vh; /* 🔑 ajustá según tu layout */
   overflow-y: auto; /* 🔑 scroll vertical */
   overflow-x: auto;
+  /* overflow: visible !important; */
 }
 
 #vinInput {
@@ -1946,3 +1947,19 @@ body > .glightbox-container {
 .new-damage-row {
   background-color: #f8f9fa;
 }
+
+/* .searchable-dropdown,
+.dropdown-menu,
+.inline-dropdown {
+  position: absolute;
+  z-index: 99999999;
+}
+
+#tabla-resultadosVIN {
+  overflow: visible;
+}
+
+#tabla-resultadosVIN td {
+  overflow: visible;
+  position: relative;
+} */

@@ -796,15 +796,16 @@ function agregarDanio(scanId) {
 
   // 🔥 animación inicial
   newRow.style.opacity = "0";
-  newRow.style.transform = "translateY(-6px)";
+  newRow.style.maxHeight = "0";
+  newRow.style.overflow = "hidden";
 
   vinRow.after(newRow);
 
   // 🎬 animar entrada
   requestAnimationFrame(() => {
-    newRow.style.transition = "all 200ms ease";
+    newRow.style.transition = "opacity 200ms ease, max-height 200ms ease";
     newRow.style.opacity = "1";
-    newRow.style.transform = "translateY(0)";
+    newRow.style.maxHeight = "200px"; // suficiente para la fila
   });
 
   // ✏️ abrir editor automáticamente (Área)
@@ -812,6 +813,11 @@ function agregarDanio(scanId) {
     const cell = newRow.querySelector(`.editable-cell[data-field="area"]`);
     if (cell) cell.click();
   });
+
+  setTimeout(() => {
+    newRow.style.maxHeight = "";
+    newRow.style.overflow = "";
+  }, 250);
 }
 
 function createNewDamageRow(scan) {
