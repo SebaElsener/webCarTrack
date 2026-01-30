@@ -1925,3 +1925,24 @@ body > .glightbox-container {
 .vin-link {
   cursor: pointer;
 }
+
+.vin-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.add-damage-icon {
+  cursor: pointer;
+  color: #198754; /* verde */
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.add-damage-icon:hover {
+  color: #146c43;
+}
+
+.new-damage-row {
+  background-color: #f8f9fa;
+}

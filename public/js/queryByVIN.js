@@ -19,6 +19,7 @@ let fotosPorScan = {};
 
 // Eliminar daños
 window.deleteMode = false;
+let addDamageMode = false;
 
 const navBarMin = document.getElementById("navBarMin");
 navBarMin.style.top = "0";
@@ -145,29 +146,42 @@ function renderTabla() {
   paginaDatos.forEach((scan) => {
     if (!scan.damages || scan.damages.length === 0) {
       rows += `
-      <tr class="resultadosVINtr">
+      <tr class="resultadosVINtr scan-base-row" data-scan-id="${scan.scan_id}">
         <td>${new Date(scan.scan_date).toLocaleString("es-AR")}</td>
         <td>${scan.marca ?? ""}</td>
         <td>${scan.modelo ?? ""}</td>
-          <td>
-            ${
-              fotosPorScan[scan.scan_id]?.length
-                ? `
-                  <a
-                    href="#"
-                    class="vin-link open-gallery"
-                    data-scanid="${scan.scan_id}"
-                    title="Ver fotos"
-                  >
-                    <span>${scan.vin}</span>
-                  </a>
-                `
-                : `
-                  <span class="vin-text">${scan.vin ?? ""}</span>
-                `
-            }
-          </td>
+        <td class="vin-cell">
+          ${
+            addDamageMode
+              ? `
+                <span
+                  class="add-damage-icon"
+                  data-scanid="${scan.scan_id}"
+                  title="Agregar daño"
+                >
+                  <i class="mdi mdi-plus-circle-outline"></i>
+                </span>
+              `
+              : ""
+          }
 
+          ${
+            fotosPorScan[scan.scan_id]?.length
+              ? `
+                <a
+                  href="#"
+                  class="vin-link open-gallery"
+                  data-scanid="${scan.scan_id}"
+                  title="Ver fotos"
+                >
+                  <span>${scan.vin}</span>
+                </a>
+              `
+              : `
+                <span class="vin-text">${scan.vin ?? ""}</span>
+              `
+          }
+        </td>
         <!-- ÁREA -->
         <td
           class="editable-cell text-center"
@@ -216,13 +230,28 @@ function renderTabla() {
     } else {
       scan.damages.forEach((damage) => {
         rows += `
-          <tr class="resultadosVINtr"
-              data-damage-id="${damage.id}"
+          <tr class="resultadosVINtr scan-base-row"
+              data-scan-id="${scan.scan_id}"
+              data-damage-id="${damage.id ?? ""}"
           >
             <td>${new Date(scan.scan_date).toLocaleString("es-AR")}</td>
             <td>${scan.marca ?? ""}</td>
             <td>${scan.modelo ?? ""}</td>
-            <td>
+            <td class="vin-cell">
+              ${
+                addDamageMode
+                  ? `
+                    <span
+                      class="add-damage-icon"
+                      data-scanid="${scan.scan_id}"
+                      title="Agregar daño"
+                    >
+                      <i class="mdi mdi-plus-circle-outline"></i>
+                    </span>
+                  `
+                  : ""
+              }
+
               ${
                 fotosPorScan[scan.scan_id]?.length
                   ? `
@@ -239,17 +268,17 @@ function renderTabla() {
                     <span class="vin-text">${scan.vin ?? ""}</span>
                   `
               }
-            </td>  
+            </td>
             <td
               class="editable-cell area-cell"
               data-field="area"
               data-scan-id="${scan.scan_id}"
-              data-damage-id="${damage.id}"
+              data-damage-id="${damage.id ?? ""}"
             >
               <span
                 class="damage-delete-icon d-none"
                 title="Eliminar daño"
-                data-damage-id="${damage.id}"
+                data-damage-id="${damage.id ?? ""}"
               >
                 <i class="mdi mdi-trash-can-outline"></i>
               </span>
@@ -262,7 +291,7 @@ function renderTabla() {
               class="editable-cell"
               data-field="averia"
               data-scan-id="${scan.scan_id}"
-              data-damage-id="${damage.id}"
+              data-damage-id="${damage.id ?? ""}"
             >
               <span class="cell-value">${damage.averia + " - " + damage.averia_desc}</span>
             </td>
@@ -270,7 +299,7 @@ function renderTabla() {
               class="editable-cell"
               data-field="gravedad"
               data-scan-id="${scan.scan_id}"
-              data-damage-id="${damage.id}"
+              data-damage-id="${damage.id ?? ""}"
             >
               <span class="cell-value">${damage.grav_desc}</span>
             </td>
@@ -278,7 +307,7 @@ function renderTabla() {
               class="editable-cell"
               data-field="observacion"
               data-scan-id="${scan.scan_id}"
-              data-damage-id="${damage.id}"
+              data-damage-id="${damage.id ?? ""}"
             >
               <span class="cell-value">${damage.obs}</span>            
             </td>
@@ -705,4 +734,136 @@ document.addEventListener("click", async (e) => {
 
 if (!document.querySelector(".damage-delete-icon")) {
   deleteMode = false;
+}
+
+document.getElementById("btnAddDamage").addEventListener("click", () => {
+  addDamageMode = !addDamageMode;
+
+  // feedback visual
+  document
+    .getElementById("btnAddDamage")
+    .classList.toggle("active", addDamageMode);
+
+  // si estaba deleteMode, lo apagamos
+  if (window.deleteMode) {
+    window.deleteMode = false;
+    document.querySelectorAll(".damage-delete-icon").forEach((icon) => {
+      icon.classList.add("d-none");
+    });
+  }
+
+  renderTabla();
+});
+
+document.addEventListener("click", (e) => {
+  const icon = e.target.closest(".add-damage-icon");
+  if (!icon) return;
+
+  e.stopPropagation();
+  e.preventDefault();
+
+  const scanId = icon.dataset.scanid;
+  console.log("CLICK ➕ scanId:", scanId); // 🧪 DEBUG
+
+  if (!scanId) return;
+
+  agregarDanio(scanId);
+});
+
+function agregarDanio(scanId) {
+  const scan = datosGlobales.find((s) => String(s.scan_id) === String(scanId));
+
+  // 🚫 evitar más de uno nuevo
+  const existing = document.querySelector(
+    `.resultadosVINtr.new-damage-row[data-scan-id="${scanId}"]`,
+  );
+  if (existing) {
+    toastInfo("Guardá el daño actual antes de agregar otro");
+    return;
+  }
+
+  // 🔎 fila del VIN
+  const vinRow = document.querySelector(
+    `.scan-base-row[data-scan-id="${scanId}"]`,
+  );
+
+  if (!vinRow) return;
+
+  // 🔥 crear fila
+  const temp = document.createElement("tbody");
+  temp.innerHTML = createNewDamageRow(scan);
+  const newRow = temp.firstElementChild;
+
+  // 🔥 animación inicial
+  newRow.style.opacity = "0";
+  newRow.style.transform = "translateY(-6px)";
+
+  vinRow.after(newRow);
+
+  // 🎬 animar entrada
+  requestAnimationFrame(() => {
+    newRow.style.transition = "all 200ms ease";
+    newRow.style.opacity = "1";
+    newRow.style.transform = "translateY(0)";
+  });
+
+  // ✏️ abrir editor automáticamente (Área)
+  requestAnimationFrame(() => {
+    const cell = newRow.querySelector(`.editable-cell[data-field="area"]`);
+    if (cell) cell.click();
+  });
+}
+
+function createNewDamageRow(scan) {
+  return `
+    <tr class="resultadosVINtr new-damage-row" data-damage-id="">
+      <td>${new Date(scan.scan_date).toLocaleString("es-AR")}</td>
+      <td>${scan.marca ?? ""}</td>
+      <td>${scan.modelo ?? ""}</td>
+      <td>
+        ${
+          fotosPorScan[scan.scan_id]?.length
+            ? `
+              <a href="#" class="vin-link open-gallery" data-scanid="${scan.scan_id}">
+                <span>${scan.vin}</span>
+              </a>
+            `
+            : `<span class="vin-text">${scan.vin}</span>`
+        }
+      </td>
+
+      <td class="editable-cell area-cell"
+          data-field="area"
+          data-scan-id="${scan.scan_id}"
+          data-damage-id="">
+        <span class="cell-value text-muted">—</span>
+      </td>
+
+      <td class="editable-cell"
+          data-field="averia"
+          data-scan-id="${scan.scan_id}"
+          data-damage-id="">
+        <span class="cell-value text-muted">—</span>
+      </td>
+
+      <td class="editable-cell"
+          data-field="gravedad"
+          data-scan-id="${scan.scan_id}"
+          data-damage-id="">
+        <span class="cell-value text-muted">—</span>
+      </td>
+
+      <td class="editable-cell"
+          data-field="observacion"
+          data-scan-id="${scan.scan_id}"
+          data-damage-id="">
+        <span class="cell-value text-muted"></span>
+      </td>
+
+      <td>${scan.batea ?? ""}</td>
+      <td>${scan.movimiento ?? ""}</td>
+      <td>${renderClimaIcon(scan.clima)}</td>
+      <td>${scan.user ?? ""}</td>
+    </tr>
+  `;
 }
