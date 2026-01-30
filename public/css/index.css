@@ -1901,3 +1901,18 @@ body > .glightbox-container {
 .modal-backdrop {
   z-index: 99999 !important;
 }
+
+.gallery-spinner {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gallery-spinner .spinner-border {
+  width: 3rem;
+  height: 3rem;
+}

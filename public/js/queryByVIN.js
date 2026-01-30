@@ -520,6 +520,7 @@ async function deleteCurrentPhoto(lightbox, scanId) {
   if (!confirmed) return;
 
   try {
+    showGallerySpinner();
     await fetch("/api/photos/delete", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
@@ -574,6 +575,8 @@ async function deleteCurrentPhoto(lightbox, scanId) {
   } catch (err) {
     console.error(err);
     toastError("No se pudo eliminar la foto");
+  } finally {
+    hideGallerySpinner();
   }
 }
 
@@ -593,6 +596,7 @@ async function deleteAllPhotos(lightbox, scanId) {
   if (!confirmed) return;
 
   try {
+    showGallerySpinner();
     await fetch("/api/photos/delete-all", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
@@ -618,6 +622,8 @@ async function deleteAllPhotos(lightbox, scanId) {
   } catch (err) {
     console.error(err);
     toastError("No se pudo eliminar la galería");
+  } finally {
+    hideGallerySpinner();
   }
 }
 
