@@ -1881,12 +1881,17 @@ body > .glightbox-container {
 }
 
 .glightbox-container .gallery-controls {
-  position: absolute;
+  position: fixed;
   top: 12px;
-  right: 350px;
+  right: 100px;
   z-index: 99999;
   display: flex;
   gap: 12px;
+  border-radius: 12px;
+  background-color: whitesmoke;
+  padding: 1rem 1.5rem;
+  border: solid 0.5px #ff000096;
+  /* box-shadow: 1px 1px 8px 2px #d50c0ccf; */
 }
 
 .modal {

@@ -17,6 +17,7 @@ let accionesPostTablaMostradas = false;
 let vin = "";
 let fotosPorScan = {};
 let scansConFotos = new Set();
+let currentGalleryScanId = null;
 
 // Eliminar daños
 window.deleteMode = false;
@@ -460,6 +461,7 @@ document.addEventListener("click", (e) => {
   });
 
   lightbox.on("open", () => {
+    currentGalleryScanId = scanId;
     injectGalleryControls(lightbox, scanId);
   });
 
@@ -520,7 +522,6 @@ async function deleteCurrentPhoto(lightbox, scanId) {
   if (!confirmed) return;
 
   try {
-    console.log("PictId eliminar actual: ", photo.pict_id);
     await fetch("/api/photos/delete", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
@@ -530,18 +531,29 @@ async function deleteCurrentPhoto(lightbox, scanId) {
       }),
     });
 
+    // 🔥 actualizar estado
     fotosPorScan[scanId].splice(index, 1);
+
+    // ❌ NO recrear lightbox acá
+    lightbox.close();
 
     if (!fotosPorScan[scanId].length) {
       delete fotosPorScan[scanId];
       scansConFotos.delete(scanId);
-      lightbox.close();
       renderTabla();
       return;
     }
 
-    lightbox.destroy();
-    GLightbox({ elements: fotosPorScan[scanId] }).open();
+    // ⏱ esperar cierre REAL del lightbox
+    setTimeout(() => {
+      const newLb = GLightbox({
+        elements: fotosPorScan[scanId],
+        loop: true,
+        preload: true,
+      });
+
+      newLb.open();
+    }, 250);
 
     toastSuccess("Foto eliminada");
   } catch {
