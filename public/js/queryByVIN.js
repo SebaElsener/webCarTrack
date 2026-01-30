@@ -580,27 +580,43 @@ async function deleteCurrentPhoto(lightbox, scanId) {
 async function deleteAllPhotos(lightbox, scanId) {
   const confirmed = await confirmModal({
     title: "Eliminar galería",
-    body: "¿Eliminar todas las fotos asociadas al VIN?",
+    body: `
+      <p class="mb-0">
+        ¿Eliminar <strong>TODAS</strong> las fotos?<br>
+        <small class="text-muted">Esta acción no se puede deshacer</small>
+      </p>
+    `,
     confirmText: "Eliminar todo",
     confirmClass: "btn-danger",
   });
+
   if (!confirmed) return;
 
   try {
-    console.log("ScanId eliminar todas: ", scanId);
     await fetch("/api/photos/delete-all", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ scan_id: scanId }),
     });
 
+    // 🔥 cerrar lightbox actual
+    try {
+      lightbox.close();
+    } catch {}
+
+    // 🔥 limpieza total (loader, container, estado)
+    hardResetGLightbox();
+
+    // 🔥 limpiar estado frontend
     delete fotosPorScan[scanId];
     scansConFotos.delete(scanId);
 
-    lightbox.close();
+    // 🔥 refrescar tabla (VIN deja de ser link)
     renderTabla();
+
     toastSuccess("Galería eliminada");
-  } catch {
+  } catch (err) {
+    console.error(err);
     toastError("No se pudo eliminar la galería");
   }
 }

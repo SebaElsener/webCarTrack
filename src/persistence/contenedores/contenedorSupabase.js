@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import { infoLogger } from "../../logger.js";
+import { getStoragePathFromPublicUrl } from "../../business/photosBusiness.js";
 
 dotenv.config();
 
@@ -304,6 +305,60 @@ class ContenedorSupabase {
     } catch (err) {
       console.error("Error deletePhoto:", err);
       return res.status(500).json({ error: "No se pudo eliminar la foto" });
+    }
+  }
+
+  async deletePhotoSetAndBucket(scan_id, bucketName) {
+    try {
+      // 1️⃣ obtener todas las fotos del scan
+      const { data: photos, error: fetchError } = await supabase
+        .from("pictures")
+        .select("id, pictureurl")
+        .eq("scan_id", scan_id);
+
+      if (fetchError) throw fetchError;
+
+      if (!photos || photos.length === 0) {
+        // nada para borrar → idempotente
+        return { success: true, deleted: 0 };
+      }
+
+      const paths = photos
+        .map((p) => {
+          try {
+            return getStoragePathFromPublicUrl(p.pictureurl, bucketName);
+          } catch {
+            return null;
+          }
+        })
+        .filter(Boolean);
+
+      // 2️⃣ borrar registros DB
+      const { error: deleteDbError } = await supabase
+        .from("pictures")
+        .delete()
+        .eq("scan_id", scan_id);
+
+      if (deleteDbError) {
+        console.error(deleteDbError);
+        throw deleteDbError;
+      }
+
+      // 4️⃣ borrar archivos del bucket (batch)
+      if (paths.length) {
+        const { error: storageError } = await supabase.storage
+          .from(bucketName)
+          .remove(paths);
+
+        if (storageError) throw storageError;
+      }
+
+      return {
+        success: true,
+        deleted: photos.length,
+      };
+    } catch (error) {
+      console.log("Error al eliminar las fotos en DB", error);
     }
   }
 }

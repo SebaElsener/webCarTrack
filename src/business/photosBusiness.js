@@ -1,7 +1,6 @@
-import { infoLogger } from "../logger.js";
 import { supabaseRepo } from "../persistence/factory.js";
 
-function getStoragePathFromPublicUrl(publicUrl, bucketName) {
+export function getStoragePathFromPublicUrl(publicUrl, bucketName) {
   const marker = `/storage/v1/object/public/${bucketName}/`;
   const index = publicUrl.indexOf(marker);
 
@@ -17,28 +16,24 @@ const deletePhoto = async (pict_id, pictureurl) => {
   const bucketName = "pics";
   const path = getStoragePathFromPublicUrl(pictureurl, bucketName);
 
-  if (!pict_id || !pictureurl) {
-    return res.status(400).json({ error: "Datos incompletos" });
-  }
-
   try {
     const data = await supabaseRepo.deletePhoto(pict_id, bucketName, path);
-    console.log(data);
     return data;
   } catch (error) {
-    infoLogger.error("Error eliminando foto en DB", error);
+    console.error("Error eliminando foto en DB", error);
     return error;
   }
 };
 
-const deletePhotoSet = async (vin) => {
+const deletePhotoSet = async (scanId) => {
+  const bucketName = "pics";
+  // 3️⃣ extraer paths del bucket
+
   try {
-    const data = await supabaseRepo.getDataByVIN(vin);
-    console.log(...data);
-    return data;
+    await supabaseRepo.deletePhotoSetAndBucket(scanId, bucketName);
   } catch (error) {
-    infoLogger.error("Error en queryByVINBusiness", error);
-    return [];
+    console.error("Error eliminando las fotos en DB", error);
+    return error;
   }
 };
 
