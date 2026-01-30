@@ -16,7 +16,6 @@ let paginaActual = 1;
 let accionesPostTablaMostradas = false;
 let vin = "";
 let fotosPorScan = {};
-let scansConFotos = new Set();
 
 // Eliminar daños
 window.deleteMode = false;
@@ -83,8 +82,6 @@ async function cargarDatos(vin) {
         type: "image",
         title: `VIN ${scan.vin} · Scan ${f.pict_scan_id} · Imagen ${idx + 1}`,
       }));
-
-      scansConFotos.add(scan.scan_id);
     });
 
     const transformScans = data.map((scan) => ({
@@ -154,7 +151,7 @@ function renderTabla() {
         <td>${scan.modelo ?? ""}</td>
           <td>
             ${
-              scansConFotos.has(scan.scan_id)
+              fotosPorScan[scan.scan_id]?.length
                 ? `
                   <a
                     href="#"
@@ -227,7 +224,7 @@ function renderTabla() {
             <td>${scan.modelo ?? ""}</td>
             <td>
               ${
-                scansConFotos.has(scan.scan_id)
+                fotosPorScan[scan.scan_id]?.length
                   ? `
                     <a
                       href="#"
@@ -538,9 +535,9 @@ async function deleteCurrentPhoto(lightbox, scanId) {
       lightbox.close();
       hardResetGLightbox();
       delete fotosPorScan[scanId];
-      scansConFotos.delete(scanId);
       renderTabla();
       toastSuccess("Foto eliminada");
+
       return;
     }
 
@@ -613,7 +610,6 @@ async function deleteAllPhotos(lightbox, scanId) {
 
     // 🔥 limpiar estado frontend
     delete fotosPorScan[scanId];
-    scansConFotos.delete(scanId);
 
     // 🔥 refrescar tabla (VIN deja de ser link)
     renderTabla();

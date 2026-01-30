@@ -1916,3 +1916,12 @@ body > .glightbox-container {
   width: 3rem;
   height: 3rem;
 }
+.vin-text {
+  color: inherit;
+  cursor: default;
+  text-decoration: none;
+}
+
+.vin-link {
+  cursor: pointer;
+}
