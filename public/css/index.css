@@ -512,6 +512,11 @@ td {
   min-width: 300px;
 }
 
+.post-table-action-buttons:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 /* tbody tr:nth-child(odd) {
   background-color: rgba(119, 165, 240, 0.921);
 }

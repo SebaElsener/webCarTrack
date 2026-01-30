@@ -18,8 +18,10 @@ let vin = "";
 let fotosPorScan = {};
 
 // Eliminar daños
-window.deleteMode = false;
-let addDamageMode = false;
+//window.deleteMode = false;
+//let addDamageMode = false;
+let currentMode = null;
+window.isDeleteDamageMode = () => currentMode === "delete-damage";
 
 const navBarMin = document.getElementById("navBarMin");
 navBarMin.style.top = "0";
@@ -152,16 +154,16 @@ function renderTabla() {
         <td>${scan.modelo ?? ""}</td>
         <td class="vin-cell">
           ${
-            addDamageMode
+            currentMode === "add-damage"
               ? `
-                <span
-                  class="add-damage-icon"
-                  data-scanid="${scan.scan_id}"
-                  title="Agregar daño"
-                >
-                  <i class="mdi mdi-plus-circle-outline"></i>
-                </span>
-              `
+            <span
+              class="add-damage-icon"
+              data-scanid="${scan.scan_id}"
+              title="Agregar daño"
+            >
+              <i class="mdi mdi-plus-circle-outline"></i>
+            </span>
+          `
               : ""
           }
 
@@ -239,19 +241,18 @@ function renderTabla() {
             <td>${scan.modelo ?? ""}</td>
             <td class="vin-cell">
               ${
-                addDamageMode
+                currentMode === "add-damage"
                   ? `
-                    <span
-                      class="add-damage-icon"
-                      data-scanid="${scan.scan_id}"
-                      title="Agregar daño"
-                    >
-                      <i class="mdi mdi-plus-circle-outline"></i>
-                    </span>
-                  `
+                <span
+                  class="add-damage-icon"
+                  data-scanid="${scan.scan_id}"
+                  title="Agregar daño"
+                >
+                  <i class="mdi mdi-plus-circle-outline"></i>
+                </span>
+              `
                   : ""
               }
-
               ${
                 fotosPorScan[scan.scan_id]?.length
                   ? `
@@ -309,7 +310,7 @@ function renderTabla() {
               data-scan-id="${scan.scan_id}"
               data-damage-id="${damage.id ?? ""}"
             >
-              <span class="cell-value">${damage.obs}</span>            
+              <span class="cell-value">${damage.obs && ""}</span>            
             </td>
             <td>${scan.batea ?? ""}</td>
             <td>${scan.movimiento ?? ""}</td>
@@ -374,12 +375,6 @@ function renderTabla() {
   // esperar un frame
   requestAnimationFrame(() => {
     mostrarAccionesPostTabla();
-  });
-
-  // 🔥 reset delete mode después de re-render
-  window.deleteMode = false;
-  document.querySelectorAll(".damage-delete-icon").forEach((icon) => {
-    icon.classList.add("d-none");
   });
 
   // 🔹 Activar resize manual
@@ -661,16 +656,14 @@ function hardResetGLightbox() {
 }
 
 document.getElementById("btnDeleteDamages").addEventListener("click", () => {
-  deleteMode = !deleteMode;
-
-  document.querySelectorAll(".damage-delete-icon").forEach((icon) => {
-    icon.classList.toggle("d-none", !deleteMode);
-  });
+  setMode(currentMode === "delete-damage" ? null : "delete-damage");
 });
 
 document.addEventListener("click", async (e) => {
   const icon = e.target.closest(".damage-delete-icon");
   if (!icon) return;
+
+  if (currentMode !== "delete-damage") return;
 
   e.stopPropagation(); // 🔥 evita inline-edit
 
@@ -732,25 +725,8 @@ document.addEventListener("click", async (e) => {
   }
 });
 
-if (!document.querySelector(".damage-delete-icon")) {
-  deleteMode = false;
-}
-
 document.getElementById("btnAddDamage").addEventListener("click", () => {
-  addDamageMode = !addDamageMode;
-
-  // feedback visual
-  document
-    .getElementById("btnAddDamage")
-    .classList.toggle("active", addDamageMode);
-
-  // si estaba deleteMode, lo apagamos
-  if (window.deleteMode) {
-    window.deleteMode = false;
-    document.querySelectorAll(".damage-delete-icon").forEach((icon) => {
-      icon.classList.add("d-none");
-    });
-  }
+  setMode(currentMode === "add-damage" ? null : "add-damage");
 
   renderTabla();
 });
@@ -763,9 +739,10 @@ document.addEventListener("click", (e) => {
   e.preventDefault();
 
   const scanId = icon.dataset.scanid;
-  console.log("CLICK ➕ scanId:", scanId); // 🧪 DEBUG
 
   if (!scanId) return;
+
+  if (currentMode !== "add-damage") return;
 
   agregarDanio(scanId);
 });
@@ -872,4 +849,52 @@ function createNewDamageRow(scan) {
       <td>${scan.user ?? ""}</td>
     </tr>
   `;
+}
+
+function setMode(mode) {
+  currentMode = mode;
+
+  // reset visual general
+  toggleDeleteDamageIcons(false);
+
+  document.querySelectorAll(".post-table-action-buttons").forEach((btn) => {
+    btn.disabled = false;
+    btn.classList.remove("active");
+  });
+
+  switch (mode) {
+    case "delete-damage":
+      document.getElementById("btnDeleteDamages").classList.add("active");
+      toggleDeleteDamageIcons(true);
+      break;
+
+    case "add-damage":
+      document.getElementById("btnAddDamage").classList.add("active");
+      break;
+
+    case "delete-vin":
+      document.getElementById("btnDeleteVIN")?.classList.add("active");
+      break;
+  }
+
+  disableOtherButtons(mode);
+}
+
+function disableOtherButtons(activeMode) {
+  const map = {
+    "delete-damage": ["btnAddDamage", "btnDeleteVIN"],
+    "add-damage": ["btnDeleteDamages", "btnDeleteVIN"],
+    "delete-vin": ["btnAddDamage", "btnDeleteDamages"],
+  };
+
+  (map[activeMode] || []).forEach((id) => {
+    const btn = document.getElementById(id);
+    if (btn) btn.disabled = true;
+  });
+}
+
+function toggleDeleteDamageIcons(show) {
+  document.querySelectorAll(".damage-delete-icon").forEach((icon) => {
+    icon.classList.toggle("d-none", !show);
+  });
 }

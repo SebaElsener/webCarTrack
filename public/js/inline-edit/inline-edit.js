@@ -11,6 +11,12 @@ class InlineEditableDropdown {
     const cell = e.target.closest(".editable-cell");
     if (!cell) return;
 
+    // 🚫 NO editar celdas en modo eliminar daños
+    if (window.isDeleteDamageMode()) return;
+
+    // 🗑 si el click fue sobre el icono eliminar → NO inline-edit
+    if (e.target.closest(".damage-delete-icon")) return;
+
     document
       .querySelectorAll(".editable-cell.editing")
       .forEach((editingCell) => {
@@ -77,20 +83,6 @@ class InlineEditableDropdown {
     cell.classList.remove("editing");
     cell.innerHTML = "";
 
-    // icono delete (solo área y con damageId)
-    if (field === "area" && damageId) {
-      const icon = document.createElement("span");
-      icon.className = "damage-delete-icon";
-
-      if (!window.deleteMode) {
-        icon.classList.add("d-none");
-      }
-      icon.dataset.damageId = damageId;
-      icon.title = "Eliminar daño";
-      icon.innerHTML = `<i class="mdi mdi-trash-can-outline"></i>`;
-      cell.appendChild(icon);
-    }
-
     const span = document.createElement("span");
     span.className = "cell-value";
     span.textContent = `${item.id} - ${item.descripcion}`;
@@ -118,22 +110,6 @@ class InlineEditableDropdown {
 
     cell.classList.remove("editing");
     cell.innerHTML = "";
-
-    // 🔥 restaurar icono delete si corresponde
-    if (field === "area" && damageId) {
-      const icon = document.createElement("span");
-      icon.className = "damage-delete-icon";
-
-      // respetar estado actual del deleteMode
-      if (!window.deleteMode) {
-        icon.classList.add("d-none");
-      }
-
-      icon.dataset.damageId = damageId;
-      icon.title = "Eliminar daño";
-      icon.innerHTML = `<i class="mdi mdi-trash-can-outline"></i>`;
-      cell.appendChild(icon);
-    }
 
     // texto original
     const span = document.createElement("span");
@@ -180,7 +156,7 @@ class InlineEditableDropdown {
       if (committed) return;
       committed = true;
 
-      const newValue = input.value.trim();
+      const newValue = input.value.trim() || "";
       if (newValue === originalText) {
         this.cancel(cell, originalText);
         return;
