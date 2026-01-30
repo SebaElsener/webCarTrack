@@ -17,7 +17,6 @@ let accionesPostTablaMostradas = false;
 let vin = "";
 let fotosPorScan = {};
 let scansConFotos = new Set();
-let currentGalleryScanId = null;
 
 // Eliminar daños
 window.deleteMode = false;
@@ -461,7 +460,6 @@ document.addEventListener("click", (e) => {
   });
 
   lightbox.on("open", () => {
-    currentGalleryScanId = scanId;
     injectGalleryControls(lightbox, scanId);
   });
 
@@ -509,13 +507,13 @@ function injectGalleryControls(lightbox, scanId) {
 }
 
 async function deleteCurrentPhoto(lightbox, scanId) {
-  const index = lightbox.index;
-  const photo = fotosPorScan[scanId][index];
+  const oldIndex = lightbox.index;
+  const photo = fotosPorScan[scanId]?.[oldIndex];
   if (!photo) return;
 
   const confirmed = await confirmModal({
     title: "Eliminar foto",
-    body: "¿Eliminar la foto actual?",
+    body: "¿Eliminar esta foto?",
     confirmText: "Eliminar",
     confirmClass: "btn-danger",
   });
@@ -532,31 +530,49 @@ async function deleteCurrentPhoto(lightbox, scanId) {
     });
 
     // 🔥 actualizar estado
-    fotosPorScan[scanId].splice(index, 1);
+    fotosPorScan[scanId].splice(oldIndex, 1);
 
-    // ❌ NO recrear lightbox acá
-    lightbox.close();
-
+    // si no quedan fotos
     if (!fotosPorScan[scanId].length) {
+      lightbox.close();
+      hardResetGLightbox();
       delete fotosPorScan[scanId];
       scansConFotos.delete(scanId);
       renderTabla();
+      toastSuccess("Foto eliminada");
       return;
     }
 
-    // ⏱ esperar cierre REAL del lightbox
-    setTimeout(() => {
-      const newLb = GLightbox({
+    // 🔥 índice nuevo (misma posición visual)
+    const newIndex = Math.min(oldIndex, fotosPorScan[scanId].length - 1);
+
+    // 🔥 cierre silencioso
+    lightbox.close();
+
+    // 🔥 limpieza total
+    hardResetGLightbox();
+
+    // 🔥 reapertura inmediata y controlada
+    requestAnimationFrame(() => {
+      const fresh = GLightbox({
         elements: fotosPorScan[scanId],
+        startAt: newIndex,
         loop: true,
-        preload: true,
+        preload: false,
+        zoomable: true,
+        draggable: true,
       });
 
-      newLb.open();
-    }, 250);
+      fresh.on("open", () => {
+        injectGalleryControls(fresh, scanId);
+      });
+
+      fresh.open();
+    });
 
     toastSuccess("Foto eliminada");
-  } catch {
+  } catch (err) {
+    console.error(err);
     toastError("No se pudo eliminar la foto");
   }
 }
@@ -587,6 +603,14 @@ async function deleteAllPhotos(lightbox, scanId) {
   } catch {
     toastError("No se pudo eliminar la galería");
   }
+}
+
+function hardResetGLightbox() {
+  document
+    .querySelectorAll(".glightbox-container, .glightbox-clean, .gloader")
+    .forEach((el) => el.remove());
+
+  document.body.classList.remove("glightbox-open");
 }
 
 document.getElementById("btnDeleteDamages").addEventListener("click", () => {
