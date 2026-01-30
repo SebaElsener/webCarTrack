@@ -123,7 +123,7 @@ class InlineEditableDropdown {
 
     const span = document.createElement("span");
     span.className = "cell-value";
-    span.textContent = item.descripcion;
+    span.textContent = `${item.id} - ${item.descripcion}`;
     cell.appendChild(span);
 
     const key = `${scanId}_${damageId}_${field}`;
@@ -134,7 +134,7 @@ class InlineEditableDropdown {
       field,
       newValue: item.id,
       originalText,
-      displayValue: item.descripcion,
+      displayValue: `${item.id} - ${item.descripcion}`,
       cell,
     });
 
