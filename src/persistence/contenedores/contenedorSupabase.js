@@ -281,6 +281,31 @@ class ContenedorSupabase {
       return null;
     }
   }
+
+  async deletePhoto(pict_id, bucketName, path) {
+    console.log(pict_id, bucketName, path);
+    try {
+      // 1️⃣ borrar registro DB
+      const { error: dbError } = await supabase
+        .from("pictures")
+        .delete()
+        .eq("id", pict_id);
+
+      if (dbError) throw dbError;
+
+      // 3️⃣ borrar archivo del storage
+      const { error: storageError } = await supabase.storage
+        .from(bucketName)
+        .remove([path]);
+
+      if (storageError) throw storageError;
+
+      return JSON.stringify({ success: true });
+    } catch (err) {
+      console.error("Error deletePhoto:", err);
+      return res.status(500).json({ error: "No se pudo eliminar la foto" });
+    }
+  }
 }
 
 export default ContenedorSupabase;

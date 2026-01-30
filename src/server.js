@@ -30,6 +30,7 @@ import querysRouter from "./router/querysRouter.js";
 import exportRouter from "./router/exportRouter.js";
 import updatesRouter from "./router/updatesRouter.js";
 import damagesRouter from "./router/damagesRouter.js";
+import photosRouter from "./router/photosRouter.js";
 
 dotenv.config();
 
@@ -70,6 +71,7 @@ app.use("/api/querys", userLoginWatcher, querysRouter);
 app.use("/api/export", userLoginWatcher, exportRouter);
 app.use("/api/updates", updatesRouter);
 app.use("/api/damages", damagesRouter);
+app.use("/api/photos", photosRouter);
 app.use("/api/scans", scansRoute);
 app.use("/api/login", userLogin);
 app.use("/api/logout", userLogout);

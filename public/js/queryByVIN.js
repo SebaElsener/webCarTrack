@@ -65,7 +65,6 @@ async function cargarDatos(vin) {
     });
 
     const data = await res.json();
-    console.log(data);
     if (!data || data.length === 0) {
       document.getElementById("resultadosVIN").innerHTML =
         "<p class='text-muted'>No se encontraron datos</p>";
@@ -448,8 +447,9 @@ document.addEventListener("click", (e) => {
 document.addEventListener("click", (e) => {
   const btn = e.target.closest(".open-gallery");
   if (!btn) return;
+
   const scanId = btn.dataset.scanid;
-  if (!vin || !fotosPorScan[vin]) return;
+  if (!scanId || !fotosPorScan[scanId]) return;
 
   const lightbox = GLightbox({
     elements: fotosPorScan[scanId],
@@ -466,23 +466,21 @@ document.addEventListener("click", (e) => {
   lightbox.open();
 });
 
-function injectGalleryControls(lightbox, vin) {
-  // esperar a que GLightbox exista en el DOM
+function injectGalleryControls(lightbox, scanId) {
   const interval = setInterval(() => {
     const container = document.querySelector(".glightbox-container");
     if (!container) return;
 
     clearInterval(interval);
-
     if (container.querySelector(".gallery-controls")) return;
 
     const controls = document.createElement("div");
     controls.className = "gallery-controls";
     controls.innerHTML = `
-      <button class="btn btn-sm btn-danger" data-action="delete-one" title="Eliminar foto">
+      <button class="btn btn-sm btn-danger" data-action="delete-one">
         <i class="mdi mdi-trash-can-outline"></i>
       </button>
-      <button class="btn btn-sm btn-outline-danger" data-action="delete-all" title="Eliminar galería">
+      <button class="btn btn-sm btn-outline-danger" data-action="delete-all">
         <i class="mdi mdi-delete-sweep-outline"></i>
       </button>
     `;
@@ -496,55 +494,54 @@ function injectGalleryControls(lightbox, vin) {
       if (!action) return;
 
       if (action === "delete-one") {
-        await deleteCurrentPhoto(lightbox, vin);
+        await deleteCurrentPhoto(lightbox, scanId);
       }
 
       if (action === "delete-all") {
-        await deleteAllPhotos(lightbox, vin);
+        await deleteAllPhotos(lightbox, scanId);
       }
     });
 
-    lightbox.on("close", () => {
-      controls.remove();
-    });
+    lightbox.on("close", () => controls.remove());
   }, 50);
 }
 
-async function deleteCurrentPhoto(lightbox, vin) {
+async function deleteCurrentPhoto(lightbox, scanId) {
   const index = lightbox.index;
-  const photo = fotosPorScan[vin][index];
+  const photo = fotosPorScan[scanId][index];
   if (!photo) return;
 
   const confirmed = await confirmModal({
     title: "Eliminar foto",
-    body: "¿Eliminar esta foto?",
+    body: "¿Eliminar la foto actual?",
     confirmText: "Eliminar",
     confirmClass: "btn-danger",
   });
-
   if (!confirmed) return;
 
   try {
-    // 👉 backend (ajustá endpoint)
+    console.log("PictId eliminar actual: ", photo.pict_id);
     await fetch("/api/photos/delete", {
-      method: "POST",
+      method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ vin, url: photo.href }),
+      body: JSON.stringify({
+        pict_id: photo.pict_id,
+        pictureurl: photo.href,
+      }),
     });
 
-    // 🔥 estado
-    fotosPorScan[vin].splice(index, 1);
+    fotosPorScan[scanId].splice(index, 1);
 
-    if (fotosPorScan[vin].length === 0) {
-      delete fotosPorScan[vin];
-      scansConFotos.delete(vin);
+    if (!fotosPorScan[scanId].length) {
+      delete fotosPorScan[scanId];
+      scansConFotos.delete(scanId);
       lightbox.close();
       renderTabla();
       return;
     }
 
     lightbox.destroy();
-    GLightbox({ elements: fotosPorScan[vin] }).open();
+    GLightbox({ elements: fotosPorScan[scanId] }).open();
 
     toastSuccess("Foto eliminada");
   } catch {
@@ -552,34 +549,28 @@ async function deleteCurrentPhoto(lightbox, vin) {
   }
 }
 
-async function deleteAllPhotos(lightbox, vin) {
+async function deleteAllPhotos(lightbox, scanId) {
   const confirmed = await confirmModal({
-    title: "Eliminar todas las fotos",
-    body: `
-      <p class="mb-0">
-        ¿Eliminar todas las fotos del VIN <strong>${vin}</strong>?<br>
-        <small class="text-muted">Esta acción no se puede deshacer</small>
-      </p>
-    `,
+    title: "Eliminar galería",
+    body: "¿Eliminar todas las fotos asociadas al VIN?",
     confirmText: "Eliminar todo",
     confirmClass: "btn-danger",
   });
-
   if (!confirmed) return;
 
   try {
+    console.log("ScanId eliminar todas: ", scanId);
     await fetch("/api/photos/delete-all", {
-      method: "POST",
+      method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ vin }),
+      body: JSON.stringify({ scan_id: scanId }),
     });
 
-    delete fotosPorScan[vin];
-    scansConFotos.delete(vin);
+    delete fotosPorScan[scanId];
+    scansConFotos.delete(scanId);
 
     lightbox.close();
     renderTabla();
-
     toastSuccess("Galería eliminada");
   } catch {
     toastError("No se pudo eliminar la galería");
