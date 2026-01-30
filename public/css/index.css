@@ -501,20 +501,24 @@ th {
 
 td {
   color: rgb(57, 57, 57);
-  text-align: center;
+  text-align: left;
+}
+.table-auto th,
+.table-auto td {
+  text-align: left !important;
 }
 
 .usersAdminTd {
   min-width: 300px;
 }
 
-tbody tr:nth-child(odd) {
+/* tbody tr:nth-child(odd) {
   background-color: rgba(119, 165, 240, 0.921);
 }
 
 tbody tr:nth-child(even) {
   background-color: rgba(87, 143, 232, 0.921);
-}
+} */
 
 .thumbnailImg {
   padding: 8px;
@@ -1853,7 +1857,7 @@ body > .glightbox-container {
 }
 
 .damage-delete-icon {
-  position: absolute;
+  position: static;
   left: 6px;
   top: 50%;
   transform: translateY(-50%);
@@ -1928,7 +1932,7 @@ body > .glightbox-container {
 }
 
 .vin-cell {
-  display: flex;
+  /* display: flex; */
   align-items: center;
   gap: 6px;
 }
