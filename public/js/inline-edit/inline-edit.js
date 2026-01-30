@@ -7,11 +7,6 @@ class InlineEditableDropdown {
     document.addEventListener("click", this.handleClick.bind(this));
   }
 
-  // handleClick(e) {
-  //   const cell = e.target.closest(".editable-cell");
-  //   if (!cell || cell.classList.contains("editing")) return;
-  //   this.activate(cell);
-  // }
   handleClick(e) {
     const cell = e.target.closest(".editable-cell");
     if (!cell) return;
@@ -79,33 +74,8 @@ class InlineEditableDropdown {
   }
 
   commit({ cell, field, scanId, damageId, item, originalText }) {
-    // // 🔥 matar ESC pendiente
-    // if (cell._escListener) {
-    //   document.removeEventListener("keydown", cell._escListener);
-    //   delete cell._escListener;
-    // }
     cell.classList.remove("editing");
     cell.innerHTML = "";
-    // cell.innerHTML = "";
-
-    // // 🔥 si es área y hay damageId → crear icono delete SIEMPRE
-    // if (field === "area" && damageId) {
-    //   const icon = document.createElement("span");
-    //   icon.className = "damage-delete-icon d-none"; // 👈 SIEMPRE empieza oculto
-    //   icon.dataset.damageId = damageId;
-    //   icon.title = "Eliminar daño";
-    //   icon.innerHTML = `<i class="mdi mdi-trash-can-outline"></i>`;
-
-    //   cell.appendChild(icon);
-    // }
-
-    // // valor visible
-    // const valueSpan = document.createElement("span");
-    // valueSpan.className = "cell-value";
-    // valueSpan.textContent = item.descripcion;
-    // cell.appendChild(valueSpan);
-    // ////////////////////////////////////////////////////////////////
-    // ////////////////////////////////////////////////////////////////
 
     // icono delete (solo área y con damageId)
     if (field === "area" && damageId) {
@@ -141,20 +111,6 @@ class InlineEditableDropdown {
     // 🔑 acá se pinta
     cell.classList.add("pending-change");
   }
-
-  // cancel(cell, originalText) {
-  //   cell.classList.remove("editing");
-  //   cell.innerHTML = `<span class="cell-value">${originalText}</span>`;
-
-  //   // 🔥 eliminar cambio pendiente asociado a esta celda
-  //   for (const [key, change] of this.pendingChanges.entries()) {
-  //     if (change.cell === cell) {
-  //       this.pendingChanges.delete(key);
-  //       cell.classList.remove("pending-change", "saving");
-  //       break;
-  //     }
-  //   }
-  // }
 
   cancel(cell, originalText) {
     const field = cell.dataset.field;
@@ -312,7 +268,6 @@ class InlineEditableDropdown {
       // // 🔥 cerrar cualquier edición activa y matar ESC pendientes
       document.querySelectorAll(".editable-cell.editing").forEach((cell) => {
         cell.classList.remove("editing");
-        //   this.removeEsc(cell);
       });
 
       this.pendingChanges.forEach((c) => {
@@ -325,12 +280,6 @@ class InlineEditableDropdown {
         }
 
         c.originalText = c.displayValue;
-
-        // // 🔥 eliminar ESC residual
-        // if (c.cell._escListener) {
-        //   document.removeEventListener("keydown", c.cell._escListener);
-        //   delete c.cell._escListener;
-        // }
       });
 
       this.pendingChanges.clear();
