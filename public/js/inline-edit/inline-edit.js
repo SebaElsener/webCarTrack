@@ -207,6 +207,19 @@ class InlineEditableDropdown {
     cell.appendChild(input);
     input.focus();
 
+    // 🔒 aislar eventos del input de observación
+    input.addEventListener("click", (e) => {
+      e.stopPropagation();
+    });
+
+    input.addEventListener("keydown", (e) => {
+      e.stopPropagation();
+    });
+
+    input.addEventListener("input", (e) => {
+      e.stopPropagation();
+    });
+
     const commitOnce = () => {
       if (committed) return;
       committed = true;
@@ -313,11 +326,11 @@ class InlineEditableDropdown {
 
         c.originalText = c.displayValue;
 
-        // 🔥 eliminar ESC residual
-        if (c.cell._escListener) {
-          document.removeEventListener("keydown", c.cell._escListener);
-          delete c.cell._escListener;
-        }
+        // // 🔥 eliminar ESC residual
+        // if (c.cell._escListener) {
+        //   document.removeEventListener("keydown", c.cell._escListener);
+        //   delete c.cell._escListener;
+        // }
       });
 
       this.pendingChanges.clear();
