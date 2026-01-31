@@ -213,7 +213,14 @@ function renderTabla() {
     if (!scan.damages || scan.damages.length === 0) {
       rows += `
         <tr>
-          <td>${new Date(scan.scan_date).toLocaleString("es-AR")}</td>
+          <td>${new Date(scan.scan_date).toLocaleString("es-AR", {
+            year: "2-digit",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          })}</td>
           <td>${scan.marca ?? ""}</td>
           <td>${scan.modelo ?? ""}</td>
           <td>
@@ -245,7 +252,14 @@ function renderTabla() {
       scan.damages.forEach((damage) => {
         rows += `
           <tr>
-            <td>${new Date(scan.scan_date).toLocaleString("es-AR")}</td>
+            <td>${new Date(scan.scan_date).toLocaleString("es-AR", {
+              year: "2-digit",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })}</td>
             <td>${scan.marca ?? ""}</td>
             <td>${scan.modelo ?? ""}</td>
             <td>

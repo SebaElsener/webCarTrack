@@ -1957,18 +1957,22 @@ body > .glightbox-container {
   background-color: #f8f9fa;
 }
 
-/* .searchable-dropdown,
-.dropdown-menu,
-.inline-dropdown {
-  position: absolute;
-  z-index: 99999999;
+.spinner-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.85);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-#tabla-resultadosVIN {
-  overflow: visible;
+.vin-delete-icon {
+  color: #dc3545;
+  cursor: pointer;
+  margin-right: 6px;
 }
 
-#tabla-resultadosVIN td {
-  overflow: visible;
-  position: relative;
-} */
+.vin-delete-icon:hover {
+  opacity: 0.8;
+}

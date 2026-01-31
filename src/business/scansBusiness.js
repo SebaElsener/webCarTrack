@@ -5,4 +5,9 @@ const getAllScans = async () => {
   return allScans;
 };
 
-export { getAllScans };
+const deleteScan = async (scan_id) => {
+  const deletedVIN = await supabaseRepo.deleteScanById(scan_id);
+  return deletedVIN;
+};
+
+export { getAllScans, deleteScan };

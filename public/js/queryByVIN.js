@@ -83,7 +83,16 @@ async function cargarDatos(vin) {
         pict_scan_id: f.pict_scan_id,
         href: f.pictureurl,
         type: "image",
-        title: `VIN ${scan.vin} · Scan ${f.pict_scan_id} · Imagen ${idx + 1}`,
+        title: `VIN ${scan.vin} · ${scan.movimiento} en ${scan.lugar} ·  ${new Date(
+          scan.scan_date,
+        ).toLocaleString("es-AR", {
+          year: "2-digit",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        })} · Imagen ${idx + 1}`,
       }));
     });
 
@@ -149,7 +158,14 @@ function renderTabla() {
     if (!scan.damages || scan.damages.length === 0) {
       rows += `
       <tr class="resultadosVINtr scan-base-row" data-scan-id="${scan.scan_id}">
-        <td>${new Date(scan.scan_date).toLocaleString("es-AR")}</td>
+        <td>${new Date(scan.scan_date).toLocaleString("es-AR", {
+          year: "2-digit",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        })}</td>
         <td>${scan.marca ?? ""}</td>
         <td>${scan.modelo ?? ""}</td>
         <td class="vin-cell">
@@ -164,6 +180,19 @@ function renderTabla() {
               <i class="mdi mdi-plus-circle-outline"></i>
             </span>
           `
+              : ""
+          }
+          ${
+            currentMode === "delete-vin"
+              ? `
+                <span
+                  class="vin-delete-icon"
+                  data-scan-id="${scan.scan_id}"
+                  title="Eliminar etapa / scan"
+                >
+                  <i class="mdi mdi-trash-can-outline"></i>
+                </span>
+              `
               : ""
           }
 
@@ -225,6 +254,7 @@ function renderTabla() {
         </td>
         <td>${scan.batea ?? ""}</td>
         <td>${scan.movimiento ?? ""}</td>
+        <td>${scan.lugar ?? ""}</td>
         <td>${renderClimaIcon(scan.clima)}</td>
         <td>${scan.user ?? ""}</td>
       </tr>
@@ -236,7 +266,14 @@ function renderTabla() {
               data-scan-id="${scan.scan_id}"
               data-damage-id="${damage.id ?? ""}"
           >
-            <td>${new Date(scan.scan_date).toLocaleString("es-AR")}</td>
+            <td>${new Date(scan.scan_date).toLocaleString("es-AR", {
+              year: "2-digit",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })}</td>
             <td>${scan.marca ?? ""}</td>
             <td>${scan.modelo ?? ""}</td>
             <td class="vin-cell">
@@ -253,6 +290,19 @@ function renderTabla() {
               `
                   : ""
               }
+                ${
+                  currentMode === "delete-vin"
+                    ? `
+                    <span
+                      class="vin-delete-icon"
+                      data-scan-id="${scan.scan_id}"
+                      title="Eliminar etapa / scan"
+                    >
+                      <i class="mdi mdi-trash-can-outline"></i>
+                    </span>
+                  `
+                    : ""
+                }
               ${
                 fotosPorScan[scan.scan_id]?.length
                   ? `
@@ -314,6 +364,7 @@ function renderTabla() {
             </td>
             <td>${scan.batea ?? ""}</td>
             <td>${scan.movimiento ?? ""}</td>
+            <td>${scan.lugar ?? ""}</td>
             <td>${renderClimaIcon(scan.clima)}</td>
             <td>${scan.user ?? ""}</td>
           </tr>
@@ -340,6 +391,7 @@ function renderTabla() {
             <th class="obsTh">Observación</th>
             <th class="bateaTh">Batea</th>
             <th class="movimientoTh">Movimiento</th>
+            <th class="lugarTh">Lugar</th>
             <th class="climaTh">Clima</th>
             <th class="userTh">Usuario</th>
           </tr>
@@ -364,6 +416,7 @@ function renderTabla() {
     userTh: 80,
     bateaTh: 60,
     movimientoTh: 60,
+    lugarTh: 60,
     climaTh: 60,
   };
 
@@ -745,6 +798,91 @@ document.addEventListener("click", (e) => {
   if (currentMode !== "add-damage") return;
 
   agregarDanio(scanId);
+});
+
+document.addEventListener("click", async (e) => {
+  const icon = e.target.closest(".vin-delete-icon");
+  if (!icon) return;
+
+  if (currentMode !== "delete-vin") return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  const scanId = icon.dataset.scanId;
+  if (!scanId) return;
+
+  // info visual opcional
+  const scan = datosGlobales.find((s) => String(s.scan_id) === String(scanId));
+
+  const confirmed = await confirmModal({
+    title: "Eliminar etapa",
+    body: `
+      <p class="mb-2">
+        ¿Eliminar el VIN <strong>${scan?.vin ?? ""}</strong><br>
+        del <strong>${scan?.movimiento ?? ""}</strong> en <strong>${scan?.lugar ?? ""}</strong> <strong>${new Date(
+          scan.scan_date,
+        ).toLocaleString("es-AR", {
+          year: "2-digit",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        })}</strong>?<br> 
+        Esto incluye todo lo asociado al VIN:
+      </p>
+      <ul class="mb-0">
+        <li>VIN</li>
+        <li>Daños</li>
+        <li>Fotos</li>
+      </ul>
+      <small class="text-muted">Esta acción no se puede deshacer</small>
+    `,
+    confirmText: "Eliminar",
+    confirmClass: "btn-danger",
+  });
+
+  if (!confirmed) return;
+
+  try {
+    showGlobalSpinner();
+
+    const res = await fetch(`/api/scans/deletebyscan_id/${scanId}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) throw new Error("Error de solicitud en DB al eliminar VIN");
+
+    // 🔥 eliminar del estado
+    datosGlobales = datosGlobales.filter(
+      (s) => String(s.scan_id) !== String(scanId),
+    );
+
+    // 🔥 limpiar fotos de ese scan
+    delete fotosPorScan[scanId];
+
+    // 🔄 re-render
+    if (datosGlobales.length === 0) {
+      document.getElementById("resultadosVIN").innerHTML =
+        "<p class='text-muted text-center mt-3'>Sin resultados</p>";
+      setMode(null);
+    } else {
+      renderTabla();
+    }
+
+    toastSuccess("VIN eliminado");
+  } catch (err) {
+    console.error(err);
+    toastError("No se pudo eliminar el VIN");
+  } finally {
+    hideGlobalSpinner();
+  }
+});
+
+document.getElementById("btnDeleteVIN").addEventListener("click", () => {
+  setMode(currentMode === "delete-vin" ? null : "delete-vin");
+  renderTabla(); // 🔥 muestra / oculta iconos
 });
 
 function agregarDanio(scanId) {

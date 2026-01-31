@@ -1,12 +1,10 @@
+import { Router } from "express";
 
-import { Router } from 'express'
+import { renderScans, deletebyscan_id } from "../controller/scansController.js";
 
-import {
-    renderScans
-} from '../controller/scansController.js'
+const scansRoute = new Router();
 
-const scansRoute = new Router()
+scansRoute.get("/", renderScans);
+scansRoute.delete("/deletebyscan_id/:scan_id", deletebyscan_id);
 
-scansRoute.get('/', renderScans)
-
-export default scansRoute
+export default scansRoute;

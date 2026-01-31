@@ -243,6 +243,8 @@ class ContenedorSupabase {
         modelo,
         clima,
         user,
+        movimiento,
+        lugar,
         batea,
         damages (
           id, area, averia, grav, obs, date
@@ -269,6 +271,8 @@ class ContenedorSupabase {
         user: s.user,
         clima: s.clima,
         batea: s.batea,
+        lugar: s.lugar,
+        movimiento: s.movimiento,
         damages: s.damages ?? [],
         fotos:
           s.pictures?.map((p) => ({
@@ -305,6 +309,59 @@ class ContenedorSupabase {
     } catch (err) {
       console.error("Error deletePhoto:", err);
       return res.status(500).json({ error: "No se pudo eliminar la foto" });
+    }
+  }
+
+  async deleteScanById(scan_id) {
+    const bucketName = "pics";
+    try {
+      // obtener todas las fotos del scan
+      const { data: photos, error: fetchError } = await supabase
+        .from("pictures")
+        .select("id, pictureurl")
+        .eq("scan_id", scan_id);
+
+      if (fetchError) throw fetchError;
+
+      if (!photos || photos.length === 0) {
+        // nada para borrar → idempotente
+      }
+
+      const paths = (photos && [])
+        .map((p) => {
+          try {
+            return getStoragePathFromPublicUrl(p.pictureurl, bucketName);
+          } catch {
+            return null;
+          }
+        })
+        .filter(Boolean);
+
+      // borrar VIN en DB
+      const { error: deleteDbError } = await supabase
+        .from("scans")
+        .delete()
+        .eq("supabase_id", scan_id);
+
+      if (deleteDbError) {
+        console.error(deleteDbError);
+        throw deleteDbError;
+      }
+
+      // borrar archivos del bucket (batch)
+      if (paths.length) {
+        const { error: storageError } = await supabase.storage
+          .from(bucketName)
+          .remove(paths);
+
+        if (storageError) throw storageError;
+      }
+
+      return {
+        success: true,
+      };
+    } catch (error) {
+      console.log("Error al eliminar VIN/Daños/Fotos en DB", error);
     }
   }
 
