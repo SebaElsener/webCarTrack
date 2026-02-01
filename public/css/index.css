@@ -1976,3 +1976,13 @@ body > .glightbox-container {
 .vin-delete-icon:hover {
   opacity: 0.8;
 }
+
+.vin-cartaporte-icon {
+  color: #3fb41ef8;
+  cursor: pointer;
+  margin-right: 6px;
+}
+
+.vin-cartaporte-icon:hover {
+  opacity: 0.8;
+}
