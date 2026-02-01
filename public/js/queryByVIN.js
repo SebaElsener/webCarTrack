@@ -183,6 +183,19 @@ function renderTabla() {
               : ""
           }
           ${
+            currentMode === "cartaporte-vin"
+              ? `
+            <span
+              class="vin-cartaporte-icon"
+              data-scan-id="${scan.scan_id}"
+              title="Generar cartaporte"
+            >
+              <i class="mdi mdi-note-text-outline"></i>
+            </span>
+          `
+              : ""
+          }
+          ${
             currentMode === "delete-vin"
               ? `
                 <span
@@ -712,6 +725,49 @@ document.getElementById("btnDeleteDamages").addEventListener("click", () => {
   setMode(currentMode === "delete-damage" ? null : "delete-damage");
 });
 
+// ==============================
+// BODY DEL MODAL CARTA DE PORTE
+// ==============================
+
+const bodyCartaPorte = `
+  <div class="mb-2">
+    <label class="form-label">Nro. Carta de Porte</label>
+    <input type="text" class="form-control" id="cp-nro" />
+  </div>
+
+  <div class="mb-2">
+    <label class="form-label">Destino</label>
+    <input type="text" class="form-control" id="cp-destino" />
+  </div>
+
+  <div class="mb-2">
+    <label class="form-label">Fecha de remito</label>
+    <input type="date" class="form-control" id="cp-fecha" />
+  </div>
+
+  <div class="text-danger small d-none" id="cp-error">
+    Completar todos los campos
+  </div>
+`;
+
+function getCartaPorteData() {
+  return {
+    cartaPorte: document.getElementById("cp-nro")?.value.trim(),
+    destino: document.getElementById("cp-destino")?.value.trim(),
+    fechaRemito: document.getElementById("cp-fecha")?.value,
+  };
+}
+
+function validarCartaPorte() {
+  const { cartaPorte, destino, fechaRemito } = getCartaPorteData();
+  const errorEl = document.getElementById("cp-error");
+
+  const valido = cartaPorte && destino && fechaRemito;
+
+  errorEl.classList.toggle("d-none", !!valido);
+  return !!valido;
+}
+
 document.addEventListener("click", async (e) => {
   const icon = e.target.closest(".damage-delete-icon");
   if (!icon) return;
@@ -885,6 +941,87 @@ document.getElementById("btnDeleteVIN").addEventListener("click", () => {
   renderTabla(); // 🔥 muestra / oculta iconos
 });
 
+document.getElementById("btnCartaporte").addEventListener("click", () => {
+  setMode(currentMode === "cartaporte-vin" ? null : "cartaporte-vin");
+  renderTabla(); // 🔥 muestra / oculta iconos
+});
+
+document.addEventListener("click", async (e) => {
+  const icon = e.target.closest(".vin-cartaporte-icon");
+  if (!icon) return;
+
+  if (currentMode !== "cartaporte-vin") return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  const scanId = icon.dataset.scan_id;
+  if (!scanId) return;
+
+  const confirmed = await confirmModal({
+    title: "Generar Carta de Porte",
+    body: bodyCartaPorte,
+    confirmText: "Generar",
+    confirmClass: "btn-primary",
+  });
+
+  if (!confirmed) return;
+
+  // 🔴 Validación post-confirm
+  if (!validarCartaPorte()) {
+    // volver a abrir el modal si querés
+    await confirmModal({
+      title: "Datos incompletos",
+      body: bodyCartaPorte,
+      confirmText: "Confirmar",
+    });
+    return;
+  }
+
+  const data = getCartaPorteData();
+
+  console.log("Carta de porte:", data);
+
+  //////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////
+
+  try {
+    showGlobalSpinner();
+
+    const res = await fetch(`/api/scans/deletebyscan_id/${scanId}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) throw new Error("Error de solicitud en DB al eliminar VIN");
+
+    // 🔥 eliminar del estado
+    datosGlobales = datosGlobales.filter(
+      (s) => String(s.scan_id) !== String(scanId),
+    );
+
+    // 🔥 limpiar fotos de ese scan
+    delete fotosPorScan[scanId];
+
+    // 🔄 re-render
+    if (datosGlobales.length === 0) {
+      document.getElementById("resultadosVIN").innerHTML =
+        "<p class='text-muted text-center mt-3'>Sin resultados</p>";
+      setMode(null);
+    } else {
+      renderTabla();
+    }
+
+    toastSuccess("VIN eliminado");
+  } catch (err) {
+    console.error(err);
+    toastError("No se pudo eliminar el VIN");
+  } finally {
+    hideGlobalSpinner();
+  }
+});
+
 function agregarDanio(scanId) {
   const scan = datosGlobales.find((s) => String(s.scan_id) === String(scanId));
 
@@ -1013,6 +1150,10 @@ function setMode(mode) {
     case "delete-vin":
       document.getElementById("btnDeleteVIN")?.classList.add("active");
       break;
+
+    case "cartaporte-vin":
+      document.getElementById("btnCartaporte")?.classList.add("active");
+      break;
   }
 
   disableOtherButtons(mode);
@@ -1020,9 +1161,10 @@ function setMode(mode) {
 
 function disableOtherButtons(activeMode) {
   const map = {
-    "delete-damage": ["btnAddDamage", "btnDeleteVIN"],
-    "add-damage": ["btnDeleteDamages", "btnDeleteVIN"],
-    "delete-vin": ["btnAddDamage", "btnDeleteDamages"],
+    "delete-damage": ["btnAddDamage", "btnDeleteVIN", "btnCartaporte"],
+    "add-damage": ["btnDeleteDamages", "btnDeleteVIN", "btnCartaporte"],
+    "delete-vin": ["btnAddDamage", "btnDeleteDamages", "btnCartaporte"],
+    "cartaporte-vin": ["btnAddDamage", "btnDeleteDamages", "btnDeleteVin"],
   };
 
   (map[activeMode] || []).forEach((id) => {

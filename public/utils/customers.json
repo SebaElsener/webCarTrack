@@ -1,0 +1,20 @@
+[
+  {
+    "id": "1",
+    "cliente": "VOLKSWAGEN ARGENTINA S.A.",
+    "cuit_cliente": "30-50401884-5",
+    "codigo": "134000"
+  },
+  {
+    "id": "2",
+    "cliente": "HONDA MOTOR DE ARGENTINA S.A.",
+    "cuit_cliente": "30-57754677-7",
+    "codigo": "134001"
+  },
+  {
+    "id": "2",
+    "cliente": "GENERAL MOTORS DE ARGENTINA S.R.L.",
+    "cuit_cliente": "30-66207168-0",
+    "codigo": "134002"
+  }
+]
