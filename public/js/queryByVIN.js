@@ -2,6 +2,7 @@ import areas from "../utils/areas.json" with { type: "json" };
 import averias from "../utils/averias.json" with { type: "json" };
 import gravedades from "../utils/gravedades.json" with { type: "json" };
 import { inlineEditor } from "./inline-edit/inline-edit.init.js";
+import { GetCartaporteInfo } from "./getCartaporteInfo.js";
 
 const indexById = (arr) =>
   Object.fromEntries(arr.map((i) => [i.id, i.descripcion]));
@@ -17,9 +18,8 @@ let accionesPostTablaMostradas = false;
 let vin = "";
 let fotosPorScan = {};
 
-// Eliminar daños
-//window.deleteMode = false;
-//let addDamageMode = false;
+const cartaporteInfo = new GetCartaporteInfo();
+
 let currentMode = null;
 window.isDeleteDamageMode = () => currentMode === "delete-damage";
 
@@ -738,31 +738,6 @@ document.getElementById("btnDeleteDamages").addEventListener("click", () => {
   setMode(currentMode === "delete-damage" ? null : "delete-damage");
 });
 
-// ==============================
-// BODY DEL MODAL CARTA DE PORTE
-// ==============================
-
-const bodyCartaPorte = `
-  <div class="mb-2">
-    <label class="form-label">Nro. Carta de Porte</label>
-    <input type="text" class="form-control" id="cp-nro" />
-  </div>
-
-  <div class="mb-2">
-    <label class="form-label">Destino</label>
-    <input type="text" class="form-control" id="cp-destino" />
-  </div>
-
-  <div class="mb-2">
-    <label class="form-label">Fecha de remito</label>
-    <input type="date" class="form-control" id="cp-fecha" />
-  </div>
-
-  <div class="text-danger small d-none" id="cp-error">
-    Completar todos los campos
-  </div>
-`;
-
 document.addEventListener("click", async (e) => {
   const icon = e.target.closest(".damage-delete-icon");
   if (!icon) return;
@@ -941,6 +916,57 @@ document.getElementById("btnCartaporte").addEventListener("click", () => {
   renderTabla(); // 🔥 muestra / oculta iconos
 });
 
+// batea: "395";
+// cartaPorte: "1234cp2026";
+// cliente: "VOLKSWAGEN ARGENTINA S.A.";
+// cod_cliente: "134000";
+// cuit_cliente: "30-50401884-5";
+// cuit_destino: "30-71096342-4";
+// cuit_origen: "30-70989193-2";
+// damages: "(55) Tapa baúl (04) Abollado con pint. dañada Más de 30 cm LADO IZDO /// (11) Puerta - Trasera izquierda (34) Pint. saltada filo 0–2.5 cm";
+// destino: "autotag";
+// dir_destino: "AVDA. CALCHAQUI 252 BERAZATEGUI - (Pcia. BUENOS AIRES)";
+// dir_origen: "Ent. Centro Industrial Zarate. Km 3,5. Zarate, Buenos Aires";
+// fechaRemito: "2026-02-05";
+// fecha_cartaporte: "01/02/26, 16:13";
+// modelo: "TERA";
+// origen: "El Molino";
+// vin: "9BWBH6DF7TT355355";
+
+// generar_carta_porte(
+//   "plantilla_carta_porte.xlsx",
+//   "salidas/carta_porte_CP-000123.xlsx",
+//   datos,
+// );
+
+// ==============================
+// BODY DEL MODAL CARTA DE PORTE
+// ==============================
+
+const bodyCartaPorte = `
+  <div class="mb-2">
+    <label class="form-label">Nro. Carta de Porte</label>
+    <input type="text" class="form-control" id="cp-nro" />
+  </div>
+
+  <div class="mb-2">
+    <label class="form-label">Destino</label>
+    <input type="text" class="form-control" id="cp-destino" />
+    <div class="invalid-feedback">
+      El destino ingresado no existe
+    </div>
+  </div>
+
+  <div class="mb-2">
+    <label class="form-label">Fecha de remito</label>
+    <input type="date" class="form-control" id="cp-fecha" />
+  </div>
+
+  <div class="text-danger small d-none" id="cp-error">
+    Completar todos los campos
+  </div>
+`;
+
 document.addEventListener("click", async (e) => {
   const icon = e.target.closest(".vin-cartaporte-icon");
   if (!icon) return;
@@ -954,8 +980,38 @@ document.addEventListener("click", async (e) => {
 
   const scan = datosGlobales.find((s) => String(s.scan_id) === String(scanId));
 
-  const data = await openCartaPorteModal(scan, bodyCartaPorte);
-  if (!data) return;
+  const formData = await openCartaPorteModal(scan, bodyCartaPorte);
+  if (!formData) return;
+
+  const cliente = cartaporteInfo.clientData(scan.marca);
+  const origen = cartaporteInfo.originData(scan.lugar);
+  const destino = cartaporteInfo.destinationData(formData.destino);
+  const damages = formatDamages(scan.damages).join(" /// ");
+  const actualDate = Date.now();
+
+  const data = {
+    ...formData,
+    fecha_cartaporte: new Date(actualDate).toLocaleString("es-AR", {
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }),
+    cliente: cliente.cliente,
+    cuit_cliente: cliente.cuit_cliente,
+    cod_cliente: cliente.codigo,
+    origen: scan.lugar,
+    dir_origen: origen.dir_origen,
+    cuit_origen: origen.cuit_origen,
+    dir_destino: destino.dir_destino,
+    cuit_destino: destino.cuit_destino,
+    vin: scan.vin,
+    modelo: scan.modelo,
+    batea: scan.batea,
+    damages: damages,
+  };
 
   console.log("Carta de porte:", data);
 
@@ -978,6 +1034,21 @@ document.addEventListener("click", async (e) => {
     hideGlobalSpinner();
   }
 });
+
+function formatDamages(damages = []) {
+  return damages.map((d) => {
+    const parts = [
+      `(${d.area})`,
+      d.area_desc,
+      `(${d.averia})`,
+      d.averia_desc,
+      d.grav_desc,
+      d.obs,
+    ].filter(Boolean);
+
+    return parts.join(" ");
+  });
+}
 
 function agregarDanio(scanId) {
   const scan = datosGlobales.find((s) => String(s.scan_id) === String(scanId));
@@ -1134,4 +1205,127 @@ function toggleDeleteDamageIcons(show) {
   document.querySelectorAll(".damage-delete-icon").forEach((icon) => {
     icon.classList.toggle("d-none", !show);
   });
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+///
+///  MODAL CARTA PORTE
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+
+function openCartaPorteModal(scan, bodyCartaPorte) {
+  const MODAL_ID = "cartaPorteModal";
+
+  let modalEl = document.getElementById(MODAL_ID);
+
+  if (!modalEl) {
+    modalEl = document.createElement("div");
+    modalEl.id = MODAL_ID;
+    modalEl.className = "modal fade";
+    modalEl.tabIndex = -1;
+    modalEl.innerHTML = `
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Generar Carta de Porte</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            ${bodyCartaPorte}
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-cancel>Cancelar</button>
+            <button class="btn btn-primary" data-confirm disabled>
+              Generar
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modalEl);
+  }
+
+  modalEl.addEventListener("input", () => {
+    const confirmBtn = modalEl.querySelector("[data-confirm]");
+    confirmBtn.disabled = !validarCartaPorte(modalEl);
+  });
+
+  const modal = new bootstrap.Modal(modalEl);
+  const confirmBtn = modalEl.querySelector("[data-confirm]");
+  const cancelBtn = modalEl.querySelector("[data-cancel]");
+
+  // 🔁 reset estado
+  confirmBtn.disabled = true;
+  modalEl.querySelector("#cp-nro").value = "";
+  modalEl.querySelector("#cp-error").classList.add("d-none");
+
+  // 🧠 precarga
+  //   if (scan) {
+  //     modalEl.querySelector("#cp-destino").value = scan.lugar ?? "";
+  //     modalEl.querySelector("#cp-fecha").value =
+  //       scan.scan_date?.slice(0, 10) ?? "";
+  //   }
+
+  return new Promise((resolve) => {
+    confirmBtn.onclick = () => {
+      if (!validarCartaPorte(modalEl)) return;
+      modal.hide();
+      resolve(getCartaPorteData());
+    };
+
+    cancelBtn.onclick = () => {
+      modal.hide();
+      resolve(null);
+    };
+
+    modal.show();
+  });
+}
+
+function validarCartaPorte(modalEl) {
+  const nro = modalEl.querySelector("#cp-nro")?.value.trim();
+  const fecha = modalEl.querySelector("#cp-fecha")?.value;
+
+  const destinoOk = validarDestino(modalEl);
+
+  const valido = !!(nro && fecha && destinoOk);
+
+  const errorEl = modalEl.querySelector("#cp-error");
+  errorEl.classList.toggle("d-none", valido);
+
+  return valido;
+}
+
+function validarDestino(modalEl) {
+  const input = modalEl.querySelector("#cp-destino");
+  if (!input) return false;
+
+  const value = input.value.trim();
+
+  if (!value) {
+    input.classList.remove("is-invalid", "is-valid");
+    return false;
+  }
+
+  const destinoInfo = cartaporteInfo.destinationData(value);
+
+  if (!destinoInfo) {
+    input.classList.add("is-invalid");
+    input.classList.remove("is-valid");
+    return false;
+  }
+
+  // válido
+  input.classList.remove("is-invalid");
+  input.classList.add("is-valid");
+  return true;
+}
+
+function getCartaPorteData() {
+  return {
+    cartaPorte: document.getElementById("cp-nro")?.value.trim(),
+    destino: document.getElementById("cp-destino")?.value.trim(),
+    fechaRemito: document.getElementById("cp-fecha")?.value,
+  };
 }

@@ -4,5 +4,11 @@
     "company": "TZ",
     "cuit_origen": "30-64153685-3",
     "dir_origen": "DR. FELIX PAGOLA 2671 ZARATE (BUENOS AIRES) - (Pcia. BUENOS AIRES)"
+  },
+  {
+    "id": "2",
+    "company": "El Molino",
+    "cuit_origen": "30-70989193-2",
+    "dir_origen": "Ent. Centro Industrial Zarate. Km 3,5. Zarate, Buenos Aires"
   }
 ]

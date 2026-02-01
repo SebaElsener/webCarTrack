@@ -1,3 +1,7 @@
+import { GetCartaporteInfo } from "./getCartaporteInfo";
+
+const cartaporteInfo = new GetCartaporteInfo();
+
 function openCartaPorteModal(scan, bodyCartaPorte) {
   const MODAL_ID = "cartaPorteModal";
 
@@ -30,6 +34,11 @@ function openCartaPorteModal(scan, bodyCartaPorte) {
     document.body.appendChild(modalEl);
   }
 
+  modalEl.addEventListener("input", (e) => {
+    const confirmBtn = modalEl.querySelector("[data-confirm]");
+    confirmBtn.disabled = !validarCartaPorte(modalEl);
+  });
+
   const modal = new bootstrap.Modal(modalEl);
   const confirmBtn = modalEl.querySelector("[data-confirm]");
   const cancelBtn = modalEl.querySelector("[data-cancel]");
@@ -40,11 +49,11 @@ function openCartaPorteModal(scan, bodyCartaPorte) {
   modalEl.querySelector("#cp-error").classList.add("d-none");
 
   // 🧠 precarga
-  if (scan) {
-    modalEl.querySelector("#cp-destino").value = scan.lugar ?? "";
-    modalEl.querySelector("#cp-fecha").value =
-      scan.scan_date?.slice(0, 10) ?? "";
-  }
+  //   if (scan) {
+  //     modalEl.querySelector("#cp-destino").value = scan.lugar ?? "";
+  //     modalEl.querySelector("#cp-fecha").value =
+  //       scan.scan_date?.slice(0, 10) ?? "";
+  //   }
 
   modalEl.oninput = () => {
     confirmBtn.disabled = !validarCartaPorte();
@@ -66,20 +75,38 @@ function openCartaPorteModal(scan, bodyCartaPorte) {
   });
 }
 
-function validarCartaPorte() {
-  const { cartaPorte, destino, fechaRemito } = getCartaPorteData();
-  const errorEl = document.getElementById("cp-error");
+function validarCartaPorte(modalEl) {
+  const nro = modalEl.querySelector("#cp-nro")?.value.trim();
+  const fecha = modalEl.querySelector("#cp-fecha")?.value;
 
-  const valido = cartaPorte && destino && fechaRemito;
+  const destinoOk = validarDestino(modalEl);
 
-  errorEl.classList.toggle("d-none", !!valido);
-  return !!valido;
+  const valido = !!(nro && fecha && destinoOk);
+
+  const errorEl = modalEl.querySelector("#cp-error");
+  errorEl.classList.toggle("d-none", valido);
+
+  return valido;
 }
 
-function getCartaPorteData() {
-  return {
-    cartaPorte: document.getElementById("cp-nro")?.value.trim(),
-    destino: document.getElementById("cp-destino")?.value.trim(),
-    fechaRemito: document.getElementById("cp-fecha")?.value,
-  };
+function validarDestino(modalEl) {
+  const input = modalEl.querySelector("#cp-destino");
+  if (!input) return false;
+
+  const value = input.value.trim();
+  if (!value) {
+    input.classList.remove("is-invalid");
+    return false;
+  }
+
+  const destinoInfo = cartaporteInfo.destinationData(value);
+
+  if (!destinoInfo) {
+    input.classList.add("is-invalid");
+    toastError("El destino ingresado no existe");
+    return false;
+  }
+
+  input.classList.remove("is-invalid");
+  return true;
 }
