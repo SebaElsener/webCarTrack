@@ -16,5 +16,11 @@
     "cliente": "GENERAL MOTORS DE ARGENTINA S.R.L.",
     "cuit_cliente": "30-66207168-0",
     "codigo": "134002"
+  },
+  {
+    "id": "3",
+    "cliente": "VERIFICAR",
+    "cuit_cliente": "VERIFICAR",
+    "codigo": "000000"
   }
 ]

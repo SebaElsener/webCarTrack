@@ -10,5 +10,11 @@
     "company": "El Molino",
     "cuit_origen": "30-70989193-2",
     "dir_origen": "Ent. Centro Industrial Zarate. Km 3,5. Zarate, Buenos Aires"
+  },
+  {
+    "id": "3",
+    "company": "Mi casa",
+    "cuit_origen": "00-00000000-0",
+    "dir_origen": "Avda. Mitre 2877 - Zárate, Buenos Aires"
   }
 ]

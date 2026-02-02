@@ -4,5 +4,11 @@
     "company": "AUTOTAG S.A.",
     "cuit_destino": "30-71096342-4",
     "dir_destino": "AVDA. CALCHAQUI 252 BERAZATEGUI - (Pcia. BUENOS AIRES)"
+  },
+  {
+    "id": "2",
+    "company": "TERMINAL ZARATE",
+    "cuit_destino": "30-64153685-3",
+    "dir_destino": "DR. FELIX PAGOLA 2671 ZARATE (BUENOS AIRES) - (Pcia. BUENOS AIRES)"
   }
 ]

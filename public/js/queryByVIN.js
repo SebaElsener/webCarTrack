@@ -990,7 +990,9 @@ document.addEventListener("click", async (e) => {
   const actualDate = Date.now();
 
   const data = {
-    ...formData,
+    cartaPorte: formData.cartaPorte,
+    fechaRemito: formData.fechaRemito,
+    destino: destino.company,
     fecha_cartaporte: new Date(actualDate).toLocaleString("es-AR", {
       year: "2-digit",
       month: "2-digit",
@@ -1014,6 +1016,14 @@ document.addEventListener("click", async (e) => {
   };
 
   console.log("Carta de porte:", data);
+
+  // detectar VERIFICAR
+  const verificarCampos = hasVerificarValues(scan);
+
+  if (verificarCampos.length) {
+    const ok = await confirmarValoresVerificar(verificarCampos);
+    if (!ok) return;
+  }
 
   try {
     showGlobalSpinner();
@@ -1328,4 +1338,40 @@ function getCartaPorteData() {
     destino: document.getElementById("cp-destino")?.value.trim(),
     fechaRemito: document.getElementById("cp-fecha")?.value,
   };
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+///
+///  MODAL - advertencia por si viene marca / modelo VERIFICAR desde backend
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+
+function hasVerificarValues(scan) {
+  const campos = [];
+
+  if (scan?.marca === "VERIFICAR") campos.push("Marca");
+  if (scan?.modelo === "VERIFICAR") campos.push("Modelo");
+
+  return campos;
+}
+
+async function confirmarValoresVerificar(campos) {
+  return await confirmModal({
+    title: "Datos a verificar",
+    body: `
+      <p class="mb-2">
+        <strong>ATENCION:  </strong>Los siguientes campos no están disponibles y quedarán en carta de porte como <strong>VERIFICAR</strong>:<br>
+        Chequear consultando el VIN y consistencia con base de datos
+      </p>
+      <ul>
+        ${campos.map((c) => `<li>${c}</li>`).join("")}
+      </ul>
+      <p class="mb-0">
+        ¿Desea continuar?
+      </p>
+    `,
+    confirmText: "Continuar",
+    confirmClass: "btn-warning",
+  });
 }
