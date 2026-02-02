@@ -1037,6 +1037,24 @@ document.addEventListener("click", async (e) => {
     if (!res.ok) throw new Error("Error backend");
 
     toastSuccess("Carta de porte generada");
+
+    const blob = await res.blob();
+    const disposition = res.headers.get("Content-Disposition");
+    let fileName = "cartaporte.pdf";
+
+    if (disposition) {
+      const match = disposition.match(/filename="(.+)"/);
+      if (match?.[1]) fileName = match[1];
+    }
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = fileName;
+    a.click();
+
+    URL.revokeObjectURL(url);
   } catch (err) {
     console.error(err);
     toastError("No se pudo generar la carta de porte");
