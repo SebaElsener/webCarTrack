@@ -145,19 +145,29 @@ def generar_carta_porte(plantilla_path, output_path, datos):
     # =========================
     # DAMAGES
     # =========================
-    damages = datos.get("damages", "")
+    raw_damages = datos.get("damages", "")
 
     # soportar string o array
-    if isinstance(damages, list):
-        damages_text = damages[0] if damages else ""
-    else:
-        damages_text = damages
+    if isinstance(raw_damages, list):
+        raw_damages = raw_damages[0] if raw_damages else ""
+
+    # separar daños
+    damages_list = [d.strip() for d in raw_damages.split("///") if d.strip()]
+
+    MAX_VISIBLE = 7  # 👈 ajustá según tu plantilla
+
+    visible = damages_list[:MAX_VISIBLE]
+
+    if len(damages_list) > MAX_VISIBLE:
+        visible.append("… (hay más daños, consultar)")
+
+    damages_text = "\n".join(visible)
 
     ws_cartaporte["A68"].value = damages_text
     ws_cartaporte["A68"].alignment = Alignment(
         wrap_text=True,
         vertical="top"
-    )
+)
 
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
