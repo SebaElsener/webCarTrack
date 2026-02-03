@@ -12,7 +12,9 @@
 
   <body>
     <div id="app-root">
-      <h2 class="formTitle">Mis datos</h2>
+      <%- include('./partials/navMin') %>
+
+      <h2 class="usersFormTitle">Mis datos</h2>
 
       <form id="userDataForm" autocomplete="off">
         <label class="userName" for="userName"
@@ -85,7 +87,13 @@
         <button class="regBtn" type="submit">Guardar</button>
       </form>
 
-      <button id="passChangeBtn" class="regBtn">Cambiar mi contraseña</button>
+      <div class="userDataBtnContainer">
+        <button id="passChangeBtn" class="regBtn">Cambiar mi contraseña</button>
+        <a class="formBackLink" href="/api/productos"
+          ><button class="formBackLinkBtn">Volver</button></a
+        >
+      </div>
+
       <form id="passForm" autocomplete="off">
         <div id="passContainer">
           <label class="userName" for="userPass"
@@ -127,11 +135,10 @@
         </button>
       </form>
 
-      <a class="formBackLink" href="/api/productos"
-        ><button class="formBackLinkBtn">Volver</button></a
-      >
+      <%- include('./partials/footer') %>
     </div>
     <script src="/js/userData.js"></script>
+    <script src="/js/toast.js"></script>
     <script src="/js/passwordCheck.js"></script>
     <script src="/js/pageAnimation.js"></script>
     <script src=" https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js "></script>

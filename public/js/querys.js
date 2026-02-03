@@ -881,7 +881,7 @@ function renderEvolucion(data) {
   const max = Math.max(...serie.map(([, v]) => v), 1);
 
   cont.innerHTML = `
-    <div class="card shadow-sm mt-3 fade-slide">
+    <div class="card shadow-sm mt-3 mb-5 fade-slide" style="width: 97%">
       <div class="card-body">
         <h6 class="card-title text-primary fw-semibold">
           Evolución de daños por fecha

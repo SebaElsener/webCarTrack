@@ -916,29 +916,6 @@ document.getElementById("btnCartaporte").addEventListener("click", () => {
   renderTabla(); // 🔥 muestra / oculta iconos
 });
 
-// batea: "395";
-// cartaPorte: "1234cp2026";
-// cliente: "VOLKSWAGEN ARGENTINA S.A.";
-// cod_cliente: "134000";
-// cuit_cliente: "30-50401884-5";
-// cuit_destino: "30-71096342-4";
-// cuit_origen: "30-70989193-2";
-// damages: "(55) Tapa baúl (04) Abollado con pint. dañada Más de 30 cm LADO IZDO /// (11) Puerta - Trasera izquierda (34) Pint. saltada filo 0–2.5 cm";
-// destino: "autotag";
-// dir_destino: "AVDA. CALCHAQUI 252 BERAZATEGUI - (Pcia. BUENOS AIRES)";
-// dir_origen: "Ent. Centro Industrial Zarate. Km 3,5. Zarate, Buenos Aires";
-// fechaRemito: "2026-02-05";
-// fecha_cartaporte: "01/02/26, 16:13";
-// modelo: "TERA";
-// origen: "El Molino";
-// vin: "9BWBH6DF7TT355355";
-
-// generar_carta_porte(
-//   "plantilla_carta_porte.xlsx",
-//   "salidas/carta_porte_CP-000123.xlsx",
-//   datos,
-// );
-
 // ==============================
 // BODY DEL MODAL CARTA DE PORTE
 // ==============================
