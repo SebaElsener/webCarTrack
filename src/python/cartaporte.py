@@ -98,6 +98,7 @@ def generar_carta_porte(plantilla_path, output_path, datos):
     ws_cartaporte.print_options.horizontalCentered = True
     ws_cartaporte.print_options.verticalCentered = True
     ws_cartaporte.page_setup.paperSize = ws_cartaporte.PAPERSIZE_A4
+    ws_cartaporte.page_setup.orientation = ws_cartaporte.ORIENTATION_PORTRAIT
 
     # Ajustar a una página
     ws_cartaporte.page_setup.fitToWidth = 1
