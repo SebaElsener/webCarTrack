@@ -48,6 +48,23 @@ cmd = [
     str(excel_path),
 ]
 
-subprocess.run(cmd, env=env)
+# subprocess.run(cmd, check=True, env=env)
+
+result = subprocess.run(
+    cmd,
+    env=env,
+    stdout=subprocess.PIPE,
+    stderr=subprocess.PIPE,
+    text=True,
+)
+
+print("STDOUT:")
+print(result.stdout)
+
+print("\nSTDERR:")
+print(result.stderr)
+
+print("\nRETURN CODE:", result.returncode)
+
 
 print(f"PDF generado en: {excel_path.with_suffix('.pdf')}")
