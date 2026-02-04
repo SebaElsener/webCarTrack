@@ -4,6 +4,7 @@ from pathlib import Path
 import sys
 import shutil
 import platform
+import os
 
 if len(sys.argv) < 2:
     print("Uso: python export_pdf.py <archivo_excel>")
@@ -30,6 +31,10 @@ def get_libreoffice_bin():
 
     raise RuntimeError("LibreOffice no encontrado en el sistema")
 
+env = os.environ.copy()
+env["SAL_USE_VCLPLUGIN"] = "gen"
+env["SAL_FORCEDPI"] = "72"
+
 LIBREOFFICE_BIN = get_libreoffice_bin()
 
 cmd = [
@@ -44,6 +49,6 @@ cmd = [
     str(excel_path),
 ]
 
-subprocess.run(cmd, check=True)
+subprocess.run(cmd, check=True, env=env)
 
 print(f"PDF generado en: {excel_path.with_suffix('.pdf')}")
