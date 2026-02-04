@@ -93,7 +93,7 @@ def generar_carta_porte(plantilla_path, output_path, datos):
     wb = load_workbook(plantilla_path)
 
     ws_cartaporte = wb["carta_porte"]
-    ws_cartaporte.sheet_view.zoomScale = 97
+    ws_cartaporte.sheet_view.zoomScale = 95
     # Centrar en la hoja
     ws_cartaporte.print_options.horizontalCentered = True
     ws_cartaporte.print_options.verticalCentered = True
