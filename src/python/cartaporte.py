@@ -175,7 +175,7 @@ def generar_carta_porte(plantilla_path, output_path, datos):
         letter = get_column_letter(col)
         dim = ws_cartaporte.column_dimensions[letter]
         if dim.width:
-            dim.width = dim.width * 0.85  # 👈 7% menos
+            dim.width = dim.width * 0.80  # 👈 7% menos
 
 
     output_path = Path(output_path)
