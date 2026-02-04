@@ -13,4 +13,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD ["python", "src/python/export_pdf.py"]
+CMD ["python", "src/python/app.py"]
