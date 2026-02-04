@@ -14,6 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libreoffice \
     libreoffice-calc \
     fonts-dejavu \
+    fonts-crosextra-carlito \
     && rm -rf /var/lib/apt/lists/*
 
 # ─────────────────────────────
