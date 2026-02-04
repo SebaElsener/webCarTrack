@@ -2,6 +2,8 @@
 import subprocess
 from pathlib import Path
 import sys
+import shutil
+import platform
 
 if len(sys.argv) < 2:
     print("Uso: python export_pdf.py <archivo_excel>")
@@ -10,19 +12,31 @@ if len(sys.argv) < 2:
 excel_path = Path(sys.argv[1]).resolve()
 output_dir = excel_path.parent
 
-# 🔑 Path correcto en macOS
-LIBREOFFICE_BIN = "/Applications/LibreOffice.app/Contents/MacOS/soffice"
+def get_libreoffice_bin():
+    system = platform.system()
 
-if not Path(LIBREOFFICE_BIN).exists():
-    raise RuntimeError("LibreOffice no encontrado en macOS")
+    # macOS
+    if system == "Darwin":
+        mac_path = "/Applications/LibreOffice.app/Contents/MacOS/soffice"
+        if Path(mac_path).exists():
+            return mac_path
+        raise RuntimeError("LibreOffice no encontrado en macOS")
+
+    # Linux (Render / Docker)
+    for bin_name in ("libreoffice", "soffice"):
+        path = shutil.which(bin_name)
+        if path:
+            return path
+
+    raise RuntimeError("LibreOffice no encontrado en el sistema")
+
+LIBREOFFICE_BIN = get_libreoffice_bin()
 
 cmd = [
     LIBREOFFICE_BIN,
     "--headless",
-    "--convert-to",
-    "pdf",
-    "--outdir",
-    str(output_dir),
+    "--convert-to", "pdf",
+    "--outdir", str(output_dir),
     str(excel_path),
 ]
 
