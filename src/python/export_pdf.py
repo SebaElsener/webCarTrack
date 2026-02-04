@@ -33,7 +33,6 @@ def get_libreoffice_bin():
 
 env = os.environ.copy()
 env["SAL_USE_VCLPLUGIN"] = "gen"
-env["SAL_FORCEDPI"] = "72"
 
 LIBREOFFICE_BIN = get_libreoffice_bin()
 
@@ -43,7 +42,7 @@ cmd = [
     "--nologo",
     "--nofirststartwizard",
     "--convert-to",
-    'pdf:calc_pdf_Export:{"ScaleToPagesX":1,"ScaleToPagesY":0}',
+    'pdf:calc_pdf_Export:ScaleToPagesX=1,ScaleToPagesY=0',
     "--outdir",
     str(output_dir),
     str(excel_path),
