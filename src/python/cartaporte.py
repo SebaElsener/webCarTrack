@@ -9,7 +9,7 @@ from barcode.writer import ImageWriter
 from pathlib import Path
 from openpyxl.drawing.image import Image
 from openpyxl.drawing.spreadsheet_drawing import OneCellAnchor, AnchorMarker, XDRPositiveSize2D
-from openpyxl.utils import column_index_from_string
+from openpyxl.utils import column_index_from_string, get_column_letter
 from openpyxl.styles import Alignment
 import os
 
@@ -93,7 +93,7 @@ def generar_carta_porte(plantilla_path, output_path, datos):
     wb = load_workbook(plantilla_path)
 
     ws_cartaporte = wb["carta_porte"]
-    ws_cartaporte.sheet_view.zoomScale = 95
+    ws_cartaporte.sheet_view.zoomScale = 98
     # Centrar en la hoja
     ws_cartaporte.print_options.horizontalCentered = True
     ws_cartaporte.print_options.verticalCentered = True
@@ -168,7 +168,15 @@ def generar_carta_porte(plantilla_path, output_path, datos):
     ws_cartaporte["A68"].alignment = Alignment(
         wrap_text=True,
         vertical="top"
-)
+    )
+
+    # Compensación Calc (GLOBAL)
+    for col in range(1, 50):
+        letter = get_column_letter(col)
+        dim = ws_cartaporte.column_dimensions[letter]
+        if dim.width:
+            dim.width = dim.width * 0.93  # 👈 7% menos
+
 
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
