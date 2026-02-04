@@ -35,8 +35,10 @@ LIBREOFFICE_BIN = get_libreoffice_bin()
 cmd = [
     LIBREOFFICE_BIN,
     "--headless",
+    "--nologo",
+    "--nofirststartwizard",
     "--convert-to",
-    'pdf:calc_pdf_Export:{"ScaleToPages":1}',
+    'pdf:calc_pdf_Export:{"ScaleToPagesX":1,"ScaleToPagesY":0}',
     "--outdir",
     str(output_dir),
     str(excel_path),
