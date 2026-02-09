@@ -18,21 +18,31 @@
         <form id="loginForm" autocomplete="off">
           <h2 class="loginFormTitle">Login de usuario</h2>
           <label class="userName" for="userName">Ingrese su email</label>
-          <input
-            id="userName"
-            class="userNameInput"
-            name="username"
-            type="text"
-            required
-          />
+          <div class="field">
+            <input
+              id="userName"
+              class="userNameInput"
+              name="username"
+              type="text"
+              required
+            />
+            <div class="inline-error" id="loginEmailError">
+              Ingrese un email válido
+            </div>
+          </div>
           <label class="userName" for="userName">Ingrese su contraseña</label>
-          <input
-            id="userPass"
-            class="userPassInput"
-            name="password"
-            type="password"
-            required
-          />
+          <div class="field">
+            <input
+              id="userPass"
+              class="userPassInput"
+              name="password"
+              type="password"
+              required
+            />
+            <div class="inline-error" id="loginPassError">
+              La contraseña no puede estar vacía
+            </div>
+          </div>
           <button
             class="loginBtn"
             type="submit"
@@ -52,5 +62,6 @@
     </div>
 
     <script src="/js/pageAnimation.js"></script>
+    <script src="/js/loginCheck.js"></script>
   </body>
 </html>
