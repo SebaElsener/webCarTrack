@@ -1,16 +1,16 @@
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { sessionMiddleware } from "./middleware/sessionMiddleware.js";
+//import { sessionMiddleware } from "./middleware/sessionMiddleware.js";
 import MessageRepository from "./persistence/repository/messageRepository.js";
 import userLogin from "./router/userLogin.js";
 import homeRoute from "./router/homeRoute.js";
 import userReg from "./router/userReg.js";
-import passport from "passport";
+//import passport from "passport";
 import routeProducts from "./router/productsRouter.js";
 import routeCart from "./router/cartRouter.js";
 import userLogout from "./router/userLogout.js";
-import userLoginWatcher from "./middleware/userLoginWatcher.js";
+import { requireLogin } from "./middleware/userLoginWatcher.js";
 import _yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import dotenv from "dotenv";
@@ -31,6 +31,7 @@ import exportRouter from "./router/exportRouter.js";
 import updatesRouter from "./router/updatesRouter.js";
 import damagesRouter from "./router/damagesRouter.js";
 import photosRouter from "./router/photosRouter.js";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 
@@ -45,30 +46,21 @@ app.set("view engine", "ejs");
 app.set("views", "./public/views");
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.use(compression());
-app.use(sessionMiddleware);
-app.use(passport.initialize());
-app.use(passport.session());
-passport.serializeUser((user, done) => {
-  done(null, user);
-});
-passport.deserializeUser((user, done) => {
-  done(null, user);
-});
 
 // Middleware para registrar todas la peticiones recibidas
 app.use(logs);
 
 // Rutas api
-//userLoginWatcher
 app.use("/", userLogin);
-app.use("/api/productos", userLoginWatcher, routeProducts);
-app.use("/api/carrito", userLoginWatcher, routeCart);
-app.use("/api/userdata", userLoginWatcher, userData);
-app.use("/api/querys", userLoginWatcher, querysRouter);
-app.use("/api/export", userLoginWatcher, exportRouter);
+app.use("/api/productos", requireLogin, routeProducts);
+app.use("/api/carrito", requireLogin, routeCart);
+app.use("/api/userdata", requireLogin, userData);
+app.use("/api/querys", requireLogin, querysRouter);
+app.use("/api/export", requireLogin, exportRouter);
 app.use("/api/updates", updatesRouter);
 app.use("/api/damages", damagesRouter);
 app.use("/api/photos", photosRouter);
@@ -85,11 +77,11 @@ app.use("/api/populateSupabase", infoAndRandoms);
 app.use(routeError);
 
 // convert a connect middleware to a Socket.IO middleware
-const wrap = (middleware) => (socket, next) =>
-  middleware(socket.request, {}, next);
-io.use(wrap(sessionMiddleware));
-io.use(wrap(passport.initialize()));
-io.use(wrap(passport.session()));
+// const wrap = (middleware) => (socket, next) =>
+//   middleware(socket.request, {}, next);
+// io.use(wrap(sessionMiddleware));
+// io.use(wrap(passport.initialize()));
+// io.use(wrap(passport.session()));
 
 const sessionStore = new SessionStore();
 io.use((socket, next) => {

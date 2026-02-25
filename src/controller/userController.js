@@ -10,7 +10,7 @@ import {
 } from "../business/userBusiness.js";
 
 const renderUserData = async (req, res) => {
-  const userName = req.session.passport.user;
+  const userName = req.user.sub;
   const userData = await getByUser(userName);
   res.render("userData", {
     userData: userData[0],
@@ -19,7 +19,7 @@ const renderUserData = async (req, res) => {
 };
 
 const getUser = async (req, res) => {
-  const userName = req.session.passport.user;
+  const userName = req.user.sub;
   res.json(await getByUser(userName));
 };
 
@@ -42,14 +42,14 @@ const addCartToUser = async (req, res) => {
 };
 
 const purchaseOrder = async (req, res) => {
-  const userName = req.session.passport.user;
+  const userName = req.user.sub;
   const orderNbr = await purchase(userName);
   res.json(`Orden ${orderNbr} generada con exito`);
 };
 
 const usersAdmin = async (req, res) => {
   const allUsers = await getAllUsers();
-  const userName = req.session.passport.user;
+  const userName = req.user.sub;
   res.render("partials/usersAdmin", {
     allUsers: allUsers,
     userName: userName,

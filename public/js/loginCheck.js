@@ -1,10 +1,23 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+// ⚠️ Reemplazar por tus valores reales
+const SUPABASE_URL = "https://gfwzalwdhgramkwdxlbq.supabase.co";
+const SUPABASE_KEY = "sb_publishable_L-wOKzhIj1yuKIkLqpz4wA_f-rBC3HZ";
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
 document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("loginForm");
   const emailInput = document.getElementById("userName");
   const passInput = document.getElementById("userPass");
   const submitBtn = document.querySelector("#loginForm button[type='submit']");
 
   const emailError = document.getElementById("loginEmailError");
   const passError = document.getElementById("loginPassError");
+
+  // -----------------------
+  // VALIDACIONES UX
+  // -----------------------
 
   function validateEmail() {
     const value = emailInput.value.trim();
@@ -30,13 +43,57 @@ document.addEventListener("DOMContentLoaded", () => {
   function validateForm() {
     const emailOk = validateEmail();
     const passOk = validatePassword();
-
     submitBtn.disabled = !(emailOk && passOk);
   }
 
   emailInput.addEventListener("input", validateForm);
   passInput.addEventListener("input", validateForm);
 
-  // estado inicial
   submitBtn.disabled = true;
+
+  // -----------------------
+  // LOGIN REAL CON SUPABASE
+  // -----------------------
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    //if (!validateForm()) return;
+
+    const email = emailInput.value.trim();
+    const password = passInput.value.trim();
+
+    submitBtn.disabled = true;
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    const token = data.session.access_token;
+
+    await fetch("/api/home", {
+      method: "POST",
+      headers: {
+        // "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      credentials: "include",
+    });
+
+    //window.location.href = "/api/productos";
+
+    if (error) {
+      passError.style.display = "block";
+      passError.innerText = "Usuario o contraseña incorrectos";
+      submitBtn.disabled = false;
+      return;
+    }
+
+    // Guardamos token (temporalmente en localStorage)
+    localStorage.setItem("sb_token", data.session.access_token);
+
+    // Redirigir a home
+    window.location.href = "/api/home";
+  });
 });

@@ -5,14 +5,14 @@ import {
 import { mainPage } from "../business/ProductsBusiness.js";
 
 const queryByDateRender = async (req, res) => {
-  const userName = req.session.passport.user;
+  const userName = req.user.sub;
   res.render("../views/queryByDate", {
     userName: userName,
   });
 };
 
 const queryByVINRender = async (req, res) => {
-  const userName = req.session.passport.user;
+  const userName = req.user.sub;
   res.render("../views/queryByVIN", {
     userName: userName,
   });

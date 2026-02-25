@@ -18,7 +18,7 @@ class ContenedorSupabase {
 
   async getInfoWithParams(options) {
     try {
-      const { vin = null, limit = 50, offset = 0 } = options || {};
+      const { vin = null, destino = null, limit = 50, offset = 0 } = options || {};
       let query = this.sql
         .from("scans")
         .select(
@@ -26,6 +26,7 @@ class ContenedorSupabase {
       supabase_id,
       vin,
       date,
+      destino,
       damages (
         id,
         area,

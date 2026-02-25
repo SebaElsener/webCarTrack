@@ -35,7 +35,7 @@ const deleteCartById = async (req, res) => {
 }
 
 const renderCart = async (req, res) => {
-    const userName = req.session.passport.user
+    const userName = req.user.sub
     const cartData = await renderedCart(userName)
     res.render('./partials/cart',
         {
@@ -47,7 +47,7 @@ const renderCart = async (req, res) => {
 }
 
 const generatePurchaseOrder = async (req, res) => {
-    const userName = req.session.passport.user
+    const userName = req.user.sub
     const purchaseOrderData = await purchaseOrder(userName)
     res.render('./partials/purchaseOrder',
         {
