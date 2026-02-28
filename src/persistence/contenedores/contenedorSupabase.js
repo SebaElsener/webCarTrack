@@ -8,7 +8,7 @@ import { createClient } from "@supabase/supabase-js";
 
 export const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY,
+  process.env.SUPABASE_SERVICE_ROLE_KEY,
 );
 
 class ContenedorSupabase {
@@ -16,30 +16,49 @@ class ContenedorSupabase {
     this.sql = supabase;
   }
 
+  applyVisibilityFilter(query, user) {
+    if (user.isAdmin) return query;
+
+    if (!user.canViewAll) {
+      query = query.eq("user", user.email);
+    }
+
+    if (user.destino) {
+      query = query.eq("destino", user.destino);
+    }
+
+    return query;
+  }
+
   async getInfoWithParams(options) {
     try {
-      const { vin = null, destino = null, limit = 50, offset = 0 } = options || {};
+      const {
+        vin = null,
+        destino = null,
+        limit = 50,
+        offset = 0,
+      } = options || {};
       let query = this.sql
         .from("scans")
         .select(
           `
-      supabase_id,
-      vin,
-      date,
-      destino,
-      damages (
-        id,
-        area,
-        averia,
-        grav,
-        obs,
-        codigo,
-        date
-      ),
-      pictures (
-        pictureurl
-      )
-    `,
+            supabase_id,
+            vin,
+            date,
+            destino,
+            damages (
+              id,
+              area,
+              averia,
+              grav,
+              obs,
+              codigo,
+              date
+            ),
+            pictures (
+              pictureurl
+            )
+          `,
         )
         .order("supabase_id", { ascending: false })
         .range(offset, offset + limit - 1);
@@ -150,9 +169,9 @@ class ContenedorSupabase {
     }
   }
 
-  async getDataByDate(startDate, endDate) {
+  async getDataByDate(startDate, endDate, user) {
     try {
-      const { data, error } = await this.sql
+      let query = this.sql
         .from("scans")
         .select(
           `
@@ -181,7 +200,13 @@ class ContenedorSupabase {
         .gte("date", startDate)
         .lte("date", endDate)
         .order("date", { ascending: true });
+
+      query = this.applyVisibilityFilter(query, user);
+
+      const { data, error } = await query;
+
       if (error) throw error;
+
       const result = data.map((s) => ({
         scan_id: s.supabase_id,
         vin: s.vin,
@@ -201,6 +226,7 @@ class ContenedorSupabase {
         ),
         fotos: (s.pictures ?? []).map((p) => p.pictureurl).filter(Boolean),
       }));
+
       return result;
     } catch (error) {
       infoLogger.info("Error al consultar base de datos por fecha", error);

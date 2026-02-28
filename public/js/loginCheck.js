@@ -1,10 +1,10 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-// ⚠️ Reemplazar por tus valores reales
 const SUPABASE_URL = "https://gfwzalwdhgramkwdxlbq.supabase.co";
-const SUPABASE_KEY = "sb_publishable_L-wOKzhIj1yuKIkLqpz4wA_f-rBC3HZ";
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_L-wOKzhIj1yuKIkLqpz4wA_f-rBC3HZ";
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("loginForm");
@@ -70,19 +70,6 @@ document.addEventListener("DOMContentLoaded", () => {
       password,
     });
 
-    const token = data.session.access_token;
-
-    await fetch("/api/home", {
-      method: "POST",
-      headers: {
-        // "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      credentials: "include",
-    });
-
-    //window.location.href = "/api/productos";
-
     if (error) {
       passError.style.display = "block";
       passError.innerText = "Usuario o contraseña incorrectos";
@@ -90,8 +77,15 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Guardamos token (temporalmente en localStorage)
-    localStorage.setItem("sb_token", data.session.access_token);
+    const token = data.session.access_token;
+
+    await fetch("/api/home", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      credentials: "include",
+    });
 
     // Redirigir a home
     window.location.href = "/api/home";

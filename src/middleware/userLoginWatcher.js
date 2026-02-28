@@ -1,17 +1,11 @@
-import jwt from "jsonwebtoken";
+import passport from "passport";
 
 export const requireLogin = (req, res, next) => {
-  const token = req.cookies.sb_token;
-
-  if (!token) {
-    return res.redirect("/timeout");
-  }
-
-  try {
-    const decoded = jwt.decode(token); // Passport ya validó antes
-    req.user = decoded;
+  passport.authenticate("supabase-jwt", { session: false }, (err, user) => {
+    if (err || !user) {
+      return res.redirect("/timeout");
+    }
+    req.user = user;
     next();
-  } catch {
-    return res.redirect("/timeout");
-  }
+  })(req, res, next);
 };

@@ -2,17 +2,16 @@ import {
   querysRenderBusiness,
   queryByVINBusiness,
 } from "../business/querysBusiness.js";
-import { mainPage } from "../business/ProductsBusiness.js";
 
 const queryByDateRender = async (req, res) => {
-  const userName = req.user.sub;
+  const userName = req.user.email;
   res.render("../views/queryByDate", {
     userName: userName,
   });
 };
 
 const queryByVINRender = async (req, res) => {
-  const userName = req.user.sub;
+  const userName = req.user.email;
   res.render("../views/queryByVIN", {
     userName: userName,
   });
@@ -20,8 +19,10 @@ const queryByVINRender = async (req, res) => {
 
 const queryByDatePost = async (req, res) => {
   const { desde, hasta } = req.body;
+  const user = req.user;
+
   try {
-    const data = await querysRenderBusiness(desde, hasta);
+    const data = await querysRenderBusiness(desde, hasta, user);
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: "Error al consultar base de datos" });

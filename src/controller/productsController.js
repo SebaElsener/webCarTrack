@@ -9,14 +9,10 @@ import {
 
 const mainPageRender = async (req, res) => {
   const userName = req.user.email;
-  console.log("userName: ", userName);
-  const data = await mainPage(userName);
-  req.session.admin = data.userData.admin;
+  const permissions = req.user.permissions;
   res.render("index", {
     userName: userName,
-    userData: data.userData,
-    allProducts: data.productsList || ["Error"],
-    productsQty: data.productsList.length,
+    permissions: permissions,
   });
 };
 

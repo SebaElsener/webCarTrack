@@ -6,7 +6,7 @@ import MessageRepository from "./persistence/repository/messageRepository.js";
 import userLogin from "./router/userLogin.js";
 import homeRoute from "./router/homeRoute.js";
 import userReg from "./router/userReg.js";
-//import passport from "passport";
+import passport from "passport";
 import routeProducts from "./router/productsRouter.js";
 import routeCart from "./router/cartRouter.js";
 import userLogout from "./router/userLogout.js";
@@ -50,6 +50,7 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.use(compression());
+app.use(passport.initialize());
 
 // Middleware para registrar todas la peticiones recibidas
 app.use(logs);
