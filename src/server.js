@@ -31,6 +31,7 @@ import exportRouter from "./router/exportRouter.js";
 import updatesRouter from "./router/updatesRouter.js";
 import damagesRouter from "./router/damagesRouter.js";
 import photosRouter from "./router/photosRouter.js";
+import timeout from "./router/timeout.js";
 import cookieParser from "cookie-parser";
 
 dotenv.config();
@@ -62,6 +63,7 @@ app.use("/api/carrito", requireLogin, routeCart);
 app.use("/api/userdata", requireLogin, userData);
 app.use("/api/querys", requireLogin, querysRouter);
 app.use("/api/export", requireLogin, exportRouter);
+app.use("/api/timeout", timeout);
 app.use("/api/updates", updatesRouter);
 app.use("/api/damages", damagesRouter);
 app.use("/api/photos", photosRouter);

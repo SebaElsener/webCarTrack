@@ -1,24 +1,21 @@
-
 <!DOCTYPE html>
 <html lang="es">
-
-<head>
+  <head>
     <%- include('./partials/head') %>
     <title>ERROR - NO IMPLEMENTADO</title>
-</head>
+  </head>
 
-<body>
-
+  <body>
     <div id="userContainer">
-        <h2 class="userTitle"><%= badRoute %>, en unos segundos será redirigido</h2>
+      <h2 class="userTitle">
+        <%= badRoute %>, en unos segundos será redirigido
+      </h2>
     </div>
 
     <script>
-        setTimeout(() => {
-            document.location.href = '/api/productos'
-        }, 4000)
+      setTimeout(() => {
+        document.location.href = "/";
+      }, 4000);
     </script>
-
-</body>
-
+  </body>
 </html>

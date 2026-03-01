@@ -167,7 +167,7 @@
                 >Filtrar movimientos</label
               >
             </div>
-            <div>
+            <div id="movimientoFilterWrap">
               <input
                 type="radio"
                 class="btn-check"
@@ -204,6 +204,10 @@
                 for="movDespacho"
                 >Despacho</label
               >
+
+              <div id="contFiltroLugar" style="display: none">
+                <select id="filtroLugar" multiple></select>
+              </div>
             </div>
           </div>
 
@@ -286,6 +290,13 @@
         searchPlaceholderValue: "Buscar...",
         shouldSort: true,
         searchEnabled: true,
+      });
+
+      const choicesLugar = new Choices("#filtroLugar", {
+        removeItemButton: true,
+        searchEnabled: true,
+        placeholderValue: "Seleccionar lugar",
+        shouldSort: false,
       });
     </script>
 

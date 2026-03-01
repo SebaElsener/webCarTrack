@@ -515,6 +515,7 @@ label {
 #actionsBar {
   margin: 2rem;
   margin-top: 1rem;
+  min-width: 1170px;
 }
 
 table {
@@ -2372,4 +2373,15 @@ body > .glightbox-container {
 
 .vin-cartaporte-icon:hover {
   opacity: 0.8;
+}
+
+#movimientoFilterWrap {
+  display: flex;
+  height: 40px;
+  gap: 8px;
+}
+
+#contFiltroLugar {
+  width: 300px;
+  margin-top: -25px;
 }

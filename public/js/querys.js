@@ -15,6 +15,7 @@ let filtros = {
   marca: [],
   modelo: [],
   batea: [],
+  lugar: [],
   topAreas: false,
   topAverias: false,
   topBateas: false,
@@ -116,6 +117,43 @@ function cargarBateas() {
   );
 }
 
+function cargarLugares() {
+  const lugares = [
+    ...new Set(datosGlobales.map((d) => d.lugar).filter(Boolean)),
+  ].sort();
+
+  choicesLugar.clearChoices();
+  choicesLugar.setChoices(
+    lugares.map((l) => ({ value: l, label: l })),
+    "value",
+    "label",
+    true,
+  );
+}
+
+function actualizarUIFiltroMovimiento() {
+  const labelIngreso = document.querySelector('label[for="movIngreso"]');
+  const labelDespacho = document.querySelector('label[for="movDespacho"]');
+  const contLugar = document.getElementById("contFiltroLugar");
+
+  if (!labelIngreso || !labelDespacho || !contLugar) return;
+
+  if (filtros.movimiento === "INGRESO") {
+    labelDespacho.style.display = "none";
+    contLugar.style.display = "block";
+  } else if (filtros.movimiento === "DESPACHO") {
+    labelIngreso.style.display = "none";
+    contLugar.style.display = "block";
+  } else {
+    labelIngreso.style.display = "inline-block";
+    labelDespacho.style.display = "inline-block";
+    contLugar.style.display = "none";
+
+    filtros.lugar = [];
+    choicesLugar.removeActiveItems();
+  }
+}
+
 // Función para mostrar spinner
 function mostrarSpinner() {
   document.getElementById("evolucion").style.display = "none";
@@ -198,6 +236,7 @@ async function cargarDatos(desde, hasta) {
       cargarMarcas();
       cargarModelos();
       cargarBateas();
+      cargarLugares();
       aplicarFiltros();
     })
     .catch((err) => {
@@ -561,18 +600,34 @@ document.getElementById("chkTopBateas").addEventListener("change", (e) => {
   aplicarFiltros();
 });
 
-document.getElementById("movAll").addEventListener("change", () => {
-  filtros.movimiento = null;
-  aplicarFiltros();
-});
-
 document.getElementById("movIngreso").addEventListener("change", () => {
   filtros.movimiento = "INGRESO";
+
+  cargarLugares(); // asegurar que el select esté poblado
+  actualizarUIFiltroMovimiento();
   aplicarFiltros();
 });
 
 document.getElementById("movDespacho").addEventListener("change", () => {
   filtros.movimiento = "DESPACHO";
+
+  cargarLugares(); // mismo select para ambos
+  actualizarUIFiltroMovimiento();
+  aplicarFiltros();
+});
+
+document.getElementById("movAll").addEventListener("change", () => {
+  filtros.movimiento = null;
+
+  filtros.lugar = [];
+  choicesLugar.removeActiveItems();
+
+  actualizarUIFiltroMovimiento();
+  aplicarFiltros();
+});
+
+document.getElementById("filtroLugar").addEventListener("change", (e) => {
+  filtros.lugar = Array.from(e.target.selectedOptions).map((o) => o.value);
   aplicarFiltros();
 });
 
@@ -611,6 +666,10 @@ function aplicarFiltros() {
       dataBase = dataBase.filter(
         (scan) => scan.movimiento === filtros.movimiento,
       );
+    }
+
+    if (filtros.lugar.length) {
+      dataBase = dataBase.filter((scan) => filtros.lugar.includes(scan.lugar));
     }
 
     datosBaseFiltrados = dataBase;
@@ -972,10 +1031,11 @@ document.getElementById("btnLimpiarFiltros").addEventListener("click", () => {
 });
 
 const limpiarFiltros = () => {
-  // 🔹 Reset filtros
+  // 🔹 Reset filtros internos
   filtros.marca = [];
   filtros.modelo = [];
   filtros.batea = [];
+  filtros.lugar = [];
   filtros.soloConDanio = false;
   filtros.movimiento = null;
   filtros.areaSeleccionada = null;
@@ -985,16 +1045,25 @@ const limpiarFiltros = () => {
   filtros.topAverias = false;
   filtros.topBateas = false;
 
-  // 🔹 Reset elementos del DOM
+  // 🔹 Reset selects Choices
   choicesMarca.removeActiveItems();
   choicesModelo.removeActiveItems();
   choicesBatea.removeActiveItems();
+  choicesLugar.removeActiveItems();
+
+  // 🔹 Reset checkboxes
   document.getElementById("chkSoloConDanio").checked = false;
-  document.getElementById("movAll").checked = true;
   document.getElementById("chkTopAreas").checked = false;
   document.getElementById("chkTopAverias").checked = false;
   document.getElementById("chkTopBateas").checked = false;
 
+  // 🔹 Reset movimiento (radio)
+  document.getElementById("movAll").checked = true;
+
+  // 🔥 MUY IMPORTANTE → restaurar UI movimiento
+  actualizarUIFiltroMovimiento();
+
+  // 🔹 Quitar estados visuales activos
   document
     .querySelectorAll(".mini-bar-row")
     .forEach((r) => r.classList.remove("active"));
