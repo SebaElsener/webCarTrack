@@ -166,7 +166,16 @@ async function cargarDatos(desde, hasta) {
           fotosPorVin[scan.vin] = scan.fotos.map((f, idx) => ({
             href: f,
             type: "image",
-            title: `VIN ${scan.vin} · Imagen ${idx + 1}`,
+            title: `VIN ${scan.vin} · ${scan.movimiento} en ${scan.lugar} ·  ${new Date(
+              scan.scan_date,
+            ).toLocaleString("es-AR", {
+              year: "2-digit",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })} · Imagen ${idx + 1}`,
           }));
 
           vinsConFotos.add(scan.vin);

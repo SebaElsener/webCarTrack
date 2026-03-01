@@ -184,6 +184,7 @@ class ContenedorSupabase {
             movimiento,
             clima,
             user,
+            lugar,
             damages (
               id,
               area,
@@ -216,6 +217,7 @@ class ContenedorSupabase {
         batea: s.batea,
         movimiento: s.movimiento,
         user: s.user,
+        lugar: s.lugar,
         clima: s.clima,
         damages: (s.damages ?? []).filter(
           (d) =>
