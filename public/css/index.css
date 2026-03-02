@@ -2043,11 +2043,11 @@ thead {
 }
 
 #title-VIN-input {
-  margin-bottom: 20px;
+  margin-bottom: 35px;
   margin-top: 1rem !important;
 }
 
-.usersFormTitle   {
+.usersFormTitle {
   margin: 30px auto;
 }
 
@@ -2390,4 +2390,9 @@ body > .glightbox-container {
 #contFiltroLugar {
   width: 300px;
   margin-top: -25px;
+}
+
+#vinError {
+  position: absolute;
+  top: 40px;
 }

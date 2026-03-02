@@ -38,13 +38,14 @@
 
           <form id="form-vin">
             <div id="VINinputGroup" class="input-group">
-              <!-- <span class="input-group-text">📅</span> -->
               <input
                 type="text"
                 id="vinInput"
                 class="form-control"
                 placeholder="Ingrese chasis o VIN"
                 onInput="this.value = this.value.toUpperCase();"
+                maxlength="17"
+                autocomplete="off"
               />
               <div class="btnFormContainer">
                 <button
@@ -55,6 +56,7 @@
                   Consultar
                 </button>
               </div>
+              <div class="invalid-feedback" id="vinError"></div>
             </div>
           </form>
         </div>

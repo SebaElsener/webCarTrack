@@ -3,6 +3,9 @@ import averias from "../utils/averias.json" with { type: "json" };
 import gravedades from "../utils/gravedades.json" with { type: "json" };
 import { inlineEditor } from "./inline-edit/inline-edit.init.js";
 import { GetCartaporteInfo } from "./getCartaporteInfo.js";
+import { obtenerVIN } from "./VIN-actions/vinService.js";
+import { manejarVINNoEncontrado } from "./VIN-actions/vinCreator.js";
+import { initVINValidation } from "./VIN-actions/vin-validator.js";
 
 const indexById = (arr) =>
   Object.fromEntries(arr.map((i) => [i.id, i.descripcion]));
@@ -29,20 +32,21 @@ const dropdownContent = document.getElementById("dropdownContent");
 dropdownContent.style.marginTop = "0";
 
 // Submit del formulario
-document.getElementById("form-vin").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  accionesPostTablaMostradas = false;
-  const acciones = document.querySelectorAll(".post-table-action-buttons");
+initVINValidation({
+  formId: "form-vin",
+  inputId: "vinInput",
+  errorId: "vinError",
+  onValidSubmit: async (vin) => {
+    accionesPostTablaMostradas = false;
 
-  // Reset visual
-  acciones.forEach((el) => {
-    el.style.display = "none";
-  });
+    const acciones = document.querySelectorAll(".post-table-action-buttons");
 
-  vin = document.getElementById("vinInput").value.trim();
-  if (!vin) return toastError("Ingrese un VIN válido");
+    acciones.forEach((el) => {
+      el.style.display = "none";
+    });
 
-  await cargarDatos(vin);
+    await cargarDatos(vin);
+  },
 });
 
 // Mostrar spinner
@@ -59,62 +63,69 @@ function mostrarSpinner() {
 // Cargar datos desde el backend
 async function cargarDatos(vin) {
   mostrarSpinner();
-  try {
-    const res = await fetch("/api/querys/queryByVIN", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ vin }),
-    });
 
-    const data = await res.json();
+  try {
+    let data = await obtenerVIN(vin);
+
     if (!data || data.length === 0) {
-      document.getElementById("resultadosVIN").innerHTML =
-        "<p class='text-muted'>No se encontraron datos</p>";
-      return;
+      // 🔹 Solo permitir crear si ingresó VIN completo
+      const esVINCompleto = /^[A-HJ-NPR-Z0-9]{17}$/.test(vin);
+
+      if (!esVINCompleto) {
+        document.getElementById("resultadosVIN").innerHTML =
+          "<p class='text-muted'>No se encontraron resultados</p>";
+        return;
+      }
+
+      const nuevoScan = await manejarVINNoEncontrado(vin, confirmModal);
+
+      if (!nuevoScan) {
+        document.getElementById("resultadosVIN").innerHTML =
+          "<p class='text-muted'>No se encontraron datos</p>";
+        return;
+      }
+
+      data = [nuevoScan];
     }
 
-    fotosPorScan = {};
-
-    data.forEach((scan) => {
-      if (!scan.fotos?.length) return;
-
-      fotosPorScan[scan.scan_id] = scan.fotos.map((f, idx) => ({
-        pict_id: f.id,
-        pict_scan_id: f.pict_scan_id,
-        href: f.pictureurl,
-        type: "image",
-        title: `VIN ${scan.vin} · ${scan.movimiento} en ${scan.lugar} ·  ${new Date(
-          scan.scan_date,
-        ).toLocaleString("es-AR", {
-          year: "2-digit",
-          month: "2-digit",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-        })} · Imagen ${idx + 1}`,
-      }));
-    });
-
-    const transformScans = data.map((scan) => ({
-      ...scan,
-      damages: scan.damages.map((d) => ({
-        ...d,
-        area_desc: areasMap[d.area] ?? null,
-        averia_desc: averiasMap[d.averia] ?? null,
-        grav_desc: gravedadesMap[d.grav] ?? null,
-      })),
-    }));
-
-    datosGlobales = transformScans;
-
-    paginaActual = 1;
-    renderTabla();
+    prepararDatosYRenderizar(data);
   } catch (err) {
     console.error(err);
     document.getElementById("resultadosVIN").innerHTML =
       "<p class='text-danger'>Error al obtener los datos</p>";
   }
+}
+
+function prepararDatosYRenderizar(data) {
+  fotosPorScan = {};
+
+  data.forEach((scan) => {
+    if (!scan.fotos?.length) return;
+
+    fotosPorScan[scan.scan_id] = scan.fotos.map((f, idx) => ({
+      pict_id: f.id,
+      pict_scan_id: f.pict_scan_id,
+      href: f.pictureurl,
+      type: "image",
+      title: `VIN ${scan.vin} · ${scan.movimiento} en ${scan.lugar} · ${new Date(
+        scan.scan_date,
+      ).toLocaleString("es-AR")} · Imagen ${idx + 1}`,
+    }));
+  });
+
+  const transformScans = data.map((scan) => ({
+    ...scan,
+    damages: scan.damages.map((d) => ({
+      ...d,
+      area_desc: areasMap[d.area] ?? null,
+      averia_desc: averiasMap[d.averia] ?? null,
+      grav_desc: gravedadesMap[d.grav] ?? null,
+    })),
+  }));
+
+  datosGlobales = transformScans;
+  paginaActual = 1;
+  renderTabla();
 }
 
 function mostrarAccionesPostTabla() {

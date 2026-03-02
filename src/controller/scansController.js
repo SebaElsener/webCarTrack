@@ -90,4 +90,8 @@ const cartaporteController = async (req, res) => {
   }
 };
 
-export { renderScans, deletebyscan_id, cartaporteController };
+const newVINController = async (req, res) => {
+  console.log(req.body);
+};
+
+export { renderScans, deletebyscan_id, cartaporteController, newVINController };
