@@ -4,7 +4,13 @@ const SUPABASE_URL = "https://gfwzalwdhgramkwdxlbq.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY =
   "sb_publishable_L-wOKzhIj1yuKIkLqpz4wA_f-rBC3HZ";
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  auth: {
+    persistSession: false,
+    autoRefreshToken: false,
+    detectSessionInUrl: false,
+  },
+});
 
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("loginForm");
@@ -86,6 +92,8 @@ document.addEventListener("DOMContentLoaded", () => {
       },
       credentials: "include",
     });
+
+    await supabase.auth.signOut();
 
     // Redirigir a home
     window.location.href = "/api/home";

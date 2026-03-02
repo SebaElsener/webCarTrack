@@ -24,3 +24,18 @@ window.addEventListener("pageshow", () => {
   appRoot.classList.remove("fade-out", "no-scroll");
   appRoot.style.opacity = "1";
 });
+
+// Listener link logout en header
+document.addEventListener("click", async (e) => {
+  const logoutLink = e.target.closest("#logoutLink");
+  if (!logoutLink) return;
+
+  e.preventDefault();
+
+  await fetch("/api/logout", {
+    method: "POST",
+    credentials: "include",
+  });
+
+  window.location.href = "/api/logout";
+});

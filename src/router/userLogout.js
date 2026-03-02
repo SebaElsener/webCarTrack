@@ -1,14 +1,19 @@
+import { Router } from "express";
 
-import { Router } from 'express'
+const userLogout = new Router();
 
-const userLogout = new Router()
+userLogout.get("/", (req, res) => {
+  res.render("logout");
+});
 
-userLogout.get('/', (req, res) => {
-    req.session.destroy(error => {
-        !error
-            ? res.render('logout')
-            : res.redirect('/api/home')
-    })
-})
+userLogout.post("/", (req, res) => {
+  res.clearCookie("sb_token", {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: false, // true en producción HTTPS
+  });
 
-export default userLogout
+  res.json({ success: true });
+});
+
+export default userLogout;
