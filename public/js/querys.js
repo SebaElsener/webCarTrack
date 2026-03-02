@@ -134,21 +134,19 @@ function cargarLugares() {
 function actualizarUIFiltroMovimiento() {
   const labelIngreso = document.querySelector('label[for="movIngreso"]');
   const labelDespacho = document.querySelector('label[for="movDespacho"]');
+  const labelTransito = document.querySelector('label[for="movTransito"]');
   const contLugar = document.getElementById("contFiltroLugar");
 
-  if (!labelIngreso || !labelDespacho || !contLugar) return;
+  if (!labelIngreso || !labelDespacho || !labelTransito || !contLugar) return;
 
-  if (filtros.movimiento === "INGRESO") {
-    labelDespacho.style.display = "none";
-    contLugar.style.display = "block";
-  } else if (filtros.movimiento === "DESPACHO") {
-    labelIngreso.style.display = "none";
+  if (
+    filtros.movimiento === "INGRESO" ||
+    filtros.movimiento === "DESPACHO" ||
+    filtros.movimiento === "TRANSITO"
+  ) {
     contLugar.style.display = "block";
   } else {
-    labelIngreso.style.display = "inline-block";
-    labelDespacho.style.display = "inline-block";
     contLugar.style.display = "none";
-
     filtros.lugar = [];
     choicesLugar.removeActiveItems();
   }
@@ -626,6 +624,14 @@ document.getElementById("movAll").addEventListener("change", () => {
   aplicarFiltros();
 });
 
+document.getElementById("movTransito").addEventListener("change", () => {
+  filtros.movimiento = "TRANSITO";
+
+  cargarLugares();
+  actualizarUIFiltroMovimiento();
+  aplicarFiltros();
+});
+
 document.getElementById("filtroLugar").addEventListener("change", (e) => {
   filtros.lugar = Array.from(e.target.selectedOptions).map((o) => o.value);
   aplicarFiltros();
@@ -661,11 +667,17 @@ function aplicarFiltros() {
     if (filtros.soloConDanio)
       dataBase = dataBase.filter((scan) => scan.damages?.length);
 
-    // Filtrar por ingreso o despacho
-    if (filtros.movimiento) {
-      dataBase = dataBase.filter(
-        (scan) => scan.movimiento === filtros.movimiento,
-      );
+    // 🔹 Filtro movimiento
+    if (filtros.movimiento === "INGRESO") {
+      dataBase = dataBase.filter((scan) => scan.movimiento === "INGRESO");
+    }
+
+    if (filtros.movimiento === "DESPACHO") {
+      dataBase = dataBase.filter((scan) => scan.movimiento === "DESPACHO");
+    }
+
+    if (filtros.movimiento === "TRANSITO") {
+      dataBase = dataBase.filter((scan) => scan.unidad_transito === true);
     }
 
     if (filtros.lugar.length) {

@@ -1846,6 +1846,9 @@ thead {
 
 .movimientoLabel {
   margin: 0 !important;
+  height: 30px;
+  display: flex !important;
+  align-items: center;
 }
 
 .movimientoLabelBtn {
@@ -1859,6 +1862,9 @@ thead {
 #movimientoContainer {
   flex-direction: column;
   height: 63px;
+  background-color: #ffffff;
+  padding: 4px 10px;
+  box-shadow: 3px 3px 7px 0px #e2e2e2;
 }
 
 #btnLimpiarFiltros {
@@ -2047,8 +2053,8 @@ thead {
 
 #btnExportPdf,
 #btnExportExcel {
-  width: 7rem;
-  height: 63px;
+  width: 5rem;
+  height: 30px;
 }
 
 .actionBtnsWrapper {

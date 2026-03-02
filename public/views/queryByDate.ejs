@@ -157,13 +157,15 @@
               id="chkSoloConDanio"
             />
             <label class="form-check-label fw-semibold" for="chkSoloConDanio">
-              Sólo VIN con daño
+              VIN con daño
             </label>
             <span id="badgeConDanio" class="badge bg-primary d-none"></span>
           </div>
           <div class="btn-group" role="group" id="movimientoContainer">
             <div>
-              <label class="form-check-label fw-semibold movimientoLabel"
+              <label
+                class="form-check-label fw-semibold movimientoLabel"
+                style="height: auto"
                 >Filtrar movimientos</label
               >
             </div>
@@ -205,13 +207,29 @@
                 >Despacho</label
               >
 
+              <input
+                type="radio"
+                class="btn-check"
+                name="movimiento"
+                id="movTransito"
+              />
+              <label
+                class="btn btn-outline-info movimientoLabel"
+                for="movTransito"
+                >Tránsito</label
+              >
+
               <div id="contFiltroLugar" style="display: none">
                 <select id="filtroLugar" multiple></select>
               </div>
             </div>
           </div>
 
-          <div class="d-flex justify-content-end gap-3">
+          <div
+            id="exportContainer"
+            class="d-flex justify-content-end gap-1"
+            style="flex-direction: column"
+          >
             <button id="btnExportPdf" class="btn btn-outline-danger btn-sm">
               📄 PDF
             </button>
