@@ -923,6 +923,14 @@ tbody tr:nth-child(even) {
   font-weight: 500;
 }
 
+.formTitleRHS {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 500;
+  align-self: center;
+  margin-left: 1.5rem !important;
+}
+
 .tableTd {
   text-align: left;
   overflow: clip;
@@ -2026,7 +2034,7 @@ thead {
 }
 
 #vinInput {
-  max-width: 300px;
+  width: 220px;
 }
 
 #VINinputGroup {
@@ -2045,6 +2053,7 @@ thead {
 #title-VIN-input {
   margin-bottom: 35px;
   margin-top: 1rem !important;
+  min-width: 1200px;
 }
 
 .usersFormTitle {
