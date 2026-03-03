@@ -416,7 +416,7 @@ function renderTabla() {
               data-scan-id="${scan.scan_id}"
               data-damage-id="${damage.id ?? ""}"
             >
-              <span class="cell-value">${damage.obs && ""}</span>            
+              <span class="cell-value">${damage.obs}</span>            
             </td>
             <td class="editable-scan"
               data-field="batea"
@@ -733,7 +733,7 @@ document.addEventListener("click", async (e) => {
     } catch (err) {
       console.error(err);
 
-      // ❌ restaurar valor anterior
+      // restaurar valor anterior
       if (field === "clima") {
         cell.innerHTML = `<span class="cell-value">${renderClimaIcon(currentValue)}</span>`;
       } else {

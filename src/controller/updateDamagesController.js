@@ -1,7 +1,7 @@
 import { updateDamages, scanPatch } from "../business/updateDamagesBusiness.js";
 
 const updateDamagesController = async (req, res) => {
-  const userName = req.user.id;
+  const userName = req.user.email;
   const infoToUpdate = {
     ...req.body,
     changes: req.body.changes.map((change) => ({

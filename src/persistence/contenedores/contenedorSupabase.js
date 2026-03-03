@@ -104,6 +104,7 @@ class ContenedorSupabase {
   }
 
   async updateDamages(infoToUpdate) {
+    console.log(infoToUpdate);
     try {
       const { data, error } = await supabase.rpc("update_damages", {
         ...infoToUpdate,
