@@ -10,4 +10,10 @@ const deleteScan = async (scan_id) => {
   return deletedVIN;
 };
 
-export { getAllScans, deleteScan };
+const addNewScan = async (user, date, vin, type) => {
+  const result = await supabaseRepo.addNewVIN(user, date, vin, type);
+  console.log(result);
+  return result;
+};
+
+export { getAllScans, deleteScan, addNewScan };

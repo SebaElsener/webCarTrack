@@ -85,9 +85,8 @@ async function cargarDatos(vin) {
         return;
       }
 
-      data = [nuevoScan];
+      data = await obtenerVIN(vin);
     }
-
     prepararDatosYRenderizar(data);
   } catch (err) {
     console.error(err);
@@ -115,7 +114,7 @@ function prepararDatosYRenderizar(data) {
 
   const transformScans = data.map((scan) => ({
     ...scan,
-    damages: scan.damages.map((d) => ({
+    damages: (scan.damages ?? []).map((d) => ({
       ...d,
       area_desc: areasMap[d.area] ?? null,
       averia_desc: averiasMap[d.averia] ?? null,

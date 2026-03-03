@@ -1,7 +1,7 @@
 import { updateDamages } from "../business/updateDamagesBusiness.js";
 
 const updateDamagesController = async (req, res) => {
-  const userName = req.user.sub;
+  const userName = req.user.id;
   const infoToUpdate = {
     ...req.body,
     changes: req.body.changes.map((change) => ({

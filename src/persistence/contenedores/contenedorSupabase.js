@@ -319,7 +319,6 @@ class ContenedorSupabase {
   }
 
   async deletePhoto(pict_id, bucketName, path) {
-    console.log(pict_id, bucketName, path);
     try {
       // 1️⃣ borrar registro DB
       const { error: dbError } = await supabase
@@ -341,6 +340,18 @@ class ContenedorSupabase {
       console.error("Error deletePhoto:", err);
       return res.status(500).json({ error: "No se pudo eliminar la foto" });
     }
+  }
+
+  async addNewVIN({ user, date, vin, type }) {
+    const { data, error } = await this.sql
+      .from("scans")
+      .insert({ user, date, vin, type })
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return data;
   }
 
   async deleteScanById(scan_id) {

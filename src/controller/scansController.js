@@ -1,4 +1,8 @@
-import { getAllScans, deleteScan } from "../business/scansBusiness.js";
+import {
+  getAllScans,
+  deleteScan,
+  addNewScan,
+} from "../business/scansBusiness.js";
 import path from "path";
 import fs from "fs";
 import { execFile } from "child_process";
@@ -91,7 +95,17 @@ const cartaporteController = async (req, res) => {
 };
 
 const newVINController = async (req, res) => {
-  console.log(req.body);
+  const vin = req.body.vin;
+  const user = req.user.email;
+  const date = new Date().toISOString();
+  const type = "webInput";
+  try {
+    const newScan = await addNewScan({ vin, user, date, type });
+    res.json(newScan);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "No se pudo guardar el nuevo VIN" });
+  }
 };
 
 export { renderScans, deletebyscan_id, cartaporteController, newVINController };
