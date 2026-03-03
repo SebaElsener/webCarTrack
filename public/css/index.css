@@ -944,6 +944,14 @@ tbody tr:nth-child(even) {
   width: 70px;
 }
 
+.unidad-transito-row > td {
+  background-color: #ccff33a1 !important;
+}
+
+.unidad-transito-row:hover > td {
+  background-color: #b4e600af !important;
+}
+
 .loginFormTitle,
 .regFormTitle {
   margin: 0 0 30px;

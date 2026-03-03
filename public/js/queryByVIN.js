@@ -123,6 +123,7 @@ function prepararDatosYRenderizar(data) {
   }));
 
   datosGlobales = transformScans;
+  console.log(datosGlobales);
   paginaActual = 1;
   renderTabla();
 }
@@ -167,7 +168,7 @@ function renderTabla() {
   paginaDatos.forEach((scan) => {
     if (!scan.damages || scan.damages.length === 0) {
       rows += `
-      <tr class="resultadosVINtr scan-base-row" data-scan-id="${scan.scan_id}">
+      <tr class="resultadosVINtr scan-base-row ${scan.unidad_transito ? "unidad-transito-row" : ""}" data-scan-id="${scan.scan_id}">
         <td>${new Date(scan.scan_date).toLocaleString("es-AR", {
           year: "2-digit",
           month: "2-digit",
@@ -285,7 +286,7 @@ function renderTabla() {
     } else {
       scan.damages.forEach((damage) => {
         rows += `
-          <tr class="resultadosVINtr scan-base-row"
+          <tr class="resultadosVINtr scan-base-row ${scan.unidad_transito ? "unidad-transito-row" : ""}"
               data-scan-id="${scan.scan_id}"
               data-damage-id="${damage.id ?? ""}"
           >
@@ -543,17 +544,6 @@ document.addEventListener("click", (e) => {
   if (!cell || cell.classList.contains("editing")) return;
 });
 
-// cerrar dropdown al scrollear
-// document.addEventListener(
-//   "scroll",
-//   () => {
-//     document
-//       .querySelectorAll(".dropdown-toggle.show")
-//       .forEach((btn) => bootstrap.Dropdown.getInstance(btn)?.hide());
-//   },
-//   true,
-// );
-
 document.addEventListener("click", (e) => {
   const btn = e.target.closest(".open-gallery");
   if (!btn) return;
@@ -713,18 +703,18 @@ async function deleteAllPhotos(lightbox, scanId) {
       body: JSON.stringify({ scan_id: scanId }),
     });
 
-    // 🔥 cerrar lightbox actual
+    //  cerrar lightbox actual
     try {
       lightbox.close();
     } catch {}
 
-    // 🔥 limpieza total (loader, container, estado)
+    //  limpieza total (loader, container, estado)
     hardResetGLightbox();
 
-    // 🔥 limpiar estado frontend
+    //  limpiar estado frontend
     delete fotosPorScan[scanId];
 
-    // 🔥 refrescar tabla (VIN deja de ser link)
+    //  refrescar tabla (VIN deja de ser link)
     renderTabla();
 
     toastSuccess("Galería eliminada");
@@ -780,13 +770,13 @@ document.addEventListener("click", async (e) => {
 
     if (!res.ok) throw new Error("Error backend");
 
-    // 🔥 eliminar del estado
+    // eliminar del estado
     datosGlobales = datosGlobales.map((scan) => ({
       ...scan,
       damages: scan.damages?.filter((d) => d.id !== damageId),
     }));
 
-    // 🔥 eliminar fila visualmente
+    // eliminar fila visualmente
     const row = document.querySelector(`tr[data-damage-id="${damageId}"]`);
 
     if (row) {
@@ -918,12 +908,12 @@ document.addEventListener("click", async (e) => {
 
 document.getElementById("btnDeleteVIN").addEventListener("click", () => {
   setMode(currentMode === "delete-vin" ? null : "delete-vin");
-  renderTabla(); // 🔥 muestra / oculta iconos
+  renderTabla(); // muestra / oculta iconos
 });
 
 document.getElementById("btnCartaporte").addEventListener("click", () => {
   setMode(currentMode === "cartaporte-vin" ? null : "cartaporte-vin");
-  renderTabla(); // 🔥 muestra / oculta iconos
+  renderTabla(); // muestra / oculta iconos
 });
 
 // ==============================
@@ -1267,6 +1257,19 @@ function openCartaPorteModal(scan, bodyCartaPorte) {
   });
 
   const modal = new bootstrap.Modal(modalEl);
+
+  // 🔥 guardar foco previo
+  const previouslyFocused = document.activeElement;
+
+  // 🔥 restaurar foco cuando el modal termina de cerrarse
+  modalEl.addEventListener(
+    "hidden.bs.modal",
+    () => {
+      previouslyFocused?.focus();
+    },
+    { once: true },
+  );
+
   const confirmBtn = modalEl.querySelector("[data-confirm]");
   const cancelBtn = modalEl.querySelector("[data-cancel]");
 
@@ -1275,21 +1278,16 @@ function openCartaPorteModal(scan, bodyCartaPorte) {
   modalEl.querySelector("#cp-nro").value = "";
   modalEl.querySelector("#cp-error").classList.add("d-none");
 
-  // 🧠 precarga
-  //   if (scan) {
-  //     modalEl.querySelector("#cp-destino").value = scan.lugar ?? "";
-  //     modalEl.querySelector("#cp-fecha").value =
-  //       scan.scan_date?.slice(0, 10) ?? "";
-  //   }
-
   return new Promise((resolve) => {
     confirmBtn.onclick = () => {
       if (!validarCartaPorte(modalEl)) return;
+      document.activeElement?.blur();
       modal.hide();
       resolve(getCartaPorteData());
     };
 
     cancelBtn.onclick = () => {
+      document.activeElement?.blur();
       modal.hide();
       resolve(null);
     };

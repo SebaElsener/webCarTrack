@@ -55,12 +55,24 @@ function confirmModal({
 
     const modal = new bootstrap.Modal(modalEl);
 
+    const previouslyFocused = document.activeElement;
+
+    modalEl.addEventListener(
+      "hidden.bs.modal",
+      () => {
+        previouslyFocused?.focus();
+      },
+      { once: true },
+    );
+
     confirmBtn.onclick = () => {
+      document.activeElement?.blur();
       modal.hide();
       resolve(true);
     };
 
     cancelBtn.onclick = () => {
+      document.activeElement?.blur();
       modal.hide();
       resolve(false);
     };

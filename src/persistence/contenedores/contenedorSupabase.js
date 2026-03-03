@@ -277,6 +277,8 @@ class ContenedorSupabase {
         movimiento,
         lugar,
         batea,
+        destino,
+        unidad_transito,
         damages (
           id, area, averia, grav, obs, date
         ),
@@ -304,6 +306,8 @@ class ContenedorSupabase {
         batea: s.batea,
         lugar: s.lugar,
         movimiento: s.movimiento,
+        destino: s.destino,
+        unidad_transito: s.unidad_transito,
         damages: s.damages ?? [],
         fotos:
           s.pictures?.map((p) => ({
