@@ -64,7 +64,7 @@ app.use("/api/userdata", requireLogin, userData);
 app.use("/api/querys", requireLogin, querysRouter);
 app.use("/api/export", requireLogin, exportRouter);
 app.use("/api/timeout", timeout);
-app.use("/api/updates", updatesRouter);
+app.use("/api/updates", requireLogin, updatesRouter);
 app.use("/api/damages", requireLogin, damagesRouter);
 app.use("/api/photos", photosRouter);
 app.use("/api/scans", requireLogin, scansRoute);

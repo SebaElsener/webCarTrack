@@ -1,9 +1,13 @@
 import { Router } from "express";
 
-import { updateDamagesController } from "../controller/updateDamagesController.js";
+import {
+  updateDamagesController,
+  patchScanController,
+} from "../controller/updateDamagesController.js";
 
 const updatesRouter = new Router();
 
 updatesRouter.post("/damages", updateDamagesController);
+updatesRouter.patch("/:scanId", patchScanController);
 
 export default updatesRouter;

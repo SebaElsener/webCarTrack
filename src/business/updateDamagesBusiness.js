@@ -11,4 +11,9 @@ const updateDamages = async (infoToUpdate) => {
   }
 };
 
-export { updateDamages };
+const scanPatch = async (scanId, infoToPatch) => {
+  const patchResult = await supabaseRepo.scanPatch(scanId, infoToPatch);
+  return patchResult;
+};
+
+export { updateDamages, scanPatch };

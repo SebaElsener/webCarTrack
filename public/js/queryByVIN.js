@@ -1,6 +1,8 @@
 import areas from "../utils/areas.json" with { type: "json" };
 import averias from "../utils/averias.json" with { type: "json" };
 import gravedades from "../utils/gravedades.json" with { type: "json" };
+import movimientos from "../utils/movimientos.json" with { type: "json" };
+import lugares from "../utils/locaciones.json" with { type: "json" };
 import { inlineEditor } from "./inline-edit/inline-edit.init.js";
 import { GetCartaporteInfo } from "./getCartaporteInfo.js";
 import { obtenerVIN } from "./VIN-actions/vinService.js";
@@ -123,7 +125,6 @@ function prepararDatosYRenderizar(data) {
   }));
 
   datosGlobales = transformScans;
-  console.log(datosGlobales);
   paginaActual = 1;
   renderTabla();
 }
@@ -276,10 +277,28 @@ function renderTabla() {
         >
           <span class="cell-value text-muted-table">Sin daños</span>
         </td>
-        <td>${scan.batea ?? ""}</td>
-        <td>${scan.movimiento ?? ""}</td>
-        <td>${scan.lugar ?? ""}</td>
-        <td>${renderClimaIcon(scan.clima)}</td>
+        <td class="editable-scan"
+            data-field="batea"
+            data-scan-id="${scan.scan_id}">
+          <span class="cell-value">${scan.batea ?? ""}</span>
+        </td>
+        <td class="editable-scan"
+            data-field="movimiento"
+            data-scan-id="${scan.scan_id}">
+          <span class="cell-value">${scan.movimiento ?? ""}</span>
+        </td>
+        <td class="editable-scan"
+            data-field="lugar"
+            data-scan-id="${scan.scan_id}">
+          <span class="cell-value">${scan.lugar ?? ""}</span>
+        </td>
+        <td class="editable-scan text-center"
+            data-field="clima"
+            data-scan-id="${scan.scan_id}">
+          <span class="cell-value">
+            ${renderClimaIcon(scan.clima)}
+          </span>
+        </td>
         <td>${scan.user ?? ""}</td>
       </tr>
     `;
@@ -399,10 +418,28 @@ function renderTabla() {
             >
               <span class="cell-value">${damage.obs && ""}</span>            
             </td>
-            <td>${scan.batea ?? ""}</td>
-            <td>${scan.movimiento ?? ""}</td>
-            <td>${scan.lugar ?? ""}</td>
-            <td>${renderClimaIcon(scan.clima)}</td>
+            <td class="editable-scan"
+              data-field="batea"
+              data-scan-id="${scan.scan_id}">
+              <span class="cell-value">${scan.batea ?? ""}</span>
+            </td>
+            <td class="editable-scan"
+                data-field="movimiento"
+                data-scan-id="${scan.scan_id}">
+              <span class="cell-value">${scan.movimiento ?? ""}</span>
+            </td>
+            <td class="editable-scan"
+                data-field="lugar"
+                data-scan-id="${scan.scan_id}">
+              <span class="cell-value">${scan.lugar ?? ""}</span>
+            </td>
+            <td class="editable-scan text-center"
+                data-field="clima"
+                data-scan-id="${scan.scan_id}">
+              <span class="cell-value">
+                ${renderClimaIcon(scan.clima)}
+              </span>
+            </td>
             <td>${scan.user ?? ""}</td>
           </tr>
         `;
@@ -452,9 +489,9 @@ function renderTabla() {
     obsTh: 200,
     userTh: 80,
     bateaTh: 60,
-    movimientoTh: 60,
-    lugarTh: 60,
-    climaTh: 60,
+    movimientoTh: 90,
+    lugarTh: 130,
+    climaTh: 90,
   };
 
   Object.entries(initialWidths).forEach(([cls, width]) => {
@@ -564,6 +601,160 @@ document.addEventListener("click", (e) => {
   });
 
   lightbox.open();
+});
+
+document.addEventListener("click", async (e) => {
+  const cell = e.target.closest(".editable-scan");
+  if (!cell || cell.classList.contains("editing")) return;
+
+  const field = cell.dataset.field;
+  const scanId = cell.dataset.scanId;
+
+  const currentValue =
+    cell.querySelector(".cell-value")?.textContent.trim() ?? "";
+
+  cell.classList.add("editing");
+
+  let input;
+
+  // ========================
+  // BATEA (text)
+  // ========================
+  if (field === "batea") {
+    input = document.createElement("input");
+    input.type = "text";
+    input.className = "form-control form-control-sm";
+    input.value = currentValue;
+  }
+
+  // ========================
+  // MOVIMIENTO (select JSON)
+  // ========================
+  if (field === "movimiento") {
+    input = document.createElement("select");
+    input.className = "form-select form-select-sm";
+
+    movimientos.forEach((m) => {
+      const option = document.createElement("option");
+      option.value = m.tipo;
+      option.textContent = m.tipo;
+
+      if (m.tipo === currentValue) {
+        option.selected = true;
+      }
+
+      input.appendChild(option);
+    });
+  }
+
+  // ========================
+  // LUGAR (select JSON)
+  // ========================
+  if (field === "lugar") {
+    input = document.createElement("select");
+    input.className = "form-select form-select-sm";
+
+    lugares.forEach((l) => {
+      const option = document.createElement("option");
+      option.value = l.nombre;
+      option.textContent = l.nombre;
+
+      if (l.nombre === currentValue) {
+        option.selected = true;
+      }
+
+      input.appendChild(option);
+    });
+  }
+
+  // ========================
+  // CLIMA (select iconos)
+  // ========================
+  if (field === "clima") {
+    input = document.createElement("select");
+    input.className = "form-select form-select-sm";
+
+    const CLIMAS = ["sol", "noche", "lluvia", "hielo", "rocío"];
+
+    CLIMAS.forEach((c) => {
+      const option = document.createElement("option");
+      option.value = c;
+      option.textContent = c;
+      if (c === currentValue.toLowerCase()) option.selected = true;
+      input.appendChild(option);
+    });
+  }
+
+  if (!input) return;
+
+  cell.innerHTML = "";
+  cell.appendChild(input);
+  input.focus();
+
+  const save = async () => {
+    const newValue = input.value;
+
+    // 🔒 si no cambió, no hacer nada
+    if (newValue === currentValue) {
+      cell.innerHTML = `<span class="cell-value">${currentValue}</span>`;
+      cell.classList.remove("editing");
+      return;
+    }
+
+    // 🔄 mostrar spinner
+    cell.innerHTML = `
+    <div class="d-flex justify-content-center">
+      <div class="spinner-border spinner-border-sm text-primary"></div>
+    </div>
+  `;
+
+    try {
+      const res = await fetch(`/api/updates/${scanId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ [field]: newValue }),
+      });
+
+      if (!res.ok) throw new Error("Error backend");
+
+      // actualizar estado local
+      datosGlobales = datosGlobales.map((s) =>
+        String(s.scan_id) === String(scanId) ? { ...s, [field]: newValue } : s,
+      );
+
+      // render final
+      if (field === "clima") {
+        cell.innerHTML = `<span class="cell-value">${renderClimaIcon(newValue)}</span>`;
+      } else {
+        cell.innerHTML = `<span class="cell-value">${newValue}</span>`;
+      }
+
+      cell.classList.remove("editing");
+    } catch (err) {
+      console.error(err);
+
+      // ❌ restaurar valor anterior
+      if (field === "clima") {
+        cell.innerHTML = `<span class="cell-value">${renderClimaIcon(currentValue)}</span>`;
+      } else {
+        cell.innerHTML = `<span class="cell-value">${currentValue}</span>`;
+      }
+
+      cell.classList.remove("editing");
+      toastError("No se pudo actualizar");
+    }
+  };
+
+  input.addEventListener("blur", save);
+  input.addEventListener("keydown", (ev) => {
+    if (ev.key === "Enter") {
+      ev.preventDefault();
+      input.blur();
+    }
+    if (ev.key === "Escape") {
+      renderTabla();
+    }
+  });
 });
 
 function injectGalleryControls(lightbox, scanId) {

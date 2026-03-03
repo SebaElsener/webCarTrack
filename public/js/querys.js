@@ -258,7 +258,7 @@ function renderTabla() {
   paginaDatos.forEach((scan) => {
     if (!scan.damages || scan.damages.length === 0) {
       rows += `
-        <tr>
+        <tr class="${scan.unidad_transito ? "unidad-transito-row" : ""}">
           <td>${new Date(scan.scan_date).toLocaleString("es-AR", {
             year: "2-digit",
             month: "2-digit",
@@ -297,7 +297,7 @@ function renderTabla() {
     } else {
       scan.damages.forEach((damage) => {
         rows += `
-          <tr>
+          <tr class="${scan.unidad_transito ? "unidad-transito-row" : ""}">
             <td>${new Date(scan.scan_date).toLocaleString("es-AR", {
               year: "2-digit",
               month: "2-digit",

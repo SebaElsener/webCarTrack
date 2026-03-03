@@ -121,6 +121,18 @@ class ContenedorSupabase {
     }
   }
 
+  async scanPatch(scanId, infoToPatch) {
+    const { data, error } = await supabase
+      .from("scans")
+      .update(infoToPatch)
+      .eq("supabase_id", scanId)
+      .select()
+      .single();
+
+    if (error) return error;
+    return data;
+  }
+
   async deleteDamages(damageReference) {
     try {
       const { data, error } = await supabase.rpc("delete_damage_by_id", {
