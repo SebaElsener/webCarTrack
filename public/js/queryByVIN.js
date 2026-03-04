@@ -101,17 +101,70 @@ function prepararDatosYRenderizar(data) {
   fotosPorScan = {};
 
   data.forEach((scan) => {
-    if (!scan.fotos?.length) return;
+    const elementos = [];
 
-    fotosPorScan[scan.scan_id] = scan.fotos.map((f, idx) => ({
-      pict_id: f.id,
-      pict_scan_id: f.pict_scan_id,
-      href: f.pictureurl,
-      type: "image",
-      title: `VIN ${scan.vin} · ${scan.movimiento} en ${scan.lugar} · ${new Date(
-        scan.scan_date,
-      ).toLocaleString("es-AR")} · Imagen ${idx + 1}`,
-    }));
+    // ==========================
+    // FOTOS (imagenes clásicas)
+    // ==========================
+    if (scan.fotos?.length) {
+      scan.fotos.forEach((f, idx) => {
+        elementos.push({
+          pict_id: f.id,
+          pict_scan_id: f.pict_scan_id,
+          href: f.pictureurl,
+          fileUrl: f.pictureurl,
+          type: "image",
+          title: `VIN ${scan.vin} · ${scan.movimiento} en ${scan.lugar} · ${new Date(
+            scan.scan_date,
+          ).toLocaleString("es-AR")} · Imagen ${idx + 1}`,
+        });
+      });
+    }
+
+    // ==========================
+    // UPLOADS (imagenes + pdf)
+    // ==========================
+    if (scan.uploads?.length) {
+      scan.uploads.forEach((u, idx) => {
+        const isPDF = u.publicUrl.toLowerCase().endsWith(".pdf");
+
+        if (isPDF) {
+          elementos.push({
+            upload_id: u.id,
+            upload_scan_id: u.upload_scan_id,
+            type: "inline",
+            fileUrl: u.publicUrl,
+            content: `
+              <div style="width:90vw;height:90vh">
+                <embed src="${u.publicUrl}" type="application/pdf" width="100%" height="100%"/>
+              </div>
+            `,
+            title: `VIN ${scan.vin} · ${scan.movimiento} en ${scan.lugar} · ${new Date(
+              scan.scan_date,
+            ).toLocaleString(
+              "es-AR",
+            )} · Archivo ${idx + 1} ${isPDF ? "(PDF)" : ""}`,
+          });
+        } else {
+          elementos.push({
+            upload_id: u.id,
+            upload_scan_id: u.upload_scan_id,
+            href: u.publicUrl,
+            fileUrl: u.pictureurl,
+            type: "image",
+            title: `VIN ${scan.vin} · ${scan.movimiento} en ${scan.lugar} · ${new Date(
+              scan.scan_date,
+            ).toLocaleString(
+              "es-AR",
+            )} · Archivo ${idx + 1} ${isPDF ? "(PDF)" : ""}`,
+          });
+        }
+      });
+    }
+
+    if (elementos.length) {
+      fotosPorScan[scan.scan_id] = elementos;
+    }
   });
 
   const transformScans = data.map((scan) => ({
@@ -226,15 +279,17 @@ function renderTabla() {
               ? `
                 <a
                   href="#"
-                  class="vin-link open-gallery"
+                  class="vin-link open-gallery vin-hover"
                   data-scanid="${scan.scan_id}"
+                  data-vin="${scan.vin}"
+                  data-scan-id="${scan.scan_id}"
                   title="Ver fotos"
                 >
                   <span>${scan.vin}</span>
                 </a>
               `
               : `
-                <span class="vin-text">${scan.vin ?? ""}</span>
+                <span class="vin-text vin-hover" data-vin="${scan.vin}" data-scan-id="${scan.scan_id}">${scan.vin ?? ""}</span>
               `
           }
         </td>
@@ -364,7 +419,9 @@ function renderTabla() {
                   ? `
                     <a
                       href="#"
-                      class="vin-link open-gallery"
+                      class="vin-link open-gallery vin-hover"
+                      data-vin="${scan.vin}"
+                      data-scan-id="${scan.scan_id}"
                       data-scanid="${scan.scan_id}"
                       title="Ver fotos"
                     >
@@ -372,7 +429,7 @@ function renderTabla() {
                     </a>
                   `
                   : `
-                    <span class="vin-text">${scan.vin ?? ""}</span>
+                    <span class="vin-text vin-hover" data-vin="${scan.vin}" data-scan-id="${scan.scan_id}">${scan.vin ?? ""}</span>
                   `
               }
             </td>
@@ -584,6 +641,8 @@ document.addEventListener("click", (e) => {
 document.addEventListener("click", (e) => {
   const btn = e.target.closest(".open-gallery");
   if (!btn) return;
+
+  document.activeElement?.blur();
 
   const scanId = btn.dataset.scanid;
   if (!scanId || !fotosPorScan[scanId]) return;
@@ -816,8 +875,9 @@ async function deleteCurrentPhoto(lightbox, scanId) {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        pict_id: photo.pict_id,
-        pictureurl: photo.href,
+        pict_id: photo.pict_id ?? null,
+        upload_id: photo.upload_id ?? null,
+        pictureurl: photo.fileUrl ?? photo.href,
       }),
     });
 
@@ -929,13 +989,23 @@ document.getElementById("btnDeleteDamages").addEventListener("click", () => {
   setMode(currentMode === "delete-damage" ? null : "delete-damage");
 });
 
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".vin-upload-btn");
+  if (!btn) return;
+
+  const input = vinTooltip.querySelector(".vin-file-input");
+  if (!input) return;
+
+  input.click();
+});
+
 document.addEventListener("click", async (e) => {
   const icon = e.target.closest(".damage-delete-icon");
   if (!icon) return;
 
   if (currentMode !== "delete-damage") return;
 
-  e.stopPropagation(); // 🔥 evita inline-edit
+  e.stopPropagation(); // evita inline-edit
 
   const damageId = icon.dataset.damageId;
   if (!damageId) return;
@@ -1183,8 +1253,6 @@ document.addEventListener("click", async (e) => {
     damages: damages,
   };
 
-  console.log("Carta de porte:", data);
-
   // detectar VERIFICAR
   const verificarCampos = hasVerificarValues(scan);
 
@@ -1306,11 +1374,14 @@ function createNewDamageRow(scan) {
         ${
           fotosPorScan[scan.scan_id]?.length
             ? `
-              <a href="#" class="vin-link open-gallery" data-scanid="${scan.scan_id}">
+              <a href="#"
+                class="vin-link open-gallery vin-hover"
+                data-scanid="${scan.scan_id}" data-vin="${scan.vin}"
+                data-scan-id="${scan.scan_id}">
                 <span>${scan.vin}</span>
               </a>
             `
-            : `<span class="vin-text">${scan.vin}</span>`
+            : `<span class="vin-text vin-hover" data-vin="${scan.vin}" data-scan-id="${scan.scan_id}">${scan.vin}</span>`
         }
       </td>
 
@@ -1569,3 +1640,107 @@ async function confirmarValoresVerificar(campos) {
     confirmClass: "btn-warning",
   });
 }
+
+const vinTooltip = document.createElement("div");
+vinTooltip.className = "vin-floating-tooltip";
+vinTooltip.innerHTML = `
+  <button class="btn btn-sm btn-light vin-upload-btn">
+    <i class="mdi mdi-upload"></i> Subir archivo
+  </button>
+  <input type="file"
+         class="vin-file-input d-none"
+         accept="application/pdf,image/*" />
+`;
+
+document.body.appendChild(vinTooltip);
+
+let currentVin = null;
+let currentScanId = null;
+
+let hideTimeout = null;
+
+document.addEventListener("mouseover", (e) => {
+  const vin = e.target.closest(".vin-hover");
+  const overTooltip = e.target.closest(".vin-floating-tooltip");
+
+  // Si estoy sobre VIN
+  if (vin) {
+    clearTimeout(hideTimeout);
+
+    currentVin = vin.dataset.vin;
+    currentScanId = vin.dataset.scanId;
+    const rect = vin.getBoundingClientRect();
+
+    vinTooltip.style.top = rect.bottom + 6 + "px";
+    vinTooltip.style.left = rect.left + "px";
+    vinTooltip.style.opacity = "1";
+    vinTooltip.style.pointerEvents = "auto";
+  }
+
+  // Si estoy sobre el tooltip, no ocultar
+  if (overTooltip) {
+    clearTimeout(hideTimeout);
+  }
+});
+
+document.addEventListener("mouseout", (e) => {
+  const fromVin = e.target.closest(".vin-hover");
+  const fromTooltip = e.target.closest(".vin-floating-tooltip");
+
+  if (fromVin || fromTooltip) {
+    hideTimeout = setTimeout(() => {
+      vinTooltip.style.opacity = "0";
+      vinTooltip.style.pointerEvents = "none";
+    }, 200); // pequeño delay para permitir cruzar
+  }
+});
+
+vinTooltip
+  .querySelector(".vin-file-input")
+  .addEventListener("change", async function () {
+    const file = this.files[0];
+    if (!file || !currentVin || !currentScanId) return;
+
+    const now = new Date();
+    const pad = (n) => n.toString().padStart(2, "0");
+
+    const timestamp =
+      now.getFullYear().toString() +
+      pad(now.getMonth() + 1) +
+      pad(now.getDate()) +
+      "_" +
+      pad(now.getHours()) +
+      pad(now.getMinutes()) +
+      pad(now.getSeconds());
+
+    const ext = file.name.split(".").pop().toLowerCase();
+    const newFileName = `${currentVin}_${timestamp}.${ext}`;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("vin", currentVin);
+    formData.append("fileName", newFileName);
+    formData.append("scanId", currentScanId);
+
+    try {
+      showGlobalSpinner();
+
+      const res = await fetch("/api/photos/upload-files", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("Upload error");
+
+      toastSuccess("Archivo subido correctamente");
+
+      // 🔄 refrescar solo si corresponde
+      await cargarDatos(currentVin);
+    } catch (err) {
+      console.error(err);
+      toastError("No se pudo subir el archivo");
+    } finally {
+      hideGlobalSpinner();
+      this.value = "";
+    }
+  });

@@ -104,7 +104,6 @@ class ContenedorSupabase {
   }
 
   async updateDamages(infoToUpdate) {
-    console.log(infoToUpdate);
     try {
       const { data, error } = await supabase.rpc("update_damages", {
         ...infoToUpdate,
@@ -132,6 +131,35 @@ class ContenedorSupabase {
 
     if (error) return error;
     return data;
+  }
+
+  async uploadFiles(vin, fileName, scanId, file, user) {
+    // Subir archivo a bucket
+    const { error: uploadError } = await supabase.storage
+      .from("pics")
+      .upload(fileName, file.buffer, {
+        contentType: file.mimetype,
+        upsert: false,
+      });
+
+    if (uploadError) return uploadError;
+
+    // Obtener URL pública
+    const { data: publicData } = supabase.storage
+      .from("pics")
+      .getPublicUrl(fileName);
+
+    const publicUrl = publicData.publicUrl;
+
+    // Insertar en uploads
+    const { error: insertError } = await supabase.from("uploads").insert({
+      vin,
+      public_url: publicUrl,
+      user: user,
+      scan_id: Number(scanId),
+    });
+
+    if (insertError) return insertError;
   }
 
   async deleteDamages(damageReference) {
@@ -262,11 +290,9 @@ class ContenedorSupabase {
 
   // Func para popular DB supabse
   async populateDb(info) {
-    console.log(info);
     const [modelo, vin, area, averia, gravedad, observacion, codigo] = info;
     try {
       const { data, error } = await this.sql.from("scans").insert(info);
-      console.log(data);
       return data;
     } catch (error) {
       return "error";
@@ -299,6 +325,11 @@ class ContenedorSupabase {
           pictureurl,
           id,
           scan_id
+        ),
+        uploads (
+          public_url,
+          id,
+          scan_id
         )
       `,
         )
@@ -328,6 +359,12 @@ class ContenedorSupabase {
             id: p.id,
             pict_scan_id: p.scan_id,
           })) ?? [],
+        uploads:
+          s.uploads?.map((u) => ({
+            publicUrl: u.public_url,
+            id: u.id,
+            upload_scan_id: u.scan_id,
+          })) ?? [],
       }));
     } catch (err) {
       console.error("Error al consultar VIN en DB", err);
@@ -335,27 +372,38 @@ class ContenedorSupabase {
     }
   }
 
-  async deletePhoto(pict_id, bucketName, path) {
+  async deleteFile({ pict_id, upload_id, bucketName, path }) {
     try {
-      // 1️⃣ borrar registro DB
-      const { error: dbError } = await supabase
-        .from("pictures")
-        .delete()
-        .eq("id", pict_id);
+      // borrar registro DB
+      if (pict_id) {
+        const { error } = await supabase
+          .from("pictures")
+          .delete()
+          .eq("id", pict_id);
 
-      if (dbError) throw dbError;
+        if (error) throw error;
+      }
 
-      // 3️⃣ borrar archivo del storage
+      if (upload_id) {
+        const { error } = await supabase
+          .from("uploads")
+          .delete()
+          .eq("id", upload_id);
+
+        if (error) throw error;
+      }
+
+      // borrar archivo storage
       const { error: storageError } = await supabase.storage
         .from(bucketName)
         .remove([path]);
 
       if (storageError) throw storageError;
 
-      return JSON.stringify({ success: true });
+      return { success: true };
     } catch (err) {
-      console.error("Error deletePhoto:", err);
-      return res.status(500).json({ error: "No se pudo eliminar la foto" });
+      console.error("deleteFile error:", err);
+      throw err;
     }
   }
 
@@ -424,22 +472,27 @@ class ContenedorSupabase {
     }
   }
 
-  async deletePhotoSetAndBucket(scan_id, bucketName) {
+  async deleteFileSetAndBucket(scan_id) {
+    const bucketName = "pics";
     try {
-      // 1️⃣ obtener todas las fotos del scan
-      const { data: photos, error: fetchError } = await supabase
+      // 1️⃣ obtener fotos
+      const { data: photos, error: photosError } = await supabase
         .from("pictures")
-        .select("id, pictureurl")
+        .select("pictureurl")
         .eq("scan_id", scan_id);
 
-      if (fetchError) throw fetchError;
+      if (photosError) throw photosError;
 
-      if (!photos || photos.length === 0) {
-        // nada para borrar → idempotente
-        return { success: true, deleted: 0 };
-      }
+      // 2️⃣ obtener uploads
+      const { data: uploads, error: uploadsError } = await supabase
+        .from("uploads")
+        .select("public_url")
+        .eq("scan_id", scan_id);
 
-      const paths = photos
+      if (uploadsError) throw uploadsError;
+
+      // 3️⃣ construir paths storage
+      const photoPaths = (photos || [])
         .map((p) => {
           try {
             return getStoragePathFromPublicUrl(p.pictureurl, bucketName);
@@ -449,32 +502,50 @@ class ContenedorSupabase {
         })
         .filter(Boolean);
 
-      // 2️⃣ borrar registros DB
-      const { error: deleteDbError } = await supabase
+      const uploadPaths = (uploads || [])
+        .map((u) => {
+          try {
+            return getStoragePathFromPublicUrl(u.public_url, bucketName);
+          } catch {
+            return null;
+          }
+        })
+        .filter(Boolean);
+
+      const allPaths = [...photoPaths, ...uploadPaths];
+
+      // 4️⃣ borrar registros DB
+      const { error: deletePhotosError } = await supabase
         .from("pictures")
         .delete()
         .eq("scan_id", scan_id);
 
-      if (deleteDbError) {
-        console.error(deleteDbError);
-        throw deleteDbError;
-      }
+      if (deletePhotosError) throw deletePhotosError;
 
-      // 4️⃣ borrar archivos del bucket (batch)
-      if (paths.length) {
+      const { error: deleteUploadsError } = await supabase
+        .from("uploads")
+        .delete()
+        .eq("scan_id", scan_id);
+
+      if (deleteUploadsError) throw deleteUploadsError;
+
+      // 5️⃣ borrar archivos storage
+      if (allPaths.length) {
         const { error: storageError } = await supabase.storage
           .from(bucketName)
-          .remove(paths);
+          .remove(allPaths);
 
         if (storageError) throw storageError;
       }
 
       return {
         success: true,
-        deleted: photos.length,
+        deletedPhotos: photoPaths.length,
+        deletedUploads: uploadPaths.length,
       };
     } catch (error) {
-      console.log("Error al eliminar las fotos en DB", error);
+      console.error("Error deleteFileSetAndBucket:", error);
+      throw error;
     }
   }
 }

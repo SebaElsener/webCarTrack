@@ -11,30 +11,46 @@ export function getStoragePathFromPublicUrl(publicUrl, bucketName) {
   return publicUrl.substring(index + marker.length);
 }
 
-const deletePhoto = async (pict_id, pictureurl) => {
+const deleteFile = async ({ pict_id, upload_id, pictureurl }) => {
   // 2️⃣ extraer path del bucket
   const bucketName = "pics";
   const path = getStoragePathFromPublicUrl(pictureurl, bucketName);
 
   try {
-    const data = await supabaseRepo.deletePhoto(pict_id, bucketName, path);
+    const data = await supabaseRepo.deleteFile({
+      pict_id,
+      upload_id,
+      bucketName,
+      path,
+    });
     return data;
   } catch (error) {
-    console.error("Error eliminando foto en DB", error);
+    console.error("Error eliminando archivo en DB", error);
     return error;
   }
 };
 
-const deletePhotoSet = async (scanId) => {
+const deleteFileSet = async (scanId) => {
   const bucketName = "pics";
-  // 3️⃣ extraer paths del bucket
 
   try {
-    await supabaseRepo.deletePhotoSetAndBucket(scanId, bucketName);
+    const data = await supabaseRepo.deleteFileSetAndBucket(scanId, bucketName);
+    return data;
   } catch (error) {
-    console.error("Error eliminando las fotos en DB", error);
-    return error;
+    console.error("Error eliminando archivos del scan", error);
+    throw error;
   }
 };
 
-export { deletePhoto, deletePhotoSet };
+const uploadFilesBusiness = async (vin, fileName, scanId, file, user) => {
+  const uploadResult = await supabaseRepo.uploadFiles(
+    vin,
+    fileName,
+    scanId,
+    file,
+    user,
+  );
+  return uploadResult;
+};
+
+export { deleteFile, deleteFileSet, uploadFilesBusiness };

@@ -952,6 +952,19 @@ tbody tr:nth-child(even) {
   background-color: #b4e600af !important;
 }
 
+.vin-floating-tooltip {
+  position: fixed;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms ease;
+  z-index: 99999;
+}
+
 .loginFormTitle,
 .regFormTitle {
   margin: 0 0 30px;

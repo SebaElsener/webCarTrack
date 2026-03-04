@@ -12,7 +12,6 @@ const deleteScan = async (scan_id) => {
 
 const addNewScan = async (user, date, vin, type) => {
   const result = await supabaseRepo.addNewVIN(user, date, vin, type);
-  console.log(result);
   return result;
 };
 
