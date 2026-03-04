@@ -22,6 +22,7 @@ let paginaActual = 1;
 let accionesPostTablaMostradas = false;
 let vin = "";
 let fotosPorScan = {};
+let lightbox = null;
 
 const cartaporteInfo = new GetCartaporteInfo();
 
@@ -645,21 +646,9 @@ document.addEventListener("click", (e) => {
   document.activeElement?.blur();
 
   const scanId = btn.dataset.scanid;
-  if (!scanId || !fotosPorScan[scanId]) return;
+  if (!scanId) return;
 
-  const lightbox = GLightbox({
-    elements: fotosPorScan[scanId],
-    loop: true,
-    zoomable: true,
-    draggable: true,
-    preload: true,
-  });
-
-  lightbox.on("open", () => {
-    injectGalleryControls(lightbox, scanId);
-  });
-
-  lightbox.open();
+  openGallery(scanId);
 });
 
 document.addEventListener("click", async (e) => {
@@ -884,14 +873,12 @@ async function deleteCurrentPhoto(lightbox, scanId) {
     // 🔥 actualizar estado
     fotosPorScan[scanId].splice(oldIndex, 1);
 
-    // si no quedan fotos
-    if (!fotosPorScan[scanId].length) {
-      lightbox.close();
-      hardResetGLightbox();
+    // 🔥 si no quedan fotos
+    if (!fotosPorScan[scanId]?.length) {
       delete fotosPorScan[scanId];
+      lightbox.close();
       renderTabla();
       toastSuccess("Foto eliminada");
-
       return;
     }
 
@@ -906,20 +893,8 @@ async function deleteCurrentPhoto(lightbox, scanId) {
 
     // 🔥 reapertura inmediata y controlada
     requestAnimationFrame(() => {
-      const fresh = GLightbox({
-        elements: fotosPorScan[scanId],
-        startAt: newIndex,
-        loop: true,
-        preload: false,
-        zoomable: true,
-        draggable: true,
-      });
-
-      fresh.on("open", () => {
-        injectGalleryControls(fresh, scanId);
-      });
-
-      fresh.open();
+      lightbox.setElements(fotosPorScan[scanId]);
+      lightbox.openAt(newIndex);
     });
 
     toastSuccess("Foto eliminada");
@@ -1744,3 +1719,28 @@ vinTooltip
       this.value = "";
     }
   });
+
+function openGallery(scanId) {
+  const elements = fotosPorScan[scanId];
+  if (!elements?.length) return;
+
+  // 🔥 destruir instancia anterior
+  if (lightbox) {
+    lightbox.destroy();
+    lightbox = null;
+  }
+
+  lightbox = GLightbox({
+    elements,
+    loop: true,
+    zoomable: true,
+    draggable: true,
+    preload: false,
+  });
+
+  lightbox.on("open", () => {
+    injectGalleryControls(lightbox, scanId);
+  });
+
+  lightbox.open();
+}
