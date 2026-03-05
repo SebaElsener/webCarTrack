@@ -290,6 +290,8 @@ function renderTabla() {
 
           <td colspan="4" class="text-center">Sin daños</td>
           <td>${scan.batea ?? ""}</td>
+          <td>${scan.movimiento ?? ""}</td>
+          <td>${scan.lugar ?? ""}</td>
           <td>${renderClimaIcon(scan.clima)}</td>
           <td>${scan.user ?? ""}</td>
         </tr>
@@ -329,6 +331,8 @@ function renderTabla() {
             <td>${damage.grav + " - " + damage.grav_desc ?? ""}</td>
             <td class="wrap">${damage.obs ?? ""}</td>
             <td>${scan.batea ?? ""}</td>
+            <td>${scan.movimiento ?? ""}</td>
+            <td>${scan.lugar ?? ""}</td>
             <td>${renderClimaIcon(scan.clima)}</td>
             <td>${scan.user ?? ""}</td>
           </tr>
@@ -354,6 +358,8 @@ function renderTabla() {
             <th class="gravTh">Gravedad</th>
             <th class="obsTh">Observación</th>
             <th class="bateaTh">Batea</th>
+            <th class="movimientoTh">Movimiento</th>
+            <th class="lugarTh">Lugar</th>
             <th class="climaTh">Clima</th>
             <th class="userTh">Usuario</th>
           </tr>
@@ -370,14 +376,16 @@ function renderTabla() {
     dateTh: 140,
     marcaTh: 100,
     modeloTh: 120,
-    VINth: 210,
-    areaTh: 240,
+    VINth: 240,
+    areaTh: 300,
     averiaTh: 170,
     gravTh: 120,
     obsTh: 200,
     userTh: 80,
     bateaTh: 60,
-    climaTh: 60,
+    movimientoTh: 90,
+    lugarTh: 130,
+    climaTh: 90,
   };
 
   Object.entries(initialWidths).forEach(([cls, width]) => {
