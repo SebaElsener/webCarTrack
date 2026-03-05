@@ -965,6 +965,11 @@ tbody tr:nth-child(even) {
   z-index: 99999;
 }
 
+.vin-floating-tooltip .form-check-input:checked {
+  background-color: #ffc107;
+  border-color: #ffc107;
+}
+
 .loginFormTitle,
 .regFormTitle {
   margin: 0 0 30px;

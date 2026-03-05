@@ -11773,3 +11773,12 @@
 {"level":40,"time":"2026-03-04T21:37:41.476Z","pid":33266,"hostname":"MacBook-Pro-de-Sebastian.local","msg":"Ruta '/.well-known/appspecific/com.chrome.devtools.json' metodo 'GET' no implementada"}
 {"level":40,"time":"2026-03-04T21:37:41.586Z","pid":33266,"hostname":"MacBook-Pro-de-Sebastian.local","msg":"Ruta '/favicon.ico' metodo 'GET' no implementada"}
 {"level":40,"time":"2026-03-04T21:37:46.317Z","pid":33266,"hostname":"MacBook-Pro-de-Sebastian.local","msg":"Ruta '/favicon.ico' metodo 'GET' no implementada"}
+{"level":40,"time":"2026-03-05T13:29:12.596Z","pid":2743,"hostname":"MacBook-Pro-de-Sebastian.local","msg":"Ruta '/favicon.ico' metodo 'GET' no implementada"}
+{"level":40,"time":"2026-03-05T13:29:25.517Z","pid":2743,"hostname":"MacBook-Pro-de-Sebastian.local","msg":"Ruta '/favicon.ico' metodo 'GET' no implementada"}
+{"level":40,"time":"2026-03-05T13:29:33.781Z","pid":2743,"hostname":"MacBook-Pro-de-Sebastian.local","msg":"Ruta '/.well-known/appspecific/com.chrome.devtools.json' metodo 'GET' no implementada"}
+{"level":40,"time":"2026-03-05T13:29:39.564Z","pid":2743,"hostname":"MacBook-Pro-de-Sebastian.local","msg":"Ruta '/.well-known/appspecific/com.chrome.devtools.json' metodo 'GET' no implementada"}
+{"level":40,"time":"2026-03-05T13:29:39.881Z","pid":2743,"hostname":"MacBook-Pro-de-Sebastian.local","msg":"Ruta '/favicon.ico' metodo 'GET' no implementada"}
+{"level":40,"time":"2026-03-05T13:29:42.023Z","pid":2743,"hostname":"MacBook-Pro-de-Sebastian.local","msg":"Ruta '/.well-known/appspecific/com.chrome.devtools.json' metodo 'GET' no implementada"}
+{"level":40,"time":"2026-03-05T13:29:42.373Z","pid":2743,"hostname":"MacBook-Pro-de-Sebastian.local","msg":"Ruta '/favicon.ico' metodo 'GET' no implementada"}
+{"level":40,"time":"2026-03-05T13:29:44.111Z","pid":2743,"hostname":"MacBook-Pro-de-Sebastian.local","msg":"Ruta '/.well-known/appspecific/com.chrome.devtools.json' metodo 'GET' no implementada"}
+{"level":40,"time":"2026-03-05T13:29:44.606Z","pid":2743,"hostname":"MacBook-Pro-de-Sebastian.local","msg":"Ruta '/favicon.ico' metodo 'GET' no implementada"}

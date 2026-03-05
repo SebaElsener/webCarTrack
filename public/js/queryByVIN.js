@@ -1622,6 +1622,14 @@ vinTooltip.innerHTML = `
   <button class="btn btn-sm btn-light vin-upload-btn">
     <i class="mdi mdi-upload"></i> Subir archivo
   </button>
+
+  <div class="form-check form-switch mt-2">
+    <input class="form-check-input vin-transito-switch" type="checkbox">
+    <label class="form-check-label small">
+      Unidad en tránsito
+    </label>
+  </div>
+
   <input type="file"
          class="vin-file-input d-none"
          accept="application/pdf,image/*" />
@@ -1638,12 +1646,22 @@ document.addEventListener("mouseover", (e) => {
   const vin = e.target.closest(".vin-hover");
   const overTooltip = e.target.closest(".vin-floating-tooltip");
 
-  // Si estoy sobre VIN
   if (vin) {
     clearTimeout(hideTimeout);
 
     currentVin = vin.dataset.vin;
     currentScanId = vin.dataset.scanId;
+
+    const scan = datosGlobales.find(
+      (s) => String(s.scan_id) === String(currentScanId),
+    );
+
+    const switchEl = vinTooltip.querySelector(".vin-transito-switch");
+
+    if (switchEl && scan) {
+      switchEl.checked = !!scan.unidad_transito;
+    }
+
     const rect = vin.getBoundingClientRect();
 
     vinTooltip.style.top = rect.bottom + 6 + "px";
@@ -1652,7 +1670,6 @@ document.addEventListener("mouseover", (e) => {
     vinTooltip.style.pointerEvents = "auto";
   }
 
-  // Si estoy sobre el tooltip, no ocultar
   if (overTooltip) {
     clearTimeout(hideTimeout);
   }
@@ -1717,6 +1734,40 @@ vinTooltip
     } finally {
       hideGlobalSpinner();
       this.value = "";
+    }
+  });
+
+vinTooltip
+  .querySelector(".vin-transito-switch")
+  .addEventListener("change", async function () {
+    if (!currentScanId) return;
+
+    const newValue = this.checked;
+
+    try {
+      const res = await fetch(`/api/updates/${currentScanId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          unidad_transito: newValue,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Error backend");
+
+      // 🔄 actualizar estado local
+      datosGlobales = datosGlobales.map((s) =>
+        String(s.scan_id) === String(currentScanId)
+          ? { ...s, unidad_transito: newValue }
+          : s,
+      );
+
+      renderTabla();
+
+      toastSuccess("Estado actualizado");
+    } catch (err) {
+      console.error(err);
+      toastError("No se pudo actualizar");
     }
   });
 
