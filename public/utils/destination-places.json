@@ -1,12 +1,47 @@
 [
   {
+    "nombre": "Sin destino",
+    "id": "0",
+    "direccion": "NA"
+  },
+  {
+    "nombre": "Sauma",
     "id": "1",
+    "direccion": "Avenida del Libertador 3382 - San Fernando"
+  },
+  {
+    "nombre": "Autotag S.A.",
+    "id": "2",
+    "direccion": "Av. Ricardo Balbin 1939/59 - Gral. San Martín"
+  },
+  {
+    "nombre": "Maynar S.A.",
+    "id": "3",
+    "direccion": "Av. del Libertador 6946 - Capital Federal"
+  },
+  {
+    "nombre": "Dietrich S.A.",
+    "id": "4",
+    "direccion": "Honduras 4210 - CABA "
+  },
+  {
+    "nombre": "Espasa S.A.",
+    "id": "5",
+    "direccion": "Av. Córdoba 3000 - Capital Federal"
+  },
+  {
+    "nombre": "Playa W",
+    "id": "6",
+    "direccion": "NA"
+  },
+  {
+    "id": "7",
     "company": "AUTOTAG S.A.",
     "cuit_destino": "30-71096342-4",
     "dir_destino": "AVDA. CALCHAQUI 252 BERAZATEGUI - (Pcia. BUENOS AIRES)"
   },
   {
-    "id": "2",
+    "id": "8",
     "company": "TERMINAL ZARATE",
     "cuit_destino": "30-64153685-3",
     "dir_destino": "DR. FELIX PAGOLA 2671 ZARATE (BUENOS AIRES) - (Pcia. BUENOS AIRES)"

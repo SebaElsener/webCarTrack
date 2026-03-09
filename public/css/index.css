@@ -2422,7 +2422,8 @@ body > .glightbox-container {
   gap: 8px;
 }
 
-#contFiltroLugar {
+#contFiltroLugar,
+#contFiltroDestino {
   width: 300px;
   margin-top: -25px;
 }

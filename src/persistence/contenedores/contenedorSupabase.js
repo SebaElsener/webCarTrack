@@ -226,6 +226,7 @@ class ContenedorSupabase {
             clima,
             user,
             lugar,
+            destino,
             unidad_transito,
             damages (
               id,
@@ -260,6 +261,7 @@ class ContenedorSupabase {
         movimiento: s.movimiento,
         user: s.user,
         lugar: s.lugar,
+        destino: s.destino,
         clima: s.clima,
         unidad_transito: s.unidad_transito,
         damages: (s.damages ?? []).filter(

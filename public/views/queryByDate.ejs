@@ -222,6 +222,9 @@
               <div id="contFiltroLugar" style="display: none">
                 <select id="filtroLugar" multiple></select>
               </div>
+              <div id="contFiltroDestino" style="display: none">
+                <select id="filtroDestino" multiple></select>
+              </div>
             </div>
           </div>
 
@@ -313,7 +316,14 @@
       const choicesLugar = new Choices("#filtroLugar", {
         removeItemButton: true,
         searchEnabled: true,
-        placeholderValue: "Seleccionar lugar",
+        placeholderValue: "Lugar",
+        shouldSort: false,
+      });
+
+      const choicesDestino = new Choices("#filtroDestino", {
+        removeItemButton: true,
+        searchEnabled: true,
+        placeholderValue: "Destino",
         shouldSort: false,
       });
     </script>

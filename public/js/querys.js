@@ -16,6 +16,7 @@ let filtros = {
   modelo: [],
   batea: [],
   lugar: [],
+  destino: [],
   topAreas: false,
   topAverias: false,
   topBateas: false,
@@ -131,11 +132,27 @@ function cargarLugares() {
   );
 }
 
+function cargarDestinos() {
+  const destinos = [
+    ...new Set(datosGlobales.map((d) => d.destino).filter(Boolean)),
+  ].sort();
+
+  choicesDestino.clearChoices();
+
+  choicesDestino.setChoices(
+    destinos.map((d) => ({ value: d, label: d })),
+    "value",
+    "label",
+    true,
+  );
+}
+
 function actualizarUIFiltroMovimiento() {
   const labelIngreso = document.querySelector('label[for="movIngreso"]');
   const labelDespacho = document.querySelector('label[for="movDespacho"]');
   const labelTransito = document.querySelector('label[for="movTransito"]');
   const contLugar = document.getElementById("contFiltroLugar");
+  const contDestino = document.getElementById("contFiltroDestino");
 
   if (!labelIngreso || !labelDespacho || !labelTransito || !contLugar) return;
 
@@ -145,10 +162,16 @@ function actualizarUIFiltroMovimiento() {
     filtros.movimiento === "TRANSITO"
   ) {
     contLugar.style.display = "block";
+    contDestino.style.display = "block";
   } else {
     contLugar.style.display = "none";
+    contDestino.style.display = "none";
+
     filtros.lugar = [];
+    filtros.destino = [];
+
     choicesLugar.removeActiveItems();
+    choicesDestino.removeActiveItems();
   }
 }
 
@@ -235,6 +258,7 @@ async function cargarDatos(desde, hasta) {
       cargarModelos();
       cargarBateas();
       cargarLugares();
+      cargarDestinos();
       aplicarFiltros();
     })
     .catch((err) => {
@@ -292,6 +316,7 @@ function renderTabla() {
           <td>${scan.batea ?? ""}</td>
           <td>${scan.movimiento ?? ""}</td>
           <td>${scan.lugar ?? ""}</td>
+          <td>${scan.destino ?? ""}</td>
           <td>${renderClimaIcon(scan.clima)}</td>
           <td>${scan.user ?? ""}</td>
         </tr>
@@ -333,6 +358,7 @@ function renderTabla() {
             <td>${scan.batea ?? ""}</td>
             <td>${scan.movimiento ?? ""}</td>
             <td>${scan.lugar ?? ""}</td>
+            <td>${scan.destino ?? ""}</td>
             <td>${renderClimaIcon(scan.clima)}</td>
             <td>${scan.user ?? ""}</td>
           </tr>
@@ -360,6 +386,7 @@ function renderTabla() {
             <th class="bateaTh">Batea</th>
             <th class="movimientoTh">Movimiento</th>
             <th class="lugarTh">Lugar</th>
+            <th class="destinoTh">Destino</th>
             <th class="climaTh">Clima</th>
             <th class="userTh">Usuario</th>
           </tr>
@@ -385,6 +412,7 @@ function renderTabla() {
     bateaTh: 60,
     movimientoTh: 90,
     lugarTh: 130,
+    destinoTh: 130,
     climaTh: 90,
   };
 
@@ -645,6 +673,11 @@ document.getElementById("filtroLugar").addEventListener("change", (e) => {
   aplicarFiltros();
 });
 
+document.getElementById("filtroDestino").addEventListener("change", (e) => {
+  filtros.destino = Array.from(e.target.selectedOptions).map((o) => o.value);
+  aplicarFiltros();
+});
+
 function aplicarFiltros() {
   const tabla = document.getElementById("resultados");
   const stats = document.getElementById("estadisticas");
@@ -690,6 +723,12 @@ function aplicarFiltros() {
 
     if (filtros.lugar.length) {
       dataBase = dataBase.filter((scan) => filtros.lugar.includes(scan.lugar));
+    }
+
+    if (filtros.destino.length) {
+      dataBase = dataBase.filter((scan) =>
+        filtros.destino.includes(scan.destino),
+      );
     }
 
     datosBaseFiltrados = dataBase;
@@ -1056,6 +1095,7 @@ const limpiarFiltros = () => {
   filtros.modelo = [];
   filtros.batea = [];
   filtros.lugar = [];
+  filtros.destino = [];
   filtros.soloConDanio = false;
   filtros.movimiento = null;
   filtros.areaSeleccionada = null;
@@ -1070,6 +1110,7 @@ const limpiarFiltros = () => {
   choicesModelo.removeActiveItems();
   choicesBatea.removeActiveItems();
   choicesLugar.removeActiveItems();
+  choicesDestino.removeActiveItems();
 
   // 🔹 Reset checkboxes
   document.getElementById("chkSoloConDanio").checked = false;

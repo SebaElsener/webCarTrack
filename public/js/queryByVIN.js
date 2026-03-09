@@ -3,6 +3,7 @@ import averias from "../utils/averias.json" with { type: "json" };
 import gravedades from "../utils/gravedades.json" with { type: "json" };
 import movimientos from "../utils/movimientos.json" with { type: "json" };
 import lugares from "../utils/locaciones.json" with { type: "json" };
+import destinos from "../utils/destination-places.json" with { type: "json" };
 import { inlineEditor } from "./inline-edit/inline-edit.init.js";
 import { GetCartaporteInfo } from "./getCartaporteInfo.js";
 import { obtenerVIN } from "./VIN-actions/vinService.js";
@@ -348,6 +349,11 @@ function renderTabla() {
             data-scan-id="${scan.scan_id}">
           <span class="cell-value">${scan.lugar ?? ""}</span>
         </td>
+        <td class="editable-scan"
+            data-field="destino"
+            data-scan-id="${scan.scan_id}">
+          <span class="cell-value">${scan.destino ?? ""}</span>
+        </td>
         <td class="editable-scan text-center"
             data-field="clima"
             data-scan-id="${scan.scan_id}">
@@ -491,6 +497,11 @@ function renderTabla() {
                 data-scan-id="${scan.scan_id}">
               <span class="cell-value">${scan.lugar ?? ""}</span>
             </td>
+            <td class="editable-scan"
+                data-field="destino"
+                data-scan-id="${scan.scan_id}">
+              <span class="cell-value">${scan.destino ?? ""}</span>
+            </td>
             <td class="editable-scan text-center"
                 data-field="clima"
                 data-scan-id="${scan.scan_id}">
@@ -524,6 +535,7 @@ function renderTabla() {
             <th class="bateaTh">Batea</th>
             <th class="movimientoTh">Movimiento</th>
             <th class="lugarTh">Lugar</th>
+            <th class="destinoTh">Destino</th>
             <th class="climaTh">Clima</th>
             <th class="userTh">Usuario</th>
           </tr>
@@ -549,6 +561,7 @@ function renderTabla() {
     bateaTh: 60,
     movimientoTh: 90,
     lugarTh: 130,
+    destinoTh: 130,
     climaTh: 90,
   };
 
@@ -703,6 +716,26 @@ document.addEventListener("click", async (e) => {
     input.className = "form-select form-select-sm";
 
     lugares.forEach((l) => {
+      const option = document.createElement("option");
+      option.value = l.nombre;
+      option.textContent = l.nombre;
+
+      if (l.nombre === currentValue) {
+        option.selected = true;
+      }
+
+      input.appendChild(option);
+    });
+  }
+
+  // ========================
+  // LUGAR (select JSON)
+  // ========================
+  if (field === "destino") {
+    input = document.createElement("select");
+    input.className = "form-select form-select-sm";
+
+    destinos.forEach((l) => {
       const option = document.createElement("option");
       option.value = l.nombre;
       option.textContent = l.nombre;
@@ -1078,7 +1111,7 @@ document.addEventListener("click", async (e) => {
   const scan = datosGlobales.find((s) => String(s.scan_id) === String(scanId));
 
   const confirmed = await confirmModal({
-    title: "Eliminar etapa",
+    title: "Eliminar VIN",
     body: `
       <p class="mb-2">
         ¿Eliminar el VIN <strong>${scan?.vin ?? ""}</strong><br>
@@ -1390,6 +1423,8 @@ function createNewDamageRow(scan) {
 
       <td>${scan.batea ?? ""}</td>
       <td>${scan.movimiento ?? ""}</td>
+      <td>${scan.lugar ?? ""}</td>
+      <td>${scan.destino ?? ""}</td>
       <td>${renderClimaIcon(scan.clima)}</td>
       <td>${scan.user ?? ""}</td>
     </tr>
