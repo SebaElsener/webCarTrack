@@ -159,29 +159,39 @@ const { PORT, clusterMode } = yargs
     clusterMode: "FORK",
   }).argv;
 
-if (clusterMode === "CLUSTER" && cluster.isPrimary) {
-  const CPUsQty = os.cpus().length;
-
-  infoLogger.info("SERVIDOR PRIMARIO DEL CLUSTER");
-  infoLogger.info("Número de procesadores: " + CPUsQty);
-  infoLogger.info("PID:" + process.pid);
-
-  for (let i = 0; i < CPUsQty; i++) {
-    cluster.fork();
-  }
-  cluster.on("exit", (worker) => {
-    infoLogger.info(
-      `Worker ${worker.process.pid} died on ${new Date().toLocaleString()}`,
-    );
-    cluster.fork();
-  });
-} else {
-  const connectedServer = httpServer.listen(PORT, () => {
-    infoLogger.info(
-      `http server escuchando en puerto ${connectedServer.address().port}`,
-    );
-  });
-  connectedServer.on("error", (error) =>
-    errorLogger.error(`Error en servidor ${error}`),
+const connectedServer = httpServer.listen(PORT, () => {
+  infoLogger.info(
+    `http server escuchando en puerto ${connectedServer.address().port}`,
   );
-}
+});
+
+connectedServer.on("error", (error) =>
+  errorLogger.error(`Error en servidor ${error}`),
+);
+
+// if (clusterMode === "CLUSTER" && cluster.isPrimary) {
+//   const CPUsQty = os.cpus().length;
+
+//   infoLogger.info("SERVIDOR PRIMARIO DEL CLUSTER");
+//   infoLogger.info("Número de procesadores: " + CPUsQty);
+//   infoLogger.info("PID:" + process.pid);
+
+//   for (let i = 0; i < CPUsQty; i++) {
+//     cluster.fork();
+//   }
+//   cluster.on("exit", (worker) => {
+//     infoLogger.info(
+//       `Worker ${worker.process.pid} died on ${new Date().toLocaleString()}`,
+//     );
+//     cluster.fork();
+//   });
+// } else {
+//   const connectedServer = httpServer.listen(PORT, () => {
+//     infoLogger.info(
+//       `http server escuchando en puerto ${connectedServer.address().port}`,
+//     );
+//   });
+//   connectedServer.on("error", (error) =>
+//     errorLogger.error(`Error en servidor ${error}`),
+//   );
+// }
