@@ -28,10 +28,12 @@ module.exports = {
     {
       name: "cartrack",
       script: "src/server.js",
-      instances: "max",
-      exec_mode: "cluster",
+      instances: 1,
+      exec_mode: "fork",
       env: {
         PYTHON_BIN: "venv/bin/python",
+        NODE_ENV: "production",
+        PORT: 8080,
       },
     },
   ],
