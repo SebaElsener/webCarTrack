@@ -31,7 +31,7 @@ module.exports = {
       instances: "max",
       exec_mode: "cluster",
       env: {
-        PYTHON_BIN: "/webCarTrack/venv/bin/python",
+        PYTHON_BIN: "venv/bin/python",
       },
     },
   ],

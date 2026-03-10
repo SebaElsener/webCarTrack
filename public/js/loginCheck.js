@@ -69,7 +69,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const email = emailInput.value.trim();
     const password = passInput.value.trim();
 
+    const spinner = document.getElementById("loginSpinner");
+    const text = document.getElementById("loginText");
+
     submitBtn.disabled = true;
+
+    let spinnerVisible = false;
+
+    const spinnerTimer = setTimeout(() => {
+      spinner.classList.remove("d-none");
+      text.textContent = "Ingresando...";
+      spinnerVisible = true;
+    }, 300);
 
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -77,9 +88,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     if (error) {
+      clearTimeout(spinnerTimer);
+
+      if (spinnerVisible) {
+        spinner.classList.add("d-none");
+      }
+
+      text.textContent = "Enviar";
+
       passError.style.display = "block";
       passError.innerText = "Usuario o contraseña incorrectos";
       submitBtn.disabled = false;
+
       return;
     }
 
@@ -96,6 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
     await supabase.auth.signOut();
 
     // Redirigir a home
+    clearTimeout(spinnerTimer);
     window.location.href = "/api/home";
   });
 });
