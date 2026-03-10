@@ -149,15 +149,17 @@ io.on("connection", async (socket) => {
   });
 });
 
-const { PORT, clusterMode } = yargs
-  .alias({
-    p: "PORT",
-    m: "clusterMode",
-  })
-  .default({
-    PORT: 8080,
-    clusterMode: "FORK",
-  }).argv;
+// const { PORT, clusterMode } = yargs
+//   .alias({
+//     p: "PORT",
+//     m: "clusterMode",
+//   })
+//   .default({
+//     PORT: 8080,
+//     clusterMode: "FORK",
+//   }).argv;
+
+const PORT = process.env.PORT || 8080;
 
 const connectedServer = httpServer.listen(PORT, () => {
   infoLogger.info(
