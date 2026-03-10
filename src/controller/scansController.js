@@ -7,6 +7,8 @@ import path from "path";
 import fs from "fs";
 import { execFile } from "child_process";
 
+const PYTHON_BIN = process.env.PYTHON_BIN || "python3";
+
 const excelHelper = async (datos) => {
   return new Promise((resolve, reject) => {
     const ahora = new Date();
@@ -27,7 +29,7 @@ const excelHelper = async (datos) => {
     const PDFoutputPath = path.resolve("exports", fileNamePDF);
 
     execFile(
-      "python3",
+      PYTHON_BIN,
       [scriptPath, templatePath, outputPath, JSON.stringify(datos)],
       (err, stdout, stderr) => {
         if (err) {
@@ -61,7 +63,7 @@ const cartaporteController = async (req, res) => {
     );
 
     execFile(
-      "python3",
+      PYTHON_BIN,
       ["src/python/export_pdf.py", outputPath],
       (err, stdout, stderr) => {
         if (err) {
