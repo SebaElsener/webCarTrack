@@ -5,10 +5,10 @@ const errorLogger = pino(
     level: "warn",
     timestamp: pino.stdTimeFunctions.isoTime,
   },
-  pino.destination({
-    dest: "./log/logs.log",
-    sync: false,
-  }),
+  //   pino.destination({
+  //     dest: "./log/logs.log",
+  //     sync: false,
+  //   }),
 );
 
 const infoLogger = pino({
