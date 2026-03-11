@@ -1230,7 +1230,7 @@ document.addEventListener("click", async (e) => {
   if (!formData) return;
 
   const cliente = cartaporteInfo.clientData(scan.marca);
-  const origen = cartaporteInfo.originData(scan.lugar);
+  const origen = cartaporteInfo.originData(scan.lugar) || {};
   const destino = cartaporteInfo.destinationData(formData.destino);
   const damages = formatDamages(scan.damages).join(" /// ");
   const actualDate = Date.now();
@@ -1251,8 +1251,8 @@ document.addEventListener("click", async (e) => {
     cuit_cliente: cliente.cuit_cliente,
     cod_cliente: cliente.codigo,
     origen: scan.lugar,
-    dir_origen: origen.dir_origen,
-    cuit_origen: origen.cuit_origen,
+    dir_origen: origen.dir_origen ?? "",
+    cuit_origen: origen.cuit_origen ?? "",
     dir_destino: destino.dir_destino,
     cuit_destino: destino.cuit_destino,
     vin: scan.vin,
