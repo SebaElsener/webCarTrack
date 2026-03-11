@@ -26,7 +26,9 @@ import { infoLogger } from "../logger.js";
 // let DAOcarrito = null
 // let DAOusers = null
 let supabaseRepo = null;
-export default supabaseRepo = supabaseRepository.getInstance();
+supabaseRepo = supabaseRepository.getInstance();
+
+export { supabaseRepo };
 
 // switch (persistenceMethod) {
 //   case "mongoDB":

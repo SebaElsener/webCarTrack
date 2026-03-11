@@ -1,14 +1,14 @@
 import { productsRepo } from "../persistence/factory.js";
-import { DAOusers } from "../persistence/factory.js";
+// import { DAOusers } from "../persistence/factory.js";
 
-const mainPage = async (userName) => {
-  const productsList = await productsRepo.getAll();
-  const userData = await DAOusers.getByUser(userName);
-  return {
-    productsList: productsList,
-    userData: userData,
-  };
-};
+// const mainPage = async (userName) => {
+//   const productsList = await productsRepo.getAll();
+//   const userData = await DAOusers.getByUser(userName);
+//   return {
+//     productsList: productsList,
+//     userData: userData,
+//   };
+// };
 
 const getAllProducts = async () => {
   return await productsRepo.getAll();

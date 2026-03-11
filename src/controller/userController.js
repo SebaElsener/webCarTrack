@@ -1,13 +1,12 @@
-import {
-  getByUser,
-  updateUserById,
-  updateUserWithCart,
-  purchase,
-  getAllUsers,
-  makeUsersAdmin,
-  deleteUsers,
-  passBusiness,
-} from "../business/userBusiness.js";
+import {} from //getByUser,
+//updateUserById,
+// updateUserWithCart,
+// purchase,
+//getAllUsers,
+// makeUsersAdmin,
+// deleteUsers,
+// passBusiness,
+"../business/userBusiness.js";
 
 const renderUserData = async (req, res) => {
   const userName = req.user.sub;
@@ -35,17 +34,17 @@ const updateUser = async (req, res) => {
   res.json(await updateUserById(userDBid, userInfoToUpdate));
 };
 
-const addCartToUser = async (req, res) => {
-  const cartId = { cartId: req.body.cartId };
-  const userId = req.body.userId;
-  res.json(updateUserWithCart(userId, cartId));
-};
+// const addCartToUser = async (req, res) => {
+//   const cartId = { cartId: req.body.cartId };
+//   const userId = req.body.userId;
+//   res.json(updateUserWithCart(userId, cartId));
+// };
 
-const purchaseOrder = async (req, res) => {
-  const userName = req.user.sub;
-  const orderNbr = await purchase(userName);
-  res.json(`Orden ${orderNbr} generada con exito`);
-};
+// const purchaseOrder = async (req, res) => {
+//   const userName = req.user.sub;
+//   const orderNbr = await purchase(userName);
+//   res.json(`Orden ${orderNbr} generada con exito`);
+// };
 
 const usersAdmin = async (req, res) => {
   const allUsers = await getAllUsers();
@@ -56,29 +55,29 @@ const usersAdmin = async (req, res) => {
   });
 };
 
-const usersAdm = async (req, res) => {
-  const users = req.body;
-  res.json(await makeUsersAdmin(users));
-};
+// const usersAdm = async (req, res) => {
+//   const users = req.body;
+//   res.json(await makeUsersAdmin(users));
+// };
 
-const usersDelete = async (req, res) => {
-  const users = req.body;
-  res.json(await deleteUsers(users));
-};
+// const usersDelete = async (req, res) => {
+//   const users = req.body;
+//   res.json(await deleteUsers(users));
+// };
 
-const passChange = async (req, res) => {
-  const passData = req.body;
-  res.json(await passBusiness(passData));
-};
+// const passChange = async (req, res) => {
+//   const passData = req.body;
+//   res.json(await passBusiness(passData));
+// };
 
 export {
   renderUserData,
   getUser,
   updateUser,
-  addCartToUser,
-  purchaseOrder,
+  // addCartToUser,
+  // purchaseOrder,
   usersAdmin,
-  usersAdm,
-  usersDelete,
-  passChange,
+  // usersAdm,
+  // usersDelete,
+  // passChange,
 };
