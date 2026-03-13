@@ -374,6 +374,29 @@ class ContenedorSupabase {
     }
   }
 
+  async getByUser(userId) {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("id, destino, name, address, phone")
+      .eq("id", userId);
+
+    if (error) throw error;
+
+    return data;
+  }
+
+  async updateUserById(userId, userInfoToUpdate) {
+    const { data, error } = await supabase
+      .from("profiles")
+      .update(userInfoToUpdate)
+      .eq("id", userId)
+      .select();
+
+    if (error) throw error;
+
+    return data;
+  }
+
   async deleteFile({ pict_id, upload_id, bucketName, path }) {
     try {
       // borrar registro DB

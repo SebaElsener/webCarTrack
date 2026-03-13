@@ -13,12 +13,10 @@ navBarMin.style.top = "0";
 userDataForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const userInfoToUpdate = {
-    userDBid: _id.value,
+    userId: _id.value,
     name: nameLastname.value,
     address: direccion.value,
-    age: age.value,
     phone: phone.value,
-    avatar: avatar.value,
   };
   await fetch("/api/userdata/", {
     method: "POST",

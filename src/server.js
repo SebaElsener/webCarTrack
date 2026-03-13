@@ -20,9 +20,9 @@ import dotenv from "dotenv";
 import compression from "compression";
 import routeError from "./middleware/routeError.js";
 import { logs } from "./middleware/logs.js";
-// import userData from "./router/userData.js";
+import userData from "./router/userData.js";
 import { infoLogger, errorLogger } from "./logger.js";
-import SessionStore from "../utils/chatSessionStorage.js";
+//import SessionStore from "../utils/chatSessionStorage.js";
 import scansRoute from "./router/scansRoute.js";
 // import chartsRoute from "./router/chartsRouter.js";
 // import statsRoute from "./router/statsRouter.js";
@@ -60,7 +60,7 @@ app.use(logs);
 app.use("/", userLogin);
 app.use("/api/productos", requireLogin, routeProducts);
 // app.use("/api/carrito", requireLogin, routeCart);
-// app.use("/api/userdata", requireLogin, userData);
+app.use("/api/userdata", requireLogin, userData);
 app.use("/api/querys", requireLogin, querysRouter);
 app.use("/api/export", requireLogin, exportRouter);
 app.use("/api/timeout", timeout);
@@ -79,86 +79,6 @@ app.use("/api/home", homeRoute);
 // Middleware para mostrar error al intentar acceder a una ruta/método no implementados
 app.use(routeError);
 
-// convert a connect middleware to a Socket.IO middleware
-// const wrap = (middleware) => (socket, next) =>
-//   middleware(socket.request, {}, next);
-// io.use(wrap(sessionMiddleware));
-// io.use(wrap(passport.initialize()));
-// io.use(wrap(passport.session()));
-
-// const sessionStore = new SessionStore();
-// io.use((socket, next) => {
-//   if (socket.request.user) {
-//     socket.sessionId = socket.request.sessionID;
-//     socket.username = socket.request.user;
-//     next();
-//   } else {
-//     next(infoLogger.error("SESION NO INICIADA"));
-//   }
-// });
-
-// io.on("connection", async (socket) => {
-//   infoLogger.info(`Nuevo cliente ${socket.username} conectado!`);
-//   sessionStore.saveSession(socket.sessionId, {
-//     username: socket.username,
-//   });
-
-//   // join the user room
-//   socket.join(socket.username);
-
-//   // Almacenamiento de usuarios que se van conectando
-//   const users = [];
-//   sessionStore.findAllSessions().forEach((session) => {
-//     users.push({
-//       username: session.username,
-//     });
-//   });
-//   // Envío de usuarios conectados
-//   io.sockets.emit("connectedUsers", users);
-
-//   // Escuchando y guardando nuevos mensajes
-//   socket.on("newMessage", async (data) => {
-//     const { newMessage, receiver, sender } = data;
-//     const dataToStore = {
-//       ...newMessage,
-//       from: sender,
-//       to: receiver,
-//     };
-//     await messages.save(dataToStore);
-//     const allMssgs = await messages.getAll();
-//     let mssgs = [];
-//     for (let mssg of allMssgs) {
-//       if (mssg.from === sender && mssg.to === sender) {
-//         mssgs.push(mssg);
-//         continue;
-//       }
-//       if (mssg.from === sender && mssg.to === receiver) {
-//         mssgs.push(mssg);
-//       }
-//       if (mssg.from === receiver && mssg.to === sender) {
-//         mssgs.push(mssg);
-//       }
-//     }
-//     io.to(receiver).to(socket.username).emit("newMessage", {
-//       newMessage: mssgs,
-//     });
-//   });
-//   socket.on("disconnect", () => {
-//     infoLogger.info(`Desconectado ${socket.username}`);
-//     sessionStore.deleteSession(socket.sessionId);
-//   });
-// })
-
-// const { PORT, clusterMode } = yargs
-//   .alias({
-//     p: "PORT",
-//     m: "clusterMode",
-//   })
-//   .default({
-//     PORT: 8080,
-//     clusterMode: "FORK",
-//   }).argv;
-
 const PORT = process.env.PORT || 8080;
 
 const connectedServer = httpServer.listen(PORT, () => {
@@ -170,30 +90,3 @@ const connectedServer = httpServer.listen(PORT, () => {
 connectedServer.on("error", (error) =>
   errorLogger.error(`Error en servidor ${error}`),
 );
-
-// if (clusterMode === "CLUSTER" && cluster.isPrimary) {
-//   const CPUsQty = os.cpus().length;
-
-//   infoLogger.info("SERVIDOR PRIMARIO DEL CLUSTER");
-//   infoLogger.info("Número de procesadores: " + CPUsQty);
-//   infoLogger.info("PID:" + process.pid);
-
-//   for (let i = 0; i < CPUsQty; i++) {
-//     cluster.fork();
-//   }
-//   cluster.on("exit", (worker) => {
-//     infoLogger.info(
-//       `Worker ${worker.process.pid} died on ${new Date().toLocaleString()}`,
-//     );
-//     cluster.fork();
-//   });
-// } else {
-//   const connectedServer = httpServer.listen(PORT, () => {
-//     infoLogger.info(
-//       `http server escuchando en puerto ${connectedServer.address().port}`,
-//     );
-//   });
-//   connectedServer.on("error", (error) =>
-//     errorLogger.error(`Error en servidor ${error}`),
-//   );
-// }

@@ -4,21 +4,22 @@
 // import { infoLogger } from '../logger.js'
 // import twilioSender from '../twilio/twilioMessage.js'
 // import { usersAdministrationDTO } from '../persistence/DTO/usersDTO.js'
-import { passwordCheck } from "../../utils/passwordCheck.js";
+import { supabaseRepo } from "../persistence/factory.js";
+//import { passwordCheck } from "../../utils/passwordCheck.js";
 
-// const getByUser = async (userName) => {
-//     const user = [await DAOusers.getByUser(userName)]
-//     return usersAdministrationDTO(user)
-// }
+const getByUser = async (userName) => {
+  const user = await supabaseRepo.getByUser(userName);
+  return user;
+};
 
 // const getAllUsers = async () => {
 //     const getData = await DAOusers.getAll()
 //     return usersAdministrationDTO(getData)
 // }
 
-// const updateUserByIds = async (userDBid, userInfoToUpdate) => {
-//     return await DAOusers.updateById(userDBid, userInfoToUpdate)
-// }
+const updateUserById = async (userId, userInfoToUpdate) => {
+  return await supabaseRepo.updateUserById(userId, userInfoToUpdate);
+};
 
 // const updateUserWithCart = async (userId, cartId) => {
 //     return await DAOusers.updateById(userId, cartId)
@@ -72,8 +73,8 @@ const passBusiness = async (passData) => {
 };
 
 export {
-  //   getByUser,
-  //   updateUserById,
+  getByUser,
+  updateUserById,
   //   updateUserWithCart,
   //   purchase,
   //   getAllUsers,

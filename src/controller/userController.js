@@ -1,16 +1,19 @@
-import {} from //getByUser,
-//updateUserById,
-// updateUserWithCart,
-// purchase,
-//getAllUsers,
-// makeUsersAdmin,
-// deleteUsers,
-// passBusiness,
-"../business/userBusiness.js";
+import {
+  getByUser,
+  updateUserById,
+  // updateUserWithCart,
+  // purchase,
+  //getAllUsers,
+  // makeUsersAdmin,
+  // deleteUsers,
+  // passBusiness,
+} from "../business/userBusiness.js";
 
 const renderUserData = async (req, res) => {
-  const userName = req.user.sub;
-  const userData = await getByUser(userName);
+  const userId = req.user.id;
+  const userName = req.user.email;
+  const userData = await getByUser(userId);
+  console.log(userName, userData[0]);
   res.render("userData", {
     userData: userData[0],
     userName: userName,
@@ -23,13 +26,11 @@ const getUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  const userDBid = req.body.userDBid;
+  const userDBid = req.body.userId;
   const userInfoToUpdate = {
     name: req.body.name,
     address: req.body.address,
-    age: req.body.age,
     phone: req.body.phone,
-    avatar: req.body.avatar,
   };
   res.json(await updateUserById(userDBid, userInfoToUpdate));
 };

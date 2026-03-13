@@ -4,8 +4,6 @@ import {
   renderUserData,
   getUser,
   updateUser,
-  //addCartToUser,
-  //purchaseOrder,
   usersAdmin,
   //usersAdm,
   //usersDelete,
