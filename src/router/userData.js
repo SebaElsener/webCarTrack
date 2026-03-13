@@ -7,7 +7,7 @@ import {
   usersAdmin,
   //usersAdm,
   //usersDelete,
-  //passChange,
+  passChange,
 } from "../controller/userController.js";
 
 const userData = new Router();
@@ -28,6 +28,6 @@ userData.get("/usersadmin", usersAdmin);
 
 // userData.delete("/usersdelete", usersDelete);
 
-// userData.post("/passchange", passChange);
+userData.post("/passchange", passChange);
 
 export default userData;

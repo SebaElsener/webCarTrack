@@ -1062,7 +1062,8 @@ tbody tr:nth-child(even) {
   box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
 }
 
-#regForm #errorPassCheck {
+#errorPassCheck,
+#errorValidPass {
   margin: 10px 0 18px;
   padding: 10px 14px;
   border-radius: 8px;

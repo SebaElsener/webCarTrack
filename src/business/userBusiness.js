@@ -60,16 +60,8 @@ const deleteUsers = async (users) => {
 };
 
 const passBusiness = async (passData) => {
-  const userData = await DAOusers.getById(passData.userId);
-  const DBUserPass = userData.password;
-  const validPassword = await passwordCheck(DBUserPass, passData.password);
-  if (!validPassword) {
-    return "LA CONTRASEÑA ACTUAL INGRESADA ES INCORRECTA";
-  }
-  await DAOusers.updateById(passData.userId, {
-    password: passData.newPassword,
-  });
-  return "CONTRASEÑA MODIFICADA CON EXITO";
+  const validPassword = await supabaseRepo.passChange(passData);
+  return validPassword;
 };
 
 export {

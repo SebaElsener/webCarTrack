@@ -6,14 +6,13 @@ import {
   //getAllUsers,
   // makeUsersAdmin,
   // deleteUsers,
-  // passBusiness,
+  passBusiness,
 } from "../business/userBusiness.js";
 
 const renderUserData = async (req, res) => {
   const userId = req.user.id;
   const userName = req.user.email;
   const userData = await getByUser(userId);
-  console.log(userName, userData[0]);
   res.render("userData", {
     userData: userData[0],
     userName: userName,
@@ -66,10 +65,24 @@ const usersAdmin = async (req, res) => {
 //   res.json(await deleteUsers(users));
 // };
 
-// const passChange = async (req, res) => {
-//   const passData = req.body;
-//   res.json(await passBusiness(passData));
-// };
+const passChange = async (req, res) => {
+  const userEmail = req.user.email;
+  const userId = req.user.id;
+
+  const passData = { userEmail, userId, ...req.body };
+
+  try {
+    const result = await passBusiness(passData);
+
+    if (!result.ok) {
+      return res.status(400).json({ message: result.message });
+    }
+
+    res.status(200).json({ message: result.message });
+  } catch (error) {
+    res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
 
 export {
   renderUserData,
@@ -80,5 +93,5 @@ export {
   usersAdmin,
   // usersAdm,
   // usersDelete,
-  // passChange,
+  passChange,
 };

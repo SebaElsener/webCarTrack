@@ -1,9 +1,7 @@
 const userDataForm = document.getElementById("userDataForm");
 const nameLastname = document.getElementById("nameLastname");
 const direccion = document.getElementById("direccion");
-const age = document.getElementById("age");
 const phone = document.getElementById("phone");
-const avatar = document.getElementById("avatar");
 const _id = document.getElementById("_id");
 const passChangeBtn = document.getElementById("passChangeBtn");
 const passForm = document.getElementById("passForm");
@@ -38,30 +36,55 @@ passChangeBtn.addEventListener("click", () => {
 
 passForm.addEventListener("submit", async (e) => {
   e.preventDefault();
+
   const actualUserPass = document.getElementById("actualUserPass");
-  const newPassword = await createHash(userPass.value);
+  const newPassword = document.getElementById("userPass");
+  const sendBtn = passForm.querySelector("button[type='submit']");
+
   const passData = {
     userId: _id.value,
     password: actualUserPass.value,
-    newPassword: newPassword,
+    newPassword: newPassword.value,
   };
-  await fetch("/api/userdata/passchange", {
-    method: "POST",
-    body: JSON.stringify(passData),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-    .then((res) => res.json())
-    .then((json) => {
-      passForm.reset();
-      passForm.style.visibility = "collapse";
-      toastInfo(json);
-    });
-});
 
-const createHash = async (passToHash) => {
-  bcrypt = dcodeIO.bcrypt;
-  const saltRounds = 10;
-  return await bcrypt.hash(passToHash, saltRounds);
-};
+  try {
+    sendBtn.disabled = true;
+    sendBtn.innerText = "Actualizando...";
+
+    const res = await fetch("/api/userdata/passchange", {
+      method: "POST",
+      body: JSON.stringify(passData),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    const { message } = await res.json();
+
+    toastInfo(message);
+    sessionStorage.setItem("toastMessage", message);
+
+    if (!res.ok) {
+      sendBtn.disabled = false;
+      sendBtn.innerText = "Cambiar";
+      return;
+    }
+
+    passForm.reset();
+    passForm.style.visibility = "collapse";
+
+    await fetch("/api/logout", {
+      method: "POST",
+      credentials: "include",
+    });
+
+    setTimeout(async () => {
+      window.location.href = "/api/login";
+    }, 1500);
+  } catch (err) {
+    toastInfo("Error inesperado");
+    sendBtn.disabled = false;
+    sendBtn.innerText = "Cambiar";
+  }
+});

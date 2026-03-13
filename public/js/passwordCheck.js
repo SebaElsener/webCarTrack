@@ -1,23 +1,48 @@
-userPassCheck.addEventListener("change", () => {
-  const userPass = document.getElementById("userPass");
-  const userPassCheck = document.getElementById("userPassCheck");
+const userPass = document.getElementById("userPass");
+const userPassCheck = document.getElementById("userPassCheck");
+
+function checkPasswords() {
   const errorPassCheck = document.getElementById("errorPassCheck");
+  const errorValidPass = document.getElementById("errorValidPass");
   const sendBtn = document.getElementById("sendBtn");
+
+  // Validar contraseña fuerte
+  if (!validatePassword(userPass.value)) {
+    errorValidPass.style.display = "block";
+    sendBtn.disabled = true;
+    return;
+  } else {
+    errorValidPass.style.display = "none";
+  }
+
+  // Validar coincidencia
   if (userPass.value !== userPassCheck.value) {
     errorPassCheck.style.display = "block";
+    sendBtn.disabled = true;
   } else {
     errorPassCheck.style.display = "none";
     sendBtn.disabled = false;
   }
-});
+}
+
+userPass.addEventListener("input", checkPasswords);
+userPassCheck.addEventListener("input", checkPasswords);
+
+function validatePassword(password) {
+  const strong =
+    password.length >= 8 &&
+    /[A-Z]/.test(password) &&
+    /[a-z]/.test(password) &&
+    /\d/.test(password);
+
+  return strong;
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   const emailInput = document.getElementById("userName");
-  const ageInput = document.getElementById("age");
   const submitBtn = document.getElementById("sendBtn");
 
   const emailError = document.getElementById("emailError");
-  const ageError = document.getElementById("ageError");
 
   function validateEmail() {
     const value = emailInput.value.trim();
@@ -30,24 +55,11 @@ document.addEventListener("DOMContentLoaded", () => {
     return valid;
   }
 
-  function validateAge() {
-    const age = parseInt(ageInput.value, 10);
-    const valid = !isNaN(age) && age >= 18 && age <= 90;
-
-    ageInput.classList.toggle("input-valid", valid);
-    ageInput.classList.toggle("input-invalid", !valid);
-    ageError.style.display = valid ? "none" : "block";
-
-    return valid;
-  }
-
   function validateForm() {
     const emailOk = validateEmail();
-    const ageOk = validateAge();
 
-    submitBtn.disabled = !(emailOk && ageOk);
+    submitBtn.disabled = !emailOk;
   }
 
   emailInput.addEventListener("input", validateForm);
-  ageInput.addEventListener("input", validateForm);
 });

@@ -13,6 +13,12 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
+  const msg = sessionStorage.getItem("toastMessage");
+  if (msg) {
+    toastInfo(msg);
+    sessionStorage.removeItem("toastMessage");
+  }
+
   const form = document.getElementById("loginForm");
   const emailInput = document.getElementById("userName");
   const passInput = document.getElementById("userPass");

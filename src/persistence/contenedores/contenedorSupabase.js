@@ -11,6 +11,11 @@ export const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY,
 );
 
+const supabaseLogin = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY,
+);
+
 class ContenedorSupabase {
   constructor() {
     this.sql = supabase;
@@ -395,6 +400,46 @@ class ContenedorSupabase {
     if (error) throw error;
 
     return data;
+  }
+
+  async passChange(passData) {
+    if (!passData.userId) {
+      return { ok: false, message: "No autorizado" };
+    }
+
+    const { error: loginError } = await supabaseLogin.auth.signInWithPassword({
+      email: passData.userEmail,
+      password: passData.password,
+    });
+
+    if (loginError) {
+      console.error("La clave actual es incorrecta", loginError);
+      return {
+        ok: false,
+        message: "LA CONTRASEÑA ACTUAL INGRESADA ES INCORRECTA",
+      };
+    }
+    await supabaseLogin.auth.signOut();
+
+    // cambiar contraseña
+    const { error } = await supabase.auth.admin.updateUserById(
+      passData.userId,
+      {
+        password: passData.newPassword,
+      },
+    );
+
+    if (error) {
+      return {
+        ok: false,
+        message: "ERROR EN DB AL INTENTAR CAMBIAR LA CONTRASEÑA",
+      };
+    }
+
+    // invalidar sesiones
+    await supabase.auth.admin.signOut(passData.userId);
+
+    return { ok: true, message: "CONTRASEÑA MODIFICADA CON EXITO" };
   }
 
   async deleteFile({ pict_id, upload_id, bucketName, path }) {
