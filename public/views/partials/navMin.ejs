@@ -9,7 +9,7 @@
     <li><a style="text-decoration: none; color: #616161;" href="/api/productos">Inicio</a></li>
     <li><a style="text-decoration: none; color: #616161;" href="/api/querys/queryByVIN">Vehículos</a></li>
     <li><a style="text-decoration: none; color: #616161;" href="/api/querys/queryByDate">Consultas</a></li>
-    <li><a style="text-decoration: none; color: #616161;" href="#">Reportes</a></li>
+    <!-- <li><a style="text-decoration: none; color: #616161;" href="#">Reportes</a></li> -->
   </ul>
   <div class="navbar-right">
     <div class="dropdown">
@@ -22,7 +22,7 @@
         </li>
       </ul>
       <div class="dropdown-content" id="dropdownContent">
-        <% if (userName === 'admin@admin.com') { %>
+        <% if (permissions.includes("users_management")) { %>
             <a class="itemLink" href="/api/userdata/usersadmin">Usuarios</a>
         <% } %>
         <a class="itemLink" href="/api/userdata">Mis datos</a>

@@ -5,15 +5,21 @@ import {
 
 const queryByDateRender = async (req, res) => {
   const userName = req.user.email;
+  const permissions = req.user.permissions;
+
   res.render("../views/queryByDate", {
     userName: userName,
+    permissions: permissions,
   });
 };
 
 const queryByVINRender = async (req, res) => {
   const userName = req.user.email;
+  const permissions = req.user.permissions;
+
   res.render("../views/queryByVIN", {
     userName: userName,
+    permissions: permissions,
   });
 };
 

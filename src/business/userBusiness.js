@@ -12,10 +12,11 @@ const getByUser = async (userName) => {
   return user;
 };
 
-// const getAllUsers = async () => {
-//     const getData = await DAOusers.getAll()
-//     return usersAdministrationDTO(getData)
-// }
+const getAllUsers = async () => {
+  const getUsers = await supabaseRepo.getAllUsers();
+  const getRoles = await supabaseRepo.getRoles();
+  return { users: getUsers, roles: getRoles };
+};
 
 const updateUserById = async (userId, userInfoToUpdate) => {
   return await supabaseRepo.updateUserById(userId, userInfoToUpdate);
@@ -69,7 +70,7 @@ export {
   updateUserById,
   //   updateUserWithCart,
   //   purchase,
-  //   getAllUsers,
+  getAllUsers,
   makeUsersAdmin,
   deleteUsers,
   passBusiness,

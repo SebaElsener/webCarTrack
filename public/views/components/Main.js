@@ -2,10 +2,10 @@ const rootElement = document.getElementById("root");
 const user = rootElement.dataset.user
   ? JSON.parse(rootElement.dataset.user)
   : null;
-const admin = rootElement.dataset.admin
-  ? JSON.parse(rootElement.dataset.admin)
+const permissions = rootElement.dataset.permissions
+  ? JSON.parse(rootElement.dataset.permissions)
   : null;
 
 const root = ReactDOM.createRoot(rootElement);
 
-root.render(<Home user={user} admin={admin} />);
+root.render(<Home user={user} permissions={permissions} />);

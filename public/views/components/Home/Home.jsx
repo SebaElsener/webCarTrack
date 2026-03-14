@@ -19,20 +19,23 @@ const cards = [
     icon: "/icons/search.png",
     href: "/api/querys/queryByDate",
   },
-  {
-    title: "Reportes",
-    description: "Historial e inspecciones",
-    icon: "/icons/stats - 01.png",
-    href: "/api/querys/queryByDate",
-  },
+  // {
+  //   title: "Reportes",
+  //   description: "Historial e inspecciones",
+  //   icon: "/icons/stats - 01.png",
+  //   href: "/api/querys/queryByDate",
+  // },
 ];
 
-function Home({ user, admin }) {
+function Home({ user, permissions }) {
   return (
     <div className="home-container">
       <section className="cards-grid">
         {cards
-          .filter((card) => !card.adminOnly || admin === "true")
+          .filter(
+            (card) =>
+              !card.adminOnly || permissions.includes("users_management"),
+          )
           .map((card) => (
             <a
               href={card.href}

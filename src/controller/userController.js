@@ -3,7 +3,7 @@ import {
   updateUserById,
   // updateUserWithCart,
   // purchase,
-  //getAllUsers,
+  getAllUsers,
   // makeUsersAdmin,
   // deleteUsers,
   passBusiness,
@@ -34,25 +34,21 @@ const updateUser = async (req, res) => {
   res.json(await updateUserById(userDBid, userInfoToUpdate));
 };
 
-// const addCartToUser = async (req, res) => {
-//   const cartId = { cartId: req.body.cartId };
-//   const userId = req.body.userId;
-//   res.json(updateUserWithCart(userId, cartId));
-// };
-
-// const purchaseOrder = async (req, res) => {
-//   const userName = req.user.sub;
-//   const orderNbr = await purchase(userName);
-//   res.json(`Orden ${orderNbr} generada con exito`);
-// };
-
 const usersAdmin = async (req, res) => {
-  const allUsers = await getAllUsers();
-  const userName = req.user.sub;
-  res.render("partials/usersAdmin", {
-    allUsers: allUsers,
-    userName: userName,
-  });
+  try {
+    const allUsers = await getAllUsers();
+    const userName = req.user.email;
+    const permissions = req.user.permissions;
+
+    res.render("partials/usersAdmin", {
+      userName: userName,
+      permissions: permissions,
+      users: allUsers.users,
+      roles: allUsers.roles,
+    });
+  } catch (error) {
+    console.error("Error al consultar en DB", error);
+  }
 };
 
 // const usersAdm = async (req, res) => {

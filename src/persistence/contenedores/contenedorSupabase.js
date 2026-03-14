@@ -442,6 +442,23 @@ class ContenedorSupabase {
     return { ok: true, message: "CONTRASEÑA MODIFICADA CON EXITO" };
   }
 
+  async getAllUsers() {
+    const { data, error } = await supabase.from("users_with_roles").select("*");
+
+    if (error) throw error;
+
+    return data;
+  }
+
+  async getRoles() {
+    const { data, error } = await supabase
+      .from("roles_formatted")
+      .select("id, name")
+      .order("name");
+    if (error) throw error;
+    return data;
+  }
+
   async deleteFile({ pict_id, upload_id, bucketName, path }) {
     try {
       // borrar registro DB
