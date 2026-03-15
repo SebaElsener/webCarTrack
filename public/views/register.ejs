@@ -6,6 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Registro usuario</title>
     <link rel="stylesheet" href="../css/index.css" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+    />
   </head>
 
   <body>
@@ -22,6 +27,7 @@
                 name="username"
                 type="email"
                 required
+                autocomplete="off"
               />
               <div class="inline-error" id="emailError">
                 Ingrese un email válido
@@ -48,8 +54,10 @@
               required
             />
           </label>
-          <p id="errorPassCheck">
-            LA CONTRASEÑA Y EL REINGRESO NO COINCIDEN, POR FAVOR VERIFICAR
+          <p id="errorPassCheck">LA CONTRASEÑA Y EL REINGRESO NO COINCIDEN</p>
+          <p id="errorValidPass">
+            LA CONTRASEÑA DEBE TENER AL MENOS 8 CARACTERES, MAYUSCULAS,
+            MINUSCULAS Y NUMEROS
           </p>
           <label class="userName" for="nameLastname"
             ><span class="labelTitle">Nombre y apellido</span>
@@ -68,64 +76,31 @@
               class="userNameInput"
               name="address"
               type="text"
-              required
             />
-          </label>
-          <label class="userName" for="age"
-            ><span class="labelTitle">Edad</span>
-            <div class="field">
-              <input
-                id="age"
-                class="userNameInput"
-                name="age"
-                type="number"
-                required
-              />
-              <div class="inline-error" id="ageError">
-                Ingrese una edad válida
-              </div>
-            </div>
           </label>
           <label class="userName" for="phone"
             ><span class="labelTitle">Teléfono</span>
-            <input
-              id="age"
-              class="userNameInput"
-              name="phone"
-              type="text"
-              required
-            />
+            <input id="phone" class="userNameInput" name="phone" type="text" />
           </label>
-          <!-- <label class="userName" for="avatar"
-            ><span class="labelTitle">Foto/Avatar</span>
-            <input
-              id="avatar"
-              class="userNameInput"
-              name="avatar"
-              type="url"
-              required
-            />
-          </label> -->
-          <button
-            id="sendBtn"
-            class="regBtn"
-            type="submit"
-            formmethod="post"
-            formaction="/api/register/"
-            disabled
-          >
+          <button id="sendBtn" class="regBtn" type="submit" disabled>
             Enviar
           </button>
         </form>
         <div class="gotoLoginContainer">
           <p class="loginContainerText">¿Ya estás registrado? Ir a</p>
-          <button class="regBtn">
-            <a class="loginLink" href="/api/login">Login</a>
-          </button>
+          <a class="loginLink" href="/api/login">
+            <button class="regBtn">Login</button>
+          </a>
         </div>
       </main>
     </div>
     <script src="/js/passwordCheck.js"></script>
+    <script src="/js/register.js"></script>
     <script src="/js/pageAnimation.js"></script>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/toastify-js"
+    ></script>
+    <script src="/js/toast.js"></script>
   </body>
 </html>

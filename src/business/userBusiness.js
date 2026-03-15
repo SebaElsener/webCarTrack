@@ -1,5 +1,4 @@
 import { supabaseRepo } from "../persistence/factory.js";
-import { updateDamages } from "./updateDamagesBusiness.js";
 
 const getByUser = async (userName) => {
   const user = await supabaseRepo.getByUser(userName);

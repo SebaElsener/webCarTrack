@@ -26,14 +26,6 @@ body {
   animation: pageFadeOut 0.35s ease forwards;
 }
 
-/* #app-root.animate-in {
-  animation: appFadeIn 0.45s ease forwards;
-}
-
-#app-root.animate-out {
-  animation: appFadeOut 0.35s ease forwards;
-} */
-
 body.no-scroll {
   overflow: hidden;
 }
@@ -597,14 +589,6 @@ td {
   cursor: not-allowed;
 }
 
-/* tbody tr:nth-child(odd) {
-  background-color: rgba(119, 165, 240, 0.921);
-}
-
-tbody tr:nth-child(even) {
-  background-color: rgba(87, 143, 232, 0.921);
-} */
-
 .thumbnailImg {
   padding: 8px;
 }
@@ -758,17 +742,6 @@ tbody tr:nth-child(even) {
   position: fixed;
 }
 
-/* #loginForm,
-#regForm {
-  background-color: #c5dbee;
-  display: flex;
-  flex-direction: column;
-  width: 600px;
-  border-radius: 5px;
-  padding: 25px;
-  margin: 20px;
-} */
-
 #passContainer {
   display: flex;
   flex-direction: column;
@@ -783,6 +756,10 @@ tbody tr:nth-child(even) {
   border-radius: 14px;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
   margin: 60px auto 25px;
+}
+
+#regForm {
+  width: 770px !important;
 }
 
 /* Card Mis Datos */
@@ -848,6 +825,7 @@ tbody tr:nth-child(even) {
   font-size: 0.95rem;
   border: none;
   transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .regBtn:hover:not(:disabled) {
@@ -1427,21 +1405,6 @@ tbody tr:nth-child(even) {
   height: auto;
 }
 
-/* .btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(0, 0, 0, 0.5);
-  color: #fff;
-  border: none;
-  padding: 10px;
-  font-size: 16px;
-  cursor: pointer;
-}
-.btn:hover {
-  background: rgba(0, 0, 0, 0.8);
-} */
-
 .prev {
   left: 10px;
 }
@@ -1460,30 +1423,6 @@ tbody tr:nth-child(even) {
 #tableTdPhoto {
   padding: 0;
 }
-
-/* .panel {
-  background: #f4f4f4;
-  padding: 20px;
-  width: 250px;
-  border-radius: 8px;
-  margin-top: 10px;
-  border: 1px solid #ccc;
-} */
-
-/* Animación fade */
-/* .fade {
-  opacity: 0;
-  transition: opacity 0.35s ease;
-}
-
-.fade.mostrar {
-  opacity: 1;
-} */
-
-/* Oculto por defecto */
-/* .oculto {
-  display: none;
-} */
 
 #graphStat {
   margin: 0 auto;

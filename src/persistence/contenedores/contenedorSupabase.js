@@ -470,6 +470,38 @@ class ContenedorSupabase {
     return { ok: true };
   }
 
+  async createUser(userData) {
+    const { email, password, userName, address, phone } = userData;
+
+    const { data, error } = await supabase.auth.admin.createUser({
+      email: email,
+      password: password,
+      email_confirm: true, // evita confirmación por email
+      user_metadata: {
+        name: userName,
+        address,
+        phone,
+      },
+    });
+
+    if (error?.code === "email_exists")
+      return {
+        ok: false,
+        message: "MAIL YA REGISTRADO EN DB - CONTACTE AL ADMINISTRADOR",
+      };
+
+    if (error) {
+      console.error(error);
+      return { ok: false, message: "ERROR AL CREAR USUARIO EN DB" };
+    }
+
+    return {
+      ok: true,
+      message:
+        "USUARIO CREADO CON EXITO - POR FAVOR AGUARDE CONFIRMACION DE ADMINISTRACION",
+    };
+  }
+
   async getRoles() {
     const { data, error } = await supabase
       .from("roles_formatted")
