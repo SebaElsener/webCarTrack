@@ -1,20 +1,20 @@
 import {
   getByUser,
   updateUserById,
-  // updateUserWithCart,
-  // purchase,
+  updateRoleByUserId,
   getAllUsers,
-  // makeUsersAdmin,
-  // deleteUsers,
+  deleteUser,
   passBusiness,
 } from "../business/userBusiness.js";
 
 const renderUserData = async (req, res) => {
   const userId = req.user.id;
   const userName = req.user.email;
+  const permissions = req.user.permissions;
   const userData = await getByUser(userId);
   res.render("userData", {
     userData: userData[0],
+    permissions: permissions,
     userName: userName,
   });
 };
@@ -51,15 +51,34 @@ const usersAdmin = async (req, res) => {
   }
 };
 
-// const usersAdm = async (req, res) => {
-//   const users = req.body;
-//   res.json(await makeUsersAdmin(users));
-// };
+const roleUpdate = async (req, res) => {
+  const userId = req.params.userId;
+  const roleId = req.body.role_id;
+  try {
+    const updatedRole = await updateRoleByUserId(userId, roleId);
+    res.status(200).json({ updatedRole });
+  } catch (error) {
+    console.error("Error al actualizar en DB", error);
+    res.status(500).json({ message: "Error al actualizar rol de ususario" });
+  }
+};
 
-// const usersDelete = async (req, res) => {
-//   const users = req.body;
-//   res.json(await deleteUsers(users));
-// };
+const userDelete = async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    if (req.user.id === req.params.userId) {
+      return res.status(400).json({
+        error: "No podés eliminar tu propio usuario",
+      });
+    }
+    const deletedUser = await deleteUser(userId);
+    res.status(200).json({ deletedUser });
+  } catch (error) {
+    console.error("Error al eliminar usuario en DB", error);
+    res.status(500).json({ error: "Error al eliminar el usuario" });
+  }
+};
 
 const passChange = async (req, res) => {
   const userEmail = req.user.email;
@@ -84,10 +103,8 @@ export {
   renderUserData,
   getUser,
   updateUser,
-  // addCartToUser,
-  // purchaseOrder,
+  roleUpdate,
   usersAdmin,
-  // usersAdm,
-  // usersDelete,
+  userDelete,
   passChange,
 };

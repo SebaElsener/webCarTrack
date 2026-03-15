@@ -123,6 +123,7 @@
 
 #main {
   flex: 1;
+  min-height: 750px;
 }
 
 #root {

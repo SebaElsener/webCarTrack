@@ -426,10 +426,10 @@ h2 {
 /* Card específica admin usuarios */
 #usersForm {
   margin: 0px auto;
+  margin-bottom: 70px;
   background: #ffffff;
   border-radius: 12px;
   padding: 28px 24px;
-  width: 720px;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
 }
 
@@ -2513,6 +2513,12 @@ body > .glightbox-container {
 }
 
 #userSearch {
-  margin-left: 20px;
+  width: 94%;
+  margin: 0px auto;
   padding: 8px;
+}
+
+.roleSpinner {
+  width: 18px;
+  height: 18px;
 }

@@ -88,6 +88,8 @@
 
 // generateUsersToDeleteAndMakeAdmin(usersAdminMakeUserAdmin, adminArray);
 // generateUsersToDeleteAndMakeAdmin(usersAdminDeleteUser, deleteArray);
+const navBarMin = document.getElementById("navBarMin");
+navBarMin.style.top = "0";
 
 const search = document.getElementById("userSearch");
 
@@ -112,26 +114,30 @@ document.querySelectorAll(".roleSelect").forEach((select) => {
     spinner.classList.remove("d-none");
 
     try {
-      const res = await fetch(`/api/users/${userId}/role`, {
+      const res = await fetch(`/api/userdata/${userId}/role`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ role_id: roleId }),
       });
 
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        throw new Error();
+      }
 
       showToast({
         text: "Rol actualizado",
         type: "success",
       });
-    } catch {
+    } catch (err) {
+      console.error(err);
+
       showToast({
         text: "Error actualizando rol",
         type: "error",
       });
+    } finally {
+      spinner.classList.add("d-none");
     }
-
-    spinner.classList.add("d-none");
   });
 });
 
@@ -151,11 +157,15 @@ document.querySelectorAll(".deleteUserBtn").forEach((btn) => {
     if (!confirmed) return;
 
     try {
-      const res = await fetch(`/api/users/${userId}`, {
+      const res = await fetch(`/api/userdata/${userId}`, {
         method: "DELETE",
       });
 
-      if (!res.ok) throw new Error();
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Error eliminando usuario");
+      }
 
       row.remove();
 
@@ -163,9 +173,9 @@ document.querySelectorAll(".deleteUserBtn").forEach((btn) => {
         text: "Usuario eliminado",
         type: "success",
       });
-    } catch {
+    } catch (error) {
       showToast({
-        text: "Error eliminando usuario",
+        text: error.message,
         type: "error",
       });
     }

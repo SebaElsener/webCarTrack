@@ -5,8 +5,8 @@ import {
   getUser,
   updateUser,
   usersAdmin,
-  //usersAdm,
-  //usersDelete,
+  roleUpdate,
+  userDelete,
   passChange,
 } from "../controller/userController.js";
 
@@ -18,7 +18,7 @@ userData.get("/getuser", getUser);
 
 userData.post("/", updateUser);
 
-// userData.put("/", addCartToUser);
+userData.put("/:userId/role", roleUpdate);
 
 // userData.get("/purchaseorder", purchaseOrder);
 
@@ -26,7 +26,7 @@ userData.get("/usersadmin", usersAdmin);
 
 // userData.put("/usersadm", usersAdm);
 
-// userData.delete("/usersdelete", usersDelete);
+userData.delete("/:userId", userDelete);
 
 userData.post("/passchange", passChange);
 

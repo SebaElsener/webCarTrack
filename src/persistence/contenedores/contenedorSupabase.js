@@ -450,6 +450,26 @@ class ContenedorSupabase {
     return data;
   }
 
+  async updateRoleByUserId(userId, roleId) {
+    const { data, error } = await supabase
+      .from("profiles")
+      .update({ role_id: roleId })
+      .eq("id", userId)
+      .select();
+
+    if (error) throw error;
+    return data;
+  }
+
+  async deleteUserById(userId) {
+    // eliminar de auth
+    const { error: authError } = await supabase.auth.admin.deleteUser(userId);
+
+    if (authError) throw authError;
+
+    return { ok: true };
+  }
+
   async getRoles() {
     const { data, error } = await supabase
       .from("roles_formatted")
