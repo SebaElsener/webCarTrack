@@ -12,12 +12,3 @@ const regController = async (req, res) => {
 };
 
 export { regController };
-
-// {
-//   username: 'test@gmail.com',
-//   password: 'test1234',
-//   passwordCheck: 'test1234',
-//   nameLastname: 'Sebastián L Elsener',
-//   address: 'lalal 1234',
-//   phone: '35845567'
-// }
