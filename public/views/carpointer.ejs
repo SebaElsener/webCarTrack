@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <%- include('./partials/head') %>
+    <title>CarPointer - GPS tracking</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+    />
+  </head>
+
+  <body>
+    <div id="app-root">
+      <%- include('./partials/navMin') %>
+      <div class="navBarSeparator"></div>
+
+      <main id="main">
+        <div class="container mt-1" id="title-date-input">
+          <h3 class="formTitle">Consulta por rango de fechas</h3>
+
+          <form id="form-fechas">
+            <div id="inputGroup" class="input-group">
+              <span class="input-group-text">📅</span>
+              <input
+                type="text"
+                id="rangoFechas"
+                class="form-control"
+                placeholder="Seleccionar fechas"
+                readonly
+              />
+              <div class="btnFormContainer">
+                <button
+                  id="btnFormSubmit"
+                  class="btn btn-primary"
+                  type="submit"
+                >
+                  Consultar
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div class="container mt-1" id="title-VIN-input">
+          <h3 class="formTitle">Consulta chasis / VIN</h3>
+
+          <form id="form-vin">
+            <div id="VINinputGroup" class="input-group">
+              <input
+                type="text"
+                id="vinInput"
+                class="form-control"
+                placeholder="Ingrese chasis o VIN"
+                onInput="this.value = this.value.toUpperCase();"
+                maxlength="17"
+                autocomplete="off"
+              />
+              <div class="btnFormContainer">
+                <button
+                  id="btnFormSubmit"
+                  class="btn btn-primary"
+                  type="submit"
+                >
+                  Consultar
+                </button>
+              </div>
+              <div class="invalid-feedback" id="vinError"></div>
+            </div>
+          </form>
+        </div>
+
+        <div class="card mb-3 shadow-sm post-table-action" id="filtersCard">
+          <div class="card-body">
+            <div
+              class="row g-3 align-items-top"
+              style="justify-content: center; gap: 2rem"
+            >
+              <!-- Marca -->
+              <div class="col-md-2 filterContainer">
+                <label class="form-label fw-semibold">Marca</label>
+                <select id="filtroMarca" class="form-select" multiple>
+                  <option value="">Todas</option>
+                </select>
+              </div>
+              <!-- Modelo -->
+              <div class="col-md-2 filterContainer">
+                <label class="form-label fw-semibold">Modelo</label>
+                <select id="filtroModelo" class="form-select" multiple>
+                  <option value="">Todos</option>
+                </select>
+              </div>
+              <!-- Batea -->
+              <div class="col-md-2 filterContainer">
+                <label class="form-label fw-semibold">Batea</label>
+                <select id="filtroBatea" class="form-select" multiple>
+                  <option value="">Todas</option>
+                </select>
+              </div>
+
+              <!-- Checks -->
+              <div class="col-md-4 filterContainer">
+                <label class="form-label fw-semibold">Estadísticas</label>
+                <div class="d-flex gap-2 flex-wrap">
+                  <div class="form-check form-switch form-chkTop">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="chkTopAreas"
+                    />
+                    <label class="form-check-label" for="chkTopAreas">
+                      Top 5 Areas
+                    </label>
+                  </div>
+
+                  <div class="form-check form-switch form-chkTop">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="chkTopAverias"
+                    />
+                    <label class="form-check-label" for="chkTopAverias">
+                      Top 5 daños
+                    </label>
+                  </div>
+
+                  <div class="form-check form-switch form-chkTop">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="chkTopBateas"
+                    />
+                    <label class="form-check-label" for="chkTopBateas">
+                      Top 5 batea
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="estadisticas" class="row g-3 mb-3"></div>
+
+        <div
+          class="justify-content-between align-items-center post-table-action"
+          id="actionsBar"
+        >
+          <button
+            id="btnLimpiarFiltros"
+            class="btn btn-sm btn-outline-secondary ms-2"
+          >
+            Limpiar filtros
+          </button>
+          <div class="form-check form-switch" id="soloVINConDanio">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="chkSoloConDanio"
+            />
+            <label class="form-check-label fw-semibold" for="chkSoloConDanio">
+              VIN con daño
+            </label>
+            <span id="badgeConDanio" class="badge bg-primary d-none"></span>
+          </div>
+          <div class="btn-group" role="group" id="movimientoContainer">
+            <div>
+              <label
+                class="form-check-label fw-semibold movimientoLabel"
+                style="height: auto"
+                >Filtrar movimientos</label
+              >
+            </div>
+            <div id="movimientoFilterWrap">
+              <input
+                type="radio"
+                class="btn-check"
+                name="movimiento"
+                id="movAll"
+                checked
+              />
+              <label
+                class="btn btn-outline-secondary movimientoLabel"
+                for="movAll"
+                >Todos</label
+              >
+
+              <input
+                type="radio"
+                class="btn-check"
+                name="movimiento"
+                id="movIngreso"
+              />
+              <label
+                class="btn btn-outline-success movimientoLabel"
+                for="movIngreso"
+                >Ingreso</label
+              >
+
+              <input
+                type="radio"
+                class="btn-check"
+                name="movimiento"
+                id="movDespacho"
+              />
+              <label
+                class="btn btn-outline-primary movimientoLabel"
+                for="movDespacho"
+                >Despacho</label
+              >
+
+              <input
+                type="radio"
+                class="btn-check"
+                name="movimiento"
+                id="movTransito"
+              />
+              <label
+                class="btn btn-outline-info movimientoLabel"
+                for="movTransito"
+                >Tránsito</label
+              >
+
+              <div id="contFiltroLugar" style="display: none">
+                <select id="filtroLugar" multiple></select>
+              </div>
+              <div id="contFiltroDestino" style="display: none">
+                <select id="filtroDestino" multiple></select>
+              </div>
+            </div>
+          </div>
+
+          <!-- <div
+            id="exportContainer"
+            class="d-flex justify-content-end gap-1"
+            style="flex-direction: column"
+          >
+            <button id="btnExportPdf" class="btn btn-outline-danger btn-sm">
+              📄 PDF
+            </button>
+            <button id="btnExportExcel" class="btn btn-outline-success btn-sm">
+              📊 Excel
+            </button>
+          </div> -->
+        </div>
+
+        <div id="tabla-wrapper" class="tabla-wrapper">
+          <div id="tabla-scroll" class="tabla-scroll">
+            <div id="resultados" class="container-fluid"></div>
+          </div>
+          <div id="paginacion" class="mt-3"></div>
+        </div>
+
+        <!-- <div id="evolucion" class="mt-4 mb-5"></div> -->
+      </main>
+
+      <%- include('./partials/footer') %>
+    </div>
+
+    <script type="module" src="/js/carpointer.js"></script>
+    <script src="/js/pageAnimation.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+    <script>
+      const rangoPicker = flatpickr("#rangoFechas", {
+        mode: "range",
+        dateFormat: "Y-m-d", // valor real
+        altInput: true,
+        altFormat: "d/m/Y", // visible
+        locale: flatpickr.l10ns.es,
+        appendTo: document.body, // 🔥 clave
+      });
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+    <!-- Script toastify -->
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/toastify-js"
+    ></script>
+    <script src="/js/toast.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+    <script>
+      const choicesMarca = new Choices("#filtroMarca", {
+        removeItemButton: true,
+        placeholder: true,
+        placeholderValue: "Buscar marca...",
+        searchPlaceholderValue: "Buscar...",
+        shouldSort: true,
+        searchEnabled: true,
+      });
+
+      const choicesModelo = new Choices("#filtroModelo", {
+        removeItemButton: true,
+        placeholder: true,
+        placeholderValue: "Buscar modelo...",
+        searchPlaceholderValue: "Buscar...",
+        shouldSort: true,
+        searchEnabled: true,
+      });
+
+      const choicesBatea = new Choices("#filtroBatea", {
+        removeItemButton: true,
+        placeholder: true,
+        placeholderValue: "Buscar batea...",
+        searchPlaceholderValue: "Buscar...",
+        shouldSort: true,
+        searchEnabled: true,
+      });
+
+      const choicesLugar = new Choices("#filtroLugar", {
+        removeItemButton: true,
+        searchEnabled: true,
+        placeholderValue: "Lugar",
+        shouldSort: false,
+      });
+
+      const choicesDestino = new Choices("#filtroDestino", {
+        removeItemButton: true,
+        searchEnabled: true,
+        placeholderValue: "Destino",
+        shouldSort: false,
+      });
+    </script>
+
+    <script>
+      document.addEventListener("glightbox_open", () => {
+        document.documentElement.style.overflow = "hidden";
+        document.body.style.overflow = "hidden";
+      });
+
+      document.addEventListener("glightbox_close", () => {
+        document.documentElement.style.overflow = "";
+        document.body.style.overflow = "";
+      });
+    </script>
+  </body>
+</html>

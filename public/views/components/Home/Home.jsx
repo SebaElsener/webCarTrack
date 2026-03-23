@@ -8,7 +8,7 @@ const cards = [
   },
   {
     title: "Vehículos",
-    description: "Registro y consulta por VIN",
+    description: "Registro y operaciones por VIN",
     icon: "/icons/car1.png",
     href: "/api/querys/queryByVIN",
   },
@@ -18,6 +18,13 @@ const cards = [
       "Consultas por fecha, marca, modelo, batea, movimiento - Areas y tipo de daño",
     icon: "/icons/search.png",
     href: "/api/querys/queryByDate",
+  },
+  {
+    title: "CarPointer",
+    description:
+      "App transportistas - Registro y consulta posicionamiento GPS de unidades a la carga y descarga",
+    icon: "/icons/camiongps1.png",
+    href: "/api/carpointer/query",
   },
   // {
   //   title: "Reportes",
@@ -46,7 +53,11 @@ function Home({ user, permissions }) {
                 <img
                   src={card.icon}
                   alt={card.title}
-                  className="card-icon"
+                  className={
+                    card.title === "CarPointer"
+                      ? "card-icon-carpointer"
+                      : "card-icon"
+                  }
                   draggable="false"
                 />
                 <h3 className="cardTitle">{card.title}</h3>

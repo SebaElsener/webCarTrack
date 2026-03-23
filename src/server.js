@@ -31,6 +31,7 @@ import exportRouter from "./router/exportRouter.js";
 import updatesRouter from "./router/updatesRouter.js";
 import damagesRouter from "./router/damagesRouter.js";
 import photosRouter from "./router/photosRouter.js";
+import carpointerRouter from "./router/carpointerRouter.js";
 import timeout from "./router/timeout.js";
 import cookieParser from "cookie-parser";
 
@@ -63,6 +64,7 @@ app.use("/api/productos", requireLogin, routeProducts);
 app.use("/api/userdata", requireLogin, userData);
 app.use("/api/querys", requireLogin, querysRouter);
 app.use("/api/export", requireLogin, exportRouter);
+app.use("/api/carpointer", requireLogin, carpointerRouter);
 app.use("/api/timeout", timeout);
 app.use("/api/updates", requireLogin, updatesRouter);
 app.use("/api/damages", requireLogin, damagesRouter);
