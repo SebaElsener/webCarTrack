@@ -1,5 +1,11 @@
 let map;
 let marker;
+let animationMarker;
+let puntosGlobales = [];
+let mapDragging = false;
+window.setVelocidad = (v) => {
+  velocidad = v;
+};
 
 function openMapModal(lat, lon) {
   const modal = document.getElementById("mapModal");
@@ -22,13 +28,12 @@ function openMapModal(lat, lon) {
       marker = L.marker([lat, lon]).addTo(map);
     }
 
-    map.invalidateSize(); // 🔥 clave en modales
+    map.invalidateSize();
   }, 100);
 }
 
 export function obtenerPuntosDelViaje(datosTabla) {
   const puntos = [];
-  console.log(datosTabla);
   datosTabla.forEach((scan) => {
     if (!scan.gps_stamp) return;
 
@@ -53,6 +58,7 @@ export function obtenerPuntosDelViaje(datosTabla) {
 }
 
 export function openMapWithRoute(puntos) {
+  puntosGlobales = puntos;
   puntos.sort(
     (a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime(),
   );
@@ -66,41 +72,59 @@ export function openMapWithRoute(puntos) {
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: "&copy; OpenStreetMap",
       }).addTo(map);
+
+      map.on("dragstart", () => {
+        mapDragging = true;
+      });
+
+      map.on("dragend", () => {
+        mapDragging = false;
+      });
     }
 
     // 🔥 limpiar capas anteriores
     map.eachLayer((layer) => {
-      if (layer instanceof L.Marker || layer instanceof L.Polyline) {
+      if (
+        layer instanceof L.Marker ||
+        layer instanceof L.Polyline ||
+        layer instanceof L.CircleMarker
+      ) {
         map.removeLayer(layer);
       }
     });
 
     const latlngs = [];
 
-    puntos.forEach((p) => {
-      const color = p.movimiento === "CARGA" ? "green" : "red";
+    puntos.forEach((p, index) => {
+      const lat = Number(p.lat);
+      const lon = Number(p.lon);
 
-      const marker = L.circleMarker([p.lat, p.lon], {
-        radius: 6,
-        color,
-        fillColor: color,
-        fillOpacity: 0.8,
-      }).addTo(map);
+      if (!lat || !lon) return;
+
+      const numero = index + 1;
+
+      const icon = L.divIcon({
+        className: "custom-marker",
+        html: `
+      <div class="marker-number">
+        ${numero}
+      </div>
+    `,
+        iconSize: [30, 30],
+        iconAnchor: [15, 15],
+      });
+
+      const marker = L.marker([lat, lon], { icon }).addTo(map);
 
       marker.bindPopup(`
-        <b>${p.vin}</b><br>
-        ${p.movimiento}<br>
-        ${new Date(p.fecha).toLocaleString("es-AR", {
-          year: "2-digit",
-          month: "2-digit",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-        })}
-        `);
+    <b>#${numero} - ${p.vin}</b><br>
+    ${p.movimiento}<br>
+    ${new Date(p.fecha).toLocaleString("es-AR", {
+      hour12: false,
+    })}
+  `);
 
-      latlngs.push([p.lat, p.lon]);
+      latlngs.push([lat, lon]);
     });
 
     // 🔥 línea del recorrido
@@ -133,6 +157,13 @@ document.addEventListener("click", (e) => {
   if (e.target === modal) {
     modal.style.display = "none";
   }
+});
+
+document.addEventListener("mouseup", () => {
+  if (!map) return;
+
+  setTimeout(() => map.invalidateSize(), 50);
+  setTimeout(() => map.invalidateSize(), 200);
 });
 
 document.getElementById("closeMapModal").addEventListener("click", () => {
@@ -180,5 +211,95 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.addEventListener("mouseup", () => {
     isDragging = false;
+  });
+});
+
+let animationFrame;
+let progreso = 0;
+let velocidad = 0.01;
+
+export function animarSuave(puntos) {
+  if (!map || puntos.length < 2) return;
+
+  puntos.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+
+  const latlngs = puntos.map((p) => [Number(p.lat), Number(p.lon)]);
+
+  let segmento = 0;
+
+  if (animationMarker) map.removeLayer(animationMarker);
+  animationMarker = L.marker(latlngs[0]).addTo(map);
+
+  function step() {
+    if (segmento >= latlngs.length - 1) {
+      // 🔥 asegurar posición final
+      animationMarker.setLatLng(latlngs[latlngs.length - 1]);
+
+      // 🔥 llevar timeline al 100%
+      const timeline = document.getElementById("timeline");
+      if (timeline) timeline.value = 100;
+
+      cancelAnimationFrame(animationFrame);
+      return;
+    }
+    progreso += velocidad;
+
+    if (progreso >= 1) {
+      progreso = 0;
+      segmento++;
+    }
+
+    if (!latlngs[segmento] || !latlngs[segmento + 1]) return;
+
+    const pos = interpolar(latlngs[segmento], latlngs[segmento + 1], progreso);
+
+    animationMarker.setLatLng(pos);
+    if (!mapDragging && !map.getBounds().contains(pos)) {
+      map.panTo(pos, { animate: false });
+    }
+    const timeline = document.getElementById("timeline");
+
+    if (timeline) {
+      const progresoGlobal = (segmento + progreso) / (latlngs.length - 1);
+      timeline.value = progresoGlobal * 100;
+    }
+
+    animationFrame = requestAnimationFrame(step);
+  }
+
+  step();
+}
+
+function interpolar(p1, p2, t) {
+  return [p1[0] + (p2[0] - p1[0]) * t, p1[1] + (p2[1] - p1[1]) * t];
+}
+
+export function pausarAnimacion() {
+  cancelAnimationFrame(animationFrame);
+}
+
+export function playAnimacion(puntos) {
+  animarSuave(puntos);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const timeline = document.getElementById("timeline");
+
+  if (!timeline) return;
+
+  timeline.addEventListener("input", (e) => {
+    const value = Number(e.target.value);
+
+    const latlngs = puntosGlobales.map((p) => [Number(p.lat), Number(p.lon)]);
+
+    const total = latlngs.length - 1;
+    const index = Math.floor((value / 100) * total);
+
+    const pos = latlngs[index];
+
+    if (animationMarker) {
+      animationMarker.setLatLng(pos);
+      map.panTo(pos);
+    }
   });
 });

@@ -1,4 +1,9 @@
-import { obtenerPuntosDelViaje, openMapWithRoute } from "./carpointer-gps.js";
+import {
+  obtenerPuntosDelViaje,
+  openMapWithRoute,
+  animarSuave,
+  pausarAnimacion,
+} from "./carpointer-gps.js";
 
 const indexById = (arr) =>
   Object.fromEntries(arr.map((i) => [i.id, i.descripcion]));
@@ -662,6 +667,14 @@ document.getElementById("btnVerMapa").addEventListener("click", () => {
     alert("No hay datos GPS para mostrar");
     return;
   }
-  console.log(puntos);
   openMapWithRoute(puntos);
+});
+
+document.getElementById("btnAnimarMapa").addEventListener("click", () => {
+  const puntos = obtenerPuntosDelViaje(datosTabla);
+  animarSuave(puntos);
+});
+
+document.getElementById("btnPauseMapa").addEventListener("click", () => {
+  pausarAnimacion();
 });
