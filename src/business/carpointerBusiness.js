@@ -11,4 +11,14 @@ const carpointerQueryRenderBusiness = async (desde, hasta, user) => {
   }
 };
 
-export { carpointerQueryRenderBusiness };
+const carpointerQuerybydateBusiness = async (desde, hasta, user) => {
+  try {
+    const data = await supabaseRepo.getCarpointerDataByDate(desde, hasta, user);
+    return data;
+  } catch (error) {
+    infoLogger.error("Error en carpointerQuerybydateBusiness", error);
+    return [];
+  }
+};
+
+export { carpointerQueryRenderBusiness, carpointerQuerybydateBusiness };

@@ -286,6 +286,64 @@ class ContenedorSupabase {
     }
   }
 
+  async getCarpointerDataByDate(startDate, endDate, user) {
+    try {
+      let query = this.sql
+        .schema("carpointer")
+        .from("scans")
+        .select(
+          `
+            id,
+            vin,
+            created_at,
+            marca,
+            modelo,
+            transport_nbr,
+            movimiento,
+            origen,
+            destino,
+            gps_stamp,
+            carpointer_pictures (
+              pictureurl
+            )
+        `,
+        )
+        .gte("created_at", startDate)
+        .lte("created_at", endDate)
+        .order("created_at", { ascending: true });
+
+      query = this.applyVisibilityFilter(query, user);
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.log(error);
+        throw error;
+      }
+
+      const result = data.map((s) => ({
+        scan_id: s.id,
+        vin: s.vin,
+        scan_date: s.created_at,
+        marca: s.marca,
+        modelo: s.modelo,
+        movimiento: s.movimiento,
+        batea: s.transport_nbr,
+        origen: s.origen,
+        destino: s.destino,
+        gps_stamp: s.gps_stamp,
+        fotos: (s.carpointer_pictures ?? [])
+          .map((p) => p.pictureurl)
+          .filter(Boolean),
+      }));
+
+      return result;
+    } catch (error) {
+      infoLogger.info("Error al consultar base de datos por fecha", error);
+      return false;
+    }
+  }
+
   async getPictures() {
     try {
       const { data, error } = await this.sql.from("pictures").select("*");

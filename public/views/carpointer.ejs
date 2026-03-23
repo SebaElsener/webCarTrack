@@ -43,58 +43,60 @@
       <div class="navBarSeparator"></div>
 
       <main id="main">
-        <div class="container mt-1" id="title-date-input">
-          <h3 class="formTitle">Consulta por rango de fechas</h3>
+        <div id="carpointerInputContainer">
+          <div class="container mt-1" id="carpointer-title-date-input">
+            <h3 class="carpointer-formTitle">Consulta por rango de fechas</h3>
 
-          <form id="form-fechas">
-            <div id="inputGroup" class="input-group">
-              <span class="input-group-text">📅</span>
-              <input
-                type="text"
-                id="rangoFechas"
-                class="form-control"
-                placeholder="Seleccionar fechas"
-                readonly
-              />
-              <div class="btnFormContainer">
-                <button
-                  id="btnFormSubmit"
-                  class="btn btn-primary"
-                  type="submit"
-                >
-                  Consultar
-                </button>
+            <form id="form-fechas">
+              <div id="inputGroup" class="input-group">
+                <span class="input-group-text">📅</span>
+                <input
+                  type="text"
+                  id="rangoFechas"
+                  class="form-control"
+                  placeholder="Seleccionar fechas"
+                  readonly
+                />
+                <div class="btnFormContainer">
+                  <button
+                    id="btnFormSubmit"
+                    class="btn btn-primary"
+                    type="submit"
+                  >
+                    Consultar
+                  </button>
+                </div>
               </div>
-            </div>
-          </form>
-        </div>
+            </form>
+          </div>
 
-        <div class="container mt-1" id="title-VIN-input">
-          <h3 class="formTitle">Consulta chasis / VIN</h3>
+          <div class="container mt-1" id="carpointer-title-VIN-input">
+            <h3 class="carpointer-formTitle">Consulta chasis / VIN</h3>
 
-          <form id="form-vin">
-            <div id="VINinputGroup" class="input-group">
-              <input
-                type="text"
-                id="vinInput"
-                class="form-control"
-                placeholder="Ingrese chasis o VIN"
-                onInput="this.value = this.value.toUpperCase();"
-                maxlength="17"
-                autocomplete="off"
-              />
-              <div class="btnFormContainer">
-                <button
-                  id="btnFormSubmit"
-                  class="btn btn-primary"
-                  type="submit"
-                >
-                  Consultar
-                </button>
+            <form id="form-vin">
+              <div id="VINinputGroup" class="input-group">
+                <input
+                  type="text"
+                  id="vinInput"
+                  class="form-control"
+                  placeholder="Ingrese chasis o VIN"
+                  onInput="this.value = this.value.toUpperCase();"
+                  maxlength="17"
+                  autocomplete="off"
+                />
+                <div class="btnFormContainer">
+                  <button
+                    id="btnFormSubmit"
+                    class="btn btn-primary"
+                    type="submit"
+                  >
+                    Consultar
+                  </button>
+                </div>
+                <div class="invalid-feedback" id="vinError"></div>
               </div>
-              <div class="invalid-feedback" id="vinError"></div>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
 
         <div class="card mb-3 shadow-sm post-table-action" id="filtersCard">
@@ -124,53 +126,26 @@
                   <option value="">Todas</option>
                 </select>
               </div>
-
-              <!-- Checks -->
-              <div class="col-md-4 filterContainer">
-                <label class="form-label fw-semibold">Estadísticas</label>
-                <div class="d-flex gap-2 flex-wrap">
-                  <div class="form-check form-switch form-chkTop">
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      id="chkTopAreas"
-                    />
-                    <label class="form-check-label" for="chkTopAreas">
-                      Top 5 Areas
-                    </label>
-                  </div>
-
-                  <div class="form-check form-switch form-chkTop">
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      id="chkTopAverias"
-                    />
-                    <label class="form-check-label" for="chkTopAverias">
-                      Top 5 daños
-                    </label>
-                  </div>
-
-                  <div class="form-check form-switch form-chkTop">
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      id="chkTopBateas"
-                    />
-                    <label class="form-check-label" for="chkTopBateas">
-                      Top 5 batea
-                    </label>
-                  </div>
-                </div>
+              <!-- Origen -->
+              <div class="col-md-2 filterContainer">
+                <label class="form-label fw-semibold">Origen</label>
+                <select id="filtroOrigen" class="form-select" multiple>
+                  <option value="">Todas</option>
+                </select>
+              </div>
+              <!-- Destino -->
+              <div class="col-md-2 filterContainer">
+                <label class="form-label fw-semibold">Destino</label>
+                <select id="filtroDestino" class="form-select" multiple>
+                  <option value="">Todas</option>
+                </select>
               </div>
             </div>
           </div>
         </div>
 
-        <div id="estadisticas" class="row g-3 mb-3"></div>
-
         <div
-          class="justify-content-between align-items-center post-table-action"
+          class="justify-content-between align-items-center post-table-action carpointer-actions-bar"
           id="actionsBar"
         >
           <button
@@ -179,17 +154,6 @@
           >
             Limpiar filtros
           </button>
-          <div class="form-check form-switch" id="soloVINConDanio">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              id="chkSoloConDanio"
-            />
-            <label class="form-check-label fw-semibold" for="chkSoloConDanio">
-              VIN con daño
-            </label>
-            <span id="badgeConDanio" class="badge bg-primary d-none"></span>
-          </div>
           <div class="btn-group" role="group" id="movimientoContainer">
             <div>
               <label
@@ -216,59 +180,27 @@
                 type="radio"
                 class="btn-check"
                 name="movimiento"
-                id="movIngreso"
+                id="movCarga"
               />
               <label
                 class="btn btn-outline-success movimientoLabel"
-                for="movIngreso"
-                >Ingreso</label
+                for="movCarga"
+                >Carga</label
               >
 
               <input
                 type="radio"
                 class="btn-check"
                 name="movimiento"
-                id="movDespacho"
+                id="movDescarga"
               />
               <label
                 class="btn btn-outline-primary movimientoLabel"
-                for="movDespacho"
-                >Despacho</label
+                for="movDescarga"
+                >Descarga</label
               >
-
-              <input
-                type="radio"
-                class="btn-check"
-                name="movimiento"
-                id="movTransito"
-              />
-              <label
-                class="btn btn-outline-info movimientoLabel"
-                for="movTransito"
-                >Tránsito</label
-              >
-
-              <div id="contFiltroLugar" style="display: none">
-                <select id="filtroLugar" multiple></select>
-              </div>
-              <div id="contFiltroDestino" style="display: none">
-                <select id="filtroDestino" multiple></select>
-              </div>
             </div>
           </div>
-
-          <!-- <div
-            id="exportContainer"
-            class="d-flex justify-content-end gap-1"
-            style="flex-direction: column"
-          >
-            <button id="btnExportPdf" class="btn btn-outline-danger btn-sm">
-              📄 PDF
-            </button>
-            <button id="btnExportExcel" class="btn btn-outline-success btn-sm">
-              📊 Excel
-            </button>
-          </div> -->
         </div>
 
         <div id="tabla-wrapper" class="tabla-wrapper">
@@ -277,8 +209,6 @@
           </div>
           <div id="paginacion" class="mt-3"></div>
         </div>
-
-        <!-- <div id="evolucion" class="mt-4 mb-5"></div> -->
       </main>
 
       <%- include('./partials/footer') %>
@@ -342,7 +272,7 @@
         searchEnabled: true,
       });
 
-      const choicesLugar = new Choices("#filtroLugar", {
+      const choicesOrigenes = new Choices("#filtroOrigen", {
         removeItemButton: true,
         searchEnabled: true,
         placeholderValue: "Lugar",
