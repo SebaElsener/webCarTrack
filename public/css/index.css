@@ -2038,8 +2038,10 @@ thead {
   text-align: end;
 }
 
-.carpointer-actions-bar {
+#main .carpointer-actions-bar {
   min-width: auto !important;
+  justify-content: flex-start !important;
+  gap: 30px;
 }
 
 #title-VIN-input {
@@ -2482,4 +2484,80 @@ body > .glightbox-container {
 .roleSpinner {
   width: 18px;
   height: 18px;
+}
+
+.map-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+}
+
+.map-modal-content {
+  position: fixed;
+
+  width: 800px;
+  height: 600px;
+
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+
+  resize: both;
+  min-width: 300px;
+  min-height: 300px;
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+#map {
+  width: 100%;
+  height: calc(100% - 40px);
+}
+
+.resize-handle {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  right: 0;
+  bottom: 0;
+  cursor: se-resize;
+  background: #ccc;
+}
+
+.close-btn {
+  position: absolute;
+  z-index: 9999999;
+  right: 10px;
+  top: 5px;
+  border: none;
+  background: transparent;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.map-header {
+  height: 40px;
+  background: #f1f1f1;
+  cursor: move;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  user-select: none;
+}
+
+#gpsTracing {
+  height: 63px;
+}
+
+#btnVerMapa {
+  height: inherit;
 }

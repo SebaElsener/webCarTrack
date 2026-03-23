@@ -1,3 +1,5 @@
+import { obtenerPuntosDelViaje, openMapWithRoute } from "./carpointer-gps.js";
+
 const indexById = (arr) =>
   Object.fromEntries(arr.map((i) => [i.id, i.descripcion]));
 
@@ -258,7 +260,21 @@ function renderTabla() {
                 `
             }
           </td>
-          <td>${scan.gps_stamp ?? ""}</td>
+          <td>
+            ${
+              scan.gps_stamp
+                ? `
+                  <button 
+                    class="btn btn-sm btn-outline-primary open-map" 
+                    data-gps='${scan.gps_stamp}'
+                    title="Ver en mapa (${scan.gps_stamp})"
+                  >
+                    📍
+                  </button>
+                `
+                : ""
+            }
+          </td>
           <td>${scan.batea ?? ""}</td>
           <td>${scan.movimiento ?? ""}</td>
           <td>${scan.origen ?? ""}</td>
@@ -298,7 +314,7 @@ function renderTabla() {
     dateTh: 140,
     marcaTh: 100,
     modeloTh: 120,
-    VINth: 170,
+    VINth: 200,
     gpsTh: 60,
     bateaTh: 60,
     movimientoTh: 90,
@@ -637,4 +653,15 @@ document.addEventListener("click", (e) => {
   });
 
   lightbox.open();
+});
+
+document.getElementById("btnVerMapa").addEventListener("click", () => {
+  const puntos = obtenerPuntosDelViaje(datosTabla);
+
+  if (!puntos.length) {
+    alert("No hay datos GPS para mostrar");
+    return;
+  }
+  console.log(puntos);
+  openMapWithRoute(puntos);
 });
