@@ -254,9 +254,18 @@ export function animarSuave(puntos) {
     const pos = interpolar(latlngs[segmento], latlngs[segmento + 1], progreso);
 
     animationMarker.setLatLng(pos);
-    if (!mapDragging && !map.getBounds().contains(pos)) {
-      map.panTo(pos, { animate: false });
+
+    // 🔥 seguimiento suave con margen
+    const margen = 0.2; // 20% del borde
+    const bounds = map.getBounds().pad(-margen);
+
+    if (!mapDragging && !bounds.contains(pos)) {
+      map.panTo(pos, {
+        animate: true,
+        duration: 0.3,
+      });
     }
+
     const timeline = document.getElementById("timeline");
 
     if (timeline) {
