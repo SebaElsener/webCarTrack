@@ -67,8 +67,6 @@ passport.use(
 
 const loginController = () => {
   return passport.authenticate("supabase-jwt", {
-    // successRedirect: "/api/home",
-    // failureRedirect: "/api/login/faillogin",
     session: false,
   });
 };
