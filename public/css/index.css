@@ -2497,10 +2497,27 @@ body > .glightbox-container {
   display: none;
 }
 
+.timelineWrapper {
+  display: flex;
+  width: 90%;
+  gap: 30px;
+}
+
+.controlsContainer {
+  width: 50%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.timelineContainer {
+  align-content: center;
+  width: 50%;
+}
+
 .map-modal-content {
   position: fixed;
 
-  min-width: 800px;
+  min-width: 875px !important;
   height: 600px;
 
   top: 50%;
@@ -2579,8 +2596,7 @@ body > .glightbox-container {
 }
 
 #timeline {
-  width: 50%; /* ocupa la mitad */
-  max-width: 400px; /* límite */
+  width: 100%; /* ocupa la mitad */
 }
 
 .marker-number.actual {

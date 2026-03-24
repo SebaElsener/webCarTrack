@@ -220,20 +220,26 @@
       <div id="mapModal" class="map-modal">
         <div class="map-modal-content">
           <div class="map-header" id="mapHeader">
-            <!-- <span>Posicionamiento carga / descarga</span> -->
-            <button id="btnAnimarMapa">▶️ Recrear recorrido</button>
-            <button onclick="setVelocidad(0.005)">🐢</button>
-            <button onclick="setVelocidad(0.01)">▶️</button>
-            <button onclick="setVelocidad(0.03)">⚡</button>
-            <button id="btnPauseMapa">⏸️ Pause</button>
-            <input
-              type="range"
-              id="timeline"
-              min="0"
-              max="100"
-              value="0"
-              style="width: 80%"
-            />
+            <div class="timeLineWrapper">
+              <div class="controlsContainer">
+                <!-- <span>Posicionamiento carga / descarga</span> -->
+                <button id="btnAnimarMapa">▶️ Recrear recorrido</button>
+                <button onclick="setVelocidad(0.005)">🐢</button>
+                <button onclick="setVelocidad(0.01)">▶️</button>
+                <button onclick="setVelocidad(0.03)">⚡</button>
+                <button id="btnPauseMapa">⏸️ Pause</button>
+              </div>
+              <div class="timelineContainer">
+                <input
+                  type="range"
+                  id="timeline"
+                  min="0"
+                  max="100"
+                  value="0"
+                  style="width: 80%"
+                />
+              </div>
+            </div>
             <button id="closeMapModal">✖</button>
           </div>
           <div id="map"></div>

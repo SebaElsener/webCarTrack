@@ -285,13 +285,17 @@ export function animarSuave(puntos) {
     progreso += velocidad;
 
     if (progreso >= 1) {
-      progreso = 0;
-      segmento++;
+      progreso = 1; // 🔥 forzamos final exacto
     }
 
     if (!latlngs[segmento] || !latlngs[segmento + 1]) return;
 
     const pos = interpolar(latlngs[segmento], latlngs[segmento + 1], progreso);
+
+    if (progreso === 1) {
+      segmento++;
+      progreso = 0;
+    }
 
     animationMarker.setLatLng(pos);
 
