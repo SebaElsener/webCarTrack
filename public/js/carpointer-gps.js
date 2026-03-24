@@ -46,6 +46,8 @@ export function obtenerPuntosDelViaje(datosTabla) {
         lat: gps.lat,
         lon: gps.lon,
         movimiento: scan.movimiento,
+        origen: scan.origen,
+        destino: scan.destino,
         vin: scan.vin,
         fecha: scan.scan_date,
         scan_id: scan.scan_id,
@@ -136,7 +138,7 @@ export function openMapWithRoute(puntos, scanIdSeleccionado = null) {
 
       marker.bindPopup(`
     <b>#${numero} - ${p.vin}</b><br>
-    ${p.movimiento}<br>
+    ${p.movimiento} en ${p.movimiento === "CARGA" ? p.origen : p.destino}<br>
     ${new Date(p.fecha).toLocaleString("es-AR", {
       hour12: false,
     })}
