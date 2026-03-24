@@ -321,7 +321,7 @@ function renderTabla() {
     dateTh: 140,
     marcaTh: 100,
     modeloTh: 120,
-    VINth: 200,
+    VINth: 170,
     gpsTh: 60,
     bateaTh: 60,
     movimientoTh: 90,

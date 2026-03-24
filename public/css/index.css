@@ -2497,7 +2497,7 @@ body > .glightbox-container {
   display: none;
 }
 
-.timelineWrapper {
+.timeLineWrapper {
   display: flex;
   width: 90%;
   gap: 30px;
