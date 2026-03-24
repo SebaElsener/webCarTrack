@@ -20,6 +20,7 @@ let filtros = {
   movimiento: null,
   bateaSeleccionada: null,
 };
+let vinSeleccionado = null;
 
 const navBarMin = document.getElementById("navBarMin");
 navBarMin.style.top = "0";
@@ -272,6 +273,7 @@ function renderTabla() {
                   <button 
                     class="btn btn-sm btn-outline-primary open-map" 
                     data-gps='${scan.gps_stamp}'
+                    data-scanid='${scan.scan_id}'
                     title="Ver en mapa (${scan.gps_stamp})"
                   >
                     📍
@@ -677,4 +679,14 @@ document.getElementById("btnAnimarMapa").addEventListener("click", () => {
 
 document.getElementById("btnPauseMapa").addEventListener("click", () => {
   pausarAnimacion();
+});
+
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".open-map");
+  if (!btn) return;
+
+  const scanId = btn.dataset.scanid;
+  const puntos = obtenerPuntosDelViaje(datosTabla);
+
+  openMapWithRoute(puntos, scanId);
 });

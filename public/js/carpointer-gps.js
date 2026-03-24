@@ -48,6 +48,7 @@ export function obtenerPuntosDelViaje(datosTabla) {
         movimiento: scan.movimiento,
         vin: scan.vin,
         fecha: scan.scan_date,
+        scan_id: scan.scan_id,
       });
     } catch (e) {
       console.warn("GPS inválido:", scan.gps_stamp);
@@ -57,7 +58,7 @@ export function obtenerPuntosDelViaje(datosTabla) {
   return puntos;
 }
 
-export function openMapWithRoute(puntos) {
+export function openMapWithRoute(puntos, scanIdSeleccionado = null) {
   puntosGlobales = puntos;
   puntos.sort(
     (a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime(),
@@ -94,6 +95,8 @@ export function openMapWithRoute(puntos) {
     });
 
     const latlngs = [];
+    let puntoSeleccionado = null;
+    let markerSeleccionado = null;
 
     puntos.forEach((p, index) => {
       const lat = Number(p.lat);
@@ -103,17 +106,32 @@ export function openMapWithRoute(puntos) {
 
       const numero = index + 1;
 
+      const esActual =
+        scanIdSeleccionado && String(p.scan_id) === String(scanIdSeleccionado);
+
+      let bgColor = "#007bff";
+
+      if (esActual) {
+        bgColor = "#ffc107"; // 🟡
+      } else if (p.movimiento === "CARGA") {
+        bgColor = "#28a745"; // 🟢
+      } else if (p.movimiento === "DESCARGA") {
+        bgColor = "#007bff"; // 🔵
+      }
+
+      // ✅ 1. crear icon PRIMERO
       const icon = L.divIcon({
         className: "custom-marker",
         html: `
-      <div class="marker-number">
+      <div class="marker-number ${esActual ? "actual" : ""}" style="background:${bgColor}">
         ${numero}
       </div>
     `,
-        iconSize: [30, 30],
-        iconAnchor: [15, 15],
+        iconSize: esActual ? [36, 36] : [30, 30],
+        iconAnchor: esActual ? [18, 18] : [15, 15],
       });
 
+      // ✅ 2. crear marker DESPUÉS
       const marker = L.marker([lat, lon], { icon }).addTo(map);
 
       marker.bindPopup(`
@@ -123,6 +141,12 @@ export function openMapWithRoute(puntos) {
       hour12: false,
     })}
   `);
+
+      // ✅ 3. recién ahora guardás el seleccionado
+      if (esActual) {
+        puntoSeleccionado = [lat, lon];
+        markerSeleccionado = marker;
+      }
 
       latlngs.push([lat, lon]);
     });
@@ -143,8 +167,24 @@ export function openMapWithRoute(puntos) {
         .bindPopup("Fin");
     }
 
-    // 🔥 ajustar vista
-    map.fitBounds(polyline.getBounds());
+    if (puntoSeleccionado) {
+      setTimeout(() => {
+        map.flyTo(puntoSeleccionado, 18, {
+          duration: 0.6,
+          easeLinearity: 0.25,
+        });
+
+        if (markerSeleccionado) {
+          markerSeleccionado.openPopup();
+        }
+      }, 50); // 🔥 clave
+    } else {
+      map.fitBounds(polyline.getBounds());
+    }
+
+    if (markerSeleccionado) {
+      markerSeleccionado.openPopup();
+    }
 
     map.invalidateSize();
   }, 100);
@@ -170,20 +210,20 @@ document.getElementById("closeMapModal").addEventListener("click", () => {
   document.getElementById("mapModal").style.display = "none";
 });
 
-document.addEventListener("click", (e) => {
-  const btn = e.target.closest(".open-map");
-  if (!btn) return;
+// document.addEventListener("click", (e) => {
+//   const btn = e.target.closest(".open-map");
+//   if (!btn) return;
 
-  try {
-    const gps = JSON.parse(btn.dataset.gps);
+//   try {
+//     const gps = JSON.parse(btn.dataset.gps);
 
-    if (!gps.lat || !gps.lon) return;
+//     if (!gps.lat || !gps.lon) return;
 
-    openMapModal(gps.lat, gps.lon);
-  } catch (err) {
-    console.error("Error parseando GPS:", err);
-  }
-});
+//     openMapModal(gps.lat, gps.lon);
+//   } catch (err) {
+//     console.error("Error parseando GPS:", err);
+//   }
+// });
 
 document.addEventListener("DOMContentLoaded", () => {
   const modal = document.querySelector(".map-modal-content");

@@ -2582,3 +2582,8 @@ body > .glightbox-container {
   width: 50%; /* ocupa la mitad */
   max-width: 400px; /* límite */
 }
+
+.marker-number.actual {
+  border: 3px solid black;
+  transform: scale(1.2);
+}
