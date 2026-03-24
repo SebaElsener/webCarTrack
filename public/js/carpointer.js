@@ -29,13 +29,28 @@ dropdownContent.style.marginTop = "0";
 document.getElementById("form-fechas").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const fechas = document.getElementById("rangoFechas").value.split(" a ");
-  if (fechas.length !== 2) {
+  const raw = document.getElementById("rangoFechas").value.trim();
+
+  if (!raw) {
+    toastError("Seleccioná una fecha");
+    return;
+  }
+
+  let fechas = raw.split(" a ").map((f) => f.trim());
+
+  // 👉 Caso 1: un solo día
+  if (fechas.length === 1) {
+    fechas = [fechas[0], fechas[0]];
+  }
+
+  // 👉 Caso inválido
+  if (fechas.length !== 2 || !fechas[0] || !fechas[1]) {
     toastError("Seleccioná un rango válido");
     return;
   }
 
   const [desde, hasta] = fechas;
+
   cargarDatos(desde, hasta);
 });
 
@@ -73,7 +88,7 @@ async function cargarDatos(desde, hasta) {
           fotosPorVin[scan.scan_id] = scan.fotos.map((f, idx) => ({
             href: f,
             type: "image",
-            title: `VIN ${scan.vin} · ${scan.movimiento} en ${scan.lugar} ·  ${new Date(
+            title: `VIN ${scan.vin} · ${scan.movimiento} en ${scan.movimiento === "CARGA" ? scan.origen : scan.destino} ·  ${new Date(
               scan.scan_date,
             ).toLocaleString("es-AR", {
               year: "2-digit",

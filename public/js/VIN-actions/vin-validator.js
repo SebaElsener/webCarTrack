@@ -52,6 +52,16 @@ export function initVINValidation({
   }
 
   // 🔠 Normalizar + live validation
+  input.addEventListener("beforeinput", (e) => {
+    const char = e.data?.toUpperCase();
+
+    if (!char) return;
+
+    if (!/[A-HJ-NPR-Z0-9]/.test(char)) {
+      e.preventDefault();
+    }
+  });
+
   input.addEventListener("input", (e) => {
     e.target.value = e.target.value.toUpperCase().trim();
     actualizarEstado(e.target.value);

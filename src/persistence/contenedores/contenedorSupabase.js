@@ -216,6 +216,15 @@ class ContenedorSupabase {
   }
 
   async getDataByDate(startDate, endDate, user) {
+    const startISO = `${startDate}T00:00:00.000Z`;
+
+    const endISO = `${endDate}T00:00:00.000Z`.replace(
+      "T00:00:00.000Z",
+      "T00:00:00.000Z",
+    );
+
+    const end = new Date(endISO);
+    end.setUTCDate(end.getUTCDate() + 1);
     try {
       let query = this.sql
         .from("scans")
@@ -246,11 +255,12 @@ class ContenedorSupabase {
             )
         `,
         )
-        .gte("date", startDate)
-        .lte("date", endDate)
+        .gte("date", startISO)
+        .lt("date", end.toISOString())
         .order("date", { ascending: true });
 
       query = this.applyVisibilityFilter(query, user);
+      console.log(startDate, endDate);
 
       const { data, error } = await query;
 
@@ -287,6 +297,15 @@ class ContenedorSupabase {
   }
 
   async getCarpointerDataByDate(startDate, endDate, user) {
+    const startISO = `${startDate}T00:00:00.000Z`;
+
+    const endISO = `${endDate}T00:00:00.000Z`.replace(
+      "T00:00:00.000Z",
+      "T00:00:00.000Z",
+    );
+
+    const end = new Date(endISO);
+    end.setUTCDate(end.getUTCDate() + 1);
     try {
       let query = this.sql
         .schema("carpointer")
@@ -309,8 +328,8 @@ class ContenedorSupabase {
             )
         `,
         )
-        .gte("created_at", startDate)
-        .lte("created_at", endDate)
+        .gte("created_at", startISO)
+        .lt("created_at", end.toISOString())
         .order("created_at", { ascending: true });
 
       query = this.applyVisibilityFilter(query, user);

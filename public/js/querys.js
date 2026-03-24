@@ -35,8 +35,22 @@ dropdownContent.style.marginTop = "0";
 document.getElementById("form-fechas").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const fechas = document.getElementById("rangoFechas").value.split(" a ");
-  if (fechas.length !== 2) {
+  const raw = document.getElementById("rangoFechas").value.trim();
+
+  if (!raw) {
+    toastError("Seleccioná una fecha");
+    return;
+  }
+
+  let fechas = raw.split(" a ").map((f) => f.trim());
+
+  // 👉 Caso 1: un solo día
+  if (fechas.length === 1) {
+    fechas = [fechas[0], fechas[0]];
+  }
+
+  // 👉 Caso inválido
+  if (fechas.length !== 2 || !fechas[0] || !fechas[1]) {
     toastError("Seleccioná un rango válido");
     return;
   }
@@ -222,7 +236,7 @@ async function cargarDatos(desde, hasta) {
 
       data.forEach((scan) => {
         if (scan.fotos?.length) {
-          fotosPorVin[scan.vin] = scan.fotos.map((f, idx) => ({
+          fotosPorVin[scan.scan_id] = scan.fotos.map((f, idx) => ({
             href: f,
             type: "image",
             title: `VIN ${scan.vin} · ${scan.movimiento} en ${scan.lugar} ·  ${new Date(
@@ -237,7 +251,7 @@ async function cargarDatos(desde, hasta) {
             })} · Imagen ${idx + 1}`,
           }));
 
-          vinsConFotos.add(scan.vin);
+          vinsConFotos.add(scan.scan_id);
         }
       });
 
@@ -295,12 +309,13 @@ function renderTabla() {
           <td>${scan.modelo ?? ""}</td>
           <td>
             ${
-              vinsConFotos.has(scan.vin)
+              vinsConFotos.has(scan.scan_id)
                 ? `
                   <a
                     href="#"
                     class="vin-link open-gallery"
                     data-vin="${scan.vin}"
+                    data-scanid="${scan.scan_id}"
                     title="Ver fotos"
                   >
                     <span>${scan.vin}</span>
@@ -337,12 +352,13 @@ function renderTabla() {
             <td>${scan.modelo ?? ""}</td>
             <td>
               ${
-                vinsConFotos.has(scan.vin)
+                vinsConFotos.has(scan.scan_id)
                   ? `
                     <a
                       href="#"
                       class="vin-link open-gallery"
                       data-vin="${scan.vin}"
+                      data-scanid="${scan.scan_id}"
                       title="Ver fotos"
                     >
                       <span>${scan.vin}</span>
@@ -1311,11 +1327,11 @@ document.addEventListener("click", (e) => {
   const btn = e.target.closest(".open-gallery");
   if (!btn) return;
 
-  const vin = btn.dataset.vin;
-  if (!vin || !fotosPorVin[vin]) return;
+  const scanId = btn.dataset.scanid;
+  if (!scanId || !fotosPorVin[scanId]) return;
 
   const lightbox = GLightbox({
-    elements: fotosPorVin[vin],
+    elements: fotosPorVin[scanId],
     loop: true,
     zoomable: true,
     draggable: true,

@@ -78,21 +78,21 @@
               <div class="col-md-2 filterContainer">
                 <label class="form-label fw-semibold">Marca</label>
                 <select id="filtroMarca" class="form-select" multiple>
-                  <option value="">Todas</option>
+                  <option value=""></option>
                 </select>
               </div>
               <!-- Modelo -->
               <div class="col-md-2 filterContainer">
                 <label class="form-label fw-semibold">Modelo</label>
                 <select id="filtroModelo" class="form-select" multiple>
-                  <option value="">Todos</option>
+                  <option value=""></option>
                 </select>
               </div>
               <!-- Batea -->
               <div class="col-md-2 filterContainer">
                 <label class="form-label fw-semibold">Batea</label>
                 <select id="filtroBatea" class="form-select" multiple>
-                  <option value="">Todas</option>
+                  <option value=""></option>
                 </select>
               </div>
 
@@ -289,8 +289,8 @@
       const choicesMarca = new Choices("#filtroMarca", {
         removeItemButton: true,
         placeholder: true,
-        placeholderValue: "Buscar marca...",
-        searchPlaceholderValue: "Buscar...",
+        // placeholderValue: "Buscar marca...",
+        // searchPlaceholderValue: "Buscar...",
         itemSelectText: "",
         shouldSort: true,
         searchEnabled: true,
@@ -299,8 +299,8 @@
       const choicesModelo = new Choices("#filtroModelo", {
         removeItemButton: true,
         placeholder: true,
-        placeholderValue: "Buscar modelo...",
-        searchPlaceholderValue: "Buscar...",
+        // placeholderValue: "Buscar modelo...",
+        // searchPlaceholderValue: "Buscar...",
         itemSelectText: "",
         shouldSort: true,
         searchEnabled: true,
@@ -309,8 +309,8 @@
       const choicesBatea = new Choices("#filtroBatea", {
         removeItemButton: true,
         placeholder: true,
-        placeholderValue: "Buscar batea...",
-        searchPlaceholderValue: "Buscar...",
+        // placeholderValue: "Buscar batea...",
+        // searchPlaceholderValue: "Buscar...",
         itemSelectText: "",
         shouldSort: true,
         searchEnabled: true,
@@ -320,7 +320,7 @@
         removeItemButton: true,
         searchEnabled: true,
         placeholderValue: "Lugar",
-        itemSelectText: "",
+        // itemSelectText: "",
         shouldSort: false,
       });
 
@@ -328,7 +328,7 @@
         removeItemButton: true,
         searchEnabled: true,
         placeholderValue: "Destino",
-        itemSelectText: "",
+        // itemSelectText: "",
         shouldSort: false,
       });
     </script>
