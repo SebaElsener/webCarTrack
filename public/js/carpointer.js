@@ -4,9 +4,8 @@ import {
   animarSuave,
   pausarAnimacion,
 } from "./carpointer-gps.js";
-
-const indexById = (arr) =>
-  Object.fromEntries(arr.map((i) => [i.id, i.descripcion]));
+import { obtenerVINcarpointer } from "./VIN-actions/vinService.js";
+import { initVINValidation } from "./VIN-actions/vin-validator.js";
 
 let accionesPostTablaMostradas = false;
 let fotosPorVin = {};
@@ -17,10 +16,10 @@ let filtros = {
   batea: [],
   origen: [],
   destino: [],
+  viaje: [],
   movimiento: null,
   bateaSeleccionada: null,
 };
-let vinSeleccionado = null;
 
 const navBarMin = document.getElementById("navBarMin");
 navBarMin.style.top = "0";
@@ -71,7 +70,7 @@ async function cargarDatos(desde, hasta) {
 
       data.forEach((scan) => {
         if (scan.fotos?.length) {
-          fotosPorVin[scan.vin] = scan.fotos.map((f, idx) => ({
+          fotosPorVin[scan.scan_id] = scan.fotos.map((f, idx) => ({
             href: f,
             type: "image",
             title: `VIN ${scan.vin} · ${scan.movimiento} en ${scan.lugar} ·  ${new Date(
@@ -86,7 +85,7 @@ async function cargarDatos(desde, hasta) {
             })} · Imagen ${idx + 1}`,
           }));
 
-          vinsConFotos.add(scan.vin);
+          vinsConFotos.add(scan.scan_id);
         }
       });
 
@@ -100,6 +99,7 @@ async function cargarDatos(desde, hasta) {
       cargarMarcas();
       cargarModelos();
       cargarBateas();
+      cargarViajes();
       cargarOrigenes();
       cargarDestinos();
       aplicarFiltros();
@@ -140,6 +140,20 @@ function cargarMarcas() {
   choicesMarca.clearChoices();
   choicesMarca.setChoices(
     marcas.map((m) => ({ value: m, label: m })),
+    "value",
+    "label",
+    true,
+  );
+}
+
+function cargarViajes() {
+  const viajes = [
+    ...new Set(datosGlobales.map((d) => d.id_viaje).filter(Boolean)),
+  ].sort();
+
+  choicesViaje.clearChoices();
+  choicesViaje.setChoices(
+    viajes.map((m) => ({ value: m, label: m })),
     "value",
     "label",
     true,
@@ -250,12 +264,13 @@ function renderTabla() {
           <td>${scan.modelo ?? ""}</td>
           <td>
             ${
-              vinsConFotos.has(scan.vin)
+              vinsConFotos.has(scan.scan_id)
                 ? `
                   <a
                     href="#"
                     class="vin-link open-gallery"
                     data-vin="${scan.vin}"
+                    data-scanid="${scan.scan_id}"
                     title="Ver fotos"
                   >
                     <span>${scan.vin}</span>
@@ -286,6 +301,7 @@ function renderTabla() {
           <td>${scan.movimiento ?? ""}</td>
           <td>${scan.origen ?? ""}</td>
           <td>${scan.destino ?? ""}</td>
+          <td>${scan.id_viaje ?? ""}</td>
         </tr>
       `;
   });
@@ -307,6 +323,7 @@ function renderTabla() {
             <th class="movimientoTh">Movimiento</th>
             <th class="lugarTh">Origen</th>
             <th class="destinoTh">Destino</th>
+            <th class="viajeTh">Viaje</th>
           </tr>
         </thead>
         <tbody>${rows}</tbody>
@@ -321,12 +338,13 @@ function renderTabla() {
     dateTh: 140,
     marcaTh: 100,
     modeloTh: 120,
-    VINth: 170,
+    VINth: 180,
     gpsTh: 60,
     bateaTh: 60,
     movimientoTh: 90,
     lugarTh: 150,
     destinoTh: 200,
+    viajeTh: 150,
   };
 
   Object.entries(initialWidths).forEach(([cls, width]) => {
@@ -460,6 +478,12 @@ document.getElementById("filtroMarca").addEventListener("change", (e) => {
   aplicarFiltros();
 });
 
+document.getElementById("filtroViaje").addEventListener("change", (e) => {
+  filtros.viaje = Array.from(e.target.selectedOptions).map((o) => o.value);
+
+  aplicarFiltros();
+});
+
 document.getElementById("filtroModelo").addEventListener("change", (e) => {
   filtros.modelo = Array.from(e.target.selectedOptions).map((o) => o.value);
 
@@ -525,6 +549,13 @@ function aplicarFiltros() {
     // filtro batea
     if (filtros.batea.length) {
       dataBase = dataBase.filter((d) => filtros.batea.includes(d.batea));
+    }
+
+    // filtro viaje
+    if (filtros.viaje.length) {
+      dataBase = dataBase.filter((d) =>
+        filtros.viaje.includes(String(d.id_viaje)),
+      );
     }
 
     // 🔹 Filtro movimiento
@@ -605,6 +636,7 @@ const limpiarFiltros = () => {
   filtros.batea = [];
   filtros.origen = [];
   filtros.destino = [];
+  filtros.viaje = [];
   filtros.movimiento = null;
   filtros.bateaSeleccionada = null;
 
@@ -612,6 +644,7 @@ const limpiarFiltros = () => {
   choicesMarca.removeActiveItems();
   choicesModelo.removeActiveItems();
   choicesBatea.removeActiveItems();
+  choicesViaje.removeActiveItems();
   choicesOrigenes.removeActiveItems();
   choicesDestino.removeActiveItems();
 
@@ -648,11 +681,11 @@ document.addEventListener("click", (e) => {
   const btn = e.target.closest(".open-gallery");
   if (!btn) return;
 
-  const vin = btn.dataset.vin;
-  if (!vin || !fotosPorVin[vin]) return;
+  const scanId = btn.dataset.scanid;
+  if (!scanId || !fotosPorVin[scanId]) return;
 
   const lightbox = GLightbox({
-    elements: fotosPorVin[vin],
+    elements: fotosPorVin[scanId],
     loop: true,
     zoomable: true,
     draggable: true,
@@ -689,4 +722,66 @@ document.addEventListener("click", (e) => {
   const puntos = obtenerPuntosDelViaje(datosTabla);
 
   openMapWithRoute(puntos, scanId);
+});
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////// OPERACIONES CONSULTA CHASIS/VIN /////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+initVINValidation({
+  formId: "form-vin",
+  inputId: "vinInput",
+  errorId: "vinError",
+
+  onValidSubmit: async (vin) => {
+    try {
+      mostrarSpinner();
+
+      const data = await obtenerVINcarpointer(vin);
+
+      if (!Array.isArray(data) || data.length === 0) {
+        document.getElementById("resultados").innerHTML =
+          "<p class='text-muted'>No se encontraron resultados para ese VIN</p>";
+
+        document.getElementById("paginacion").innerHTML = "";
+        return;
+      }
+
+      // 🔥 MISMA lógica que usar query por fecha
+      fotosPorVin = {};
+      vinsConFotos.clear();
+
+      data.forEach((scan) => {
+        if (scan.fotos?.length) {
+          fotosPorVin[scan.scan_id] = scan.fotos.map((f, idx) => ({
+            href: f,
+            type: "image",
+            title: `VIN ${scan.vin} · ${scan.movimiento} en ${scan.lugar} · ${new Date(
+              scan.scan_date,
+            ).toLocaleString("es-AR")} · Imagen ${idx + 1}`,
+          }));
+
+          vinsConFotos.add(scan.sca_id);
+        }
+      });
+
+      // IMPORTANTE: reemplazamos dataset global
+      datosGlobales = data;
+
+      // limpiamos filtros para que no rompan la búsqueda
+      limpiarFiltros();
+    } catch (error) {
+      console.error(error);
+
+      document.getElementById("resultados").innerHTML =
+        "<p class='text-danger'>Error consultando VIN</p>";
+
+      document.getElementById("paginacion").innerHTML = "";
+    }
+  },
+});
+
+document.getElementById("vinInput").addEventListener("input", () => {
+  document.getElementById("paginacion").innerHTML = "";
 });

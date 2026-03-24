@@ -1,4 +1,3 @@
-import { infoLogger } from "../logger.js";
 import { supabaseRepo } from "../persistence/factory.js";
 
 const carpointerQueryRenderBusiness = async (desde, hasta, user) => {
@@ -6,7 +5,7 @@ const carpointerQueryRenderBusiness = async (desde, hasta, user) => {
     const data = await supabaseRepo.getDataByDate(desde, hasta, user);
     return data;
   } catch (error) {
-    infoLogger.error("Error en querysRenderBusiness", error);
+    console.error("Error en querysRenderBusiness", error);
     return [];
   }
 };
@@ -16,9 +15,17 @@ const carpointerQuerybydateBusiness = async (desde, hasta, user) => {
     const data = await supabaseRepo.getCarpointerDataByDate(desde, hasta, user);
     return data;
   } catch (error) {
-    infoLogger.error("Error en carpointerQuerybydateBusiness", error);
+    console.error("Error en carpointerQuerybydateBusiness", error);
     return [];
   }
 };
 
-export { carpointerQueryRenderBusiness, carpointerQuerybydateBusiness };
+const getDataByVINfromCarpointerBusiness = async (vin) => {
+  return await supabaseRepo.getDataByVINfromCarpointer(vin);
+};
+
+export {
+  carpointerQueryRenderBusiness,
+  carpointerQuerybydateBusiness,
+  getDataByVINfromCarpointerBusiness,
+};

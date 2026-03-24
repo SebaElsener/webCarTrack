@@ -1,0 +1,1761 @@
+import { obtenerVINcarpointer } from "./VIN-actions/vinService.js";
+import { initVINValidation } from "./VIN-actions/vin-validator.js";
+
+const FILAS_POR_PAGINA = 10;
+let datosGlobales = [];
+let paginaActual = 1;
+let accionesPostTablaMostradas = false;
+let fotosPorScan = {};
+let lightbox = null;
+
+// const navBarMin = document.getElementById("navBarMin");
+// navBarMin.style.top = "0";
+// const dropdownContent = document.getElementById("dropdownContent");
+// dropdownContent.style.marginTop = "0";
+
+// Submit del formulario
+initVINValidation({
+  formId: "form-vin",
+  inputId: "vinInput",
+  errorId: "vinError",
+  onValidSubmit: async (vin) => {
+    accionesPostTablaMostradas = false;
+
+    const acciones = document.querySelectorAll(".post-table-action-buttons");
+
+    acciones.forEach((el) => {
+      el.style.display = "none";
+    });
+
+    await cargarDatos(vin);
+  },
+});
+
+// Mostrar spinner
+function mostrarSpinner() {
+  document.getElementById("resultadosVIN").innerHTML = `
+    <div class="d-flex justify-content-center align-items-center my-3">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+  `;
+}
+
+// Cargar datos desde el backend
+async function cargarDatos(vin) {
+  mostrarSpinner();
+
+  try {
+    let data = await obtenerVINcarpointer(vin);
+
+    if (!data || data.length === 0) {
+      // 🔹 Solo permitir crear si ingresó VIN completo
+      const esVINCompleto = /^[A-HJ-NPR-Z0-9]{17}$/.test(vin);
+
+      if (!esVINCompleto) {
+        document.getElementById("resultadosVIN").innerHTML =
+          "<p class='text-muted'>No se encontraron resultados</p>";
+        return;
+      }
+
+      if (!nuevoScan) {
+        document.getElementById("resultadosVIN").innerHTML =
+          "<p class='text-muted'>No se encontraron datos</p>";
+        return;
+      }
+
+      data = await obtenerVINcarpointer(vin);
+    }
+    prepararDatosYRenderizar(data);
+  } catch (err) {
+    console.error(err);
+    document.getElementById("resultadosVIN").innerHTML =
+      "<p class='text-danger'>Error al obtener los datos</p>";
+  }
+}
+
+function prepararDatosYRenderizar(data) {
+  fotosPorScan = {};
+
+  data.forEach((scan) => {
+    const elementos = [];
+
+    // ==========================
+    // FOTOS (imagenes clásicas)
+    // ==========================
+    if (scan.fotos?.length) {
+      scan.fotos.forEach((f, idx) => {
+        elementos.push({
+          pict_id: f.id,
+          pict_scan_id: f.pict_scan_id,
+          href: f.pictureurl,
+          fileUrl: f.pictureurl,
+          type: "image",
+          title: `VIN ${scan.vin} · ${scan.movimiento} en ${scan.lugar} · ${new Date(
+            scan.scan_date,
+          ).toLocaleString("es-AR")} · Imagen ${idx + 1}`,
+        });
+      });
+    }
+
+    if (elementos.length) {
+      fotosPorScan[scan.scan_id] = elementos;
+    }
+  });
+
+  const transformScans = data.map((scan) => ({
+    ...scan,
+  }));
+
+  datosGlobales = transformScans;
+  paginaActual = 1;
+  renderTabla();
+}
+
+function mostrarAccionesPostTabla() {
+  if (accionesPostTablaMostradas) return;
+
+  const acciones = document.querySelectorAll(".post-table-action-buttons");
+  const delayBase = 200;
+  const delayStep = 180;
+
+  // Reset visual
+  acciones.forEach((el) => {
+    el.style.display = "block";
+  });
+
+  acciones.forEach((el) => {
+    el.classList.remove("animate-in");
+    el.style.opacity = "0";
+  });
+
+  acciones.forEach((el, i) => {
+    setTimeout(
+      () => {
+        el.classList.add("animate-in");
+      },
+      delayBase + i * delayStep,
+    );
+  });
+
+  accionesPostTablaMostradas = true;
+}
+
+// Render de tabla
+function renderTabla() {
+  const inicio = (paginaActual - 1) * FILAS_POR_PAGINA;
+  const fin = inicio + FILAS_POR_PAGINA;
+  const paginaDatos = datosGlobales.slice(inicio, fin);
+
+  let rows = "";
+
+  paginaDatos.forEach((scan) => {
+    if (!scan.damages || scan.damages.length === 0) {
+      rows += `
+      <tr class="resultadosVINtr scan-base-row ${scan.unidad_transito ? "unidad-transito-row" : ""}" data-scan-id="${scan.scan_id}">
+        <td>${new Date(scan.scan_date).toLocaleString("es-AR", {
+          year: "2-digit",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        })}</td>
+        <td>${scan.marca ?? ""}</td>
+        <td>${scan.modelo ?? ""}</td>
+        <td class="vin-cell">
+          ${
+            currentMode === "add-damage"
+              ? `
+            <span
+              class="add-damage-icon"
+              data-scanid="${scan.scan_id}"
+              title="Agregar daño"
+            >
+              <i class="mdi mdi-plus-circle-outline"></i>
+            </span>
+          `
+              : ""
+          }
+          ${
+            currentMode === "cartaporte-vin"
+              ? `
+            <span
+              class="vin-cartaporte-icon"
+              data-scan-id="${scan.scan_id}"
+              title="Generar cartaporte"
+            >
+              <i class="mdi mdi-note-text-outline"></i>
+            </span>
+          `
+              : ""
+          }
+          ${
+            currentMode === "delete-vin"
+              ? `
+                <span
+                  class="vin-delete-icon"
+                  data-scan-id="${scan.scan_id}"
+                  title="Eliminar etapa / scan"
+                >
+                  <i class="mdi mdi-trash-can-outline"></i>
+                </span>
+              `
+              : ""
+          }
+
+          ${
+            fotosPorScan[scan.scan_id]?.length
+              ? `
+                <a
+                  href="#"
+                  class="vin-link open-gallery vin-hover"
+                  data-scanid="${scan.scan_id}"
+                  data-vin="${scan.vin}"
+                  data-scan-id="${scan.scan_id}"
+                  title="Ver fotos"
+                >
+                  <span>${scan.vin}</span>
+                </a>
+              `
+              : `
+                <span class="vin-text vin-hover" data-vin="${scan.vin}" data-scan-id="${scan.scan_id}">${scan.vin ?? ""}</span>
+              `
+          }
+        </td>
+        <!-- ÁREA -->
+        <td
+          class="editable-cell text-center"
+          data-field="area"
+          data-scan-id="${scan.scan_id}"
+          data-damage-id=""
+        >
+          <span class="cell-value text-muted-table">—</span>
+        </td>
+
+        <!-- AVERÍA -->
+        <td
+          class="editable-cell text-center"
+          data-field="averia"
+          data-scan-id="${scan.scan_id}"
+          data-damage-id=""
+        >
+          <span class="cell-value text-muted-table">—</span>
+        </td>
+
+        <!-- GRAVEDAD -->
+        <td
+          class="editable-cell text-center"
+          data-field="gravedad"
+          data-scan-id="${scan.scan_id}"
+          data-damage-id=""
+        >
+          <span class="cell-value text-muted-table">—</span>
+        </td>
+
+        <!-- OBSERVACIÓN -->
+        <td
+          class="editable-cell text-center"
+          data-field="observacion"
+          data-scan-id="${scan.scan_id}"
+          data-damage-id=""
+        >
+          <span class="cell-value text-muted-table">Sin daños</span>
+        </td>
+        <td class="editable-scan"
+            data-field="batea"
+            data-scan-id="${scan.scan_id}">
+          <span class="cell-value">${scan.batea ?? ""}</span>
+        </td>
+        <td class="editable-scan"
+            data-field="movimiento"
+            data-scan-id="${scan.scan_id}">
+          <span class="cell-value">${scan.movimiento ?? ""}</span>
+        </td>
+        <td class="editable-scan"
+            data-field="lugar"
+            data-scan-id="${scan.scan_id}">
+          <span class="cell-value">${scan.lugar ?? ""}</span>
+        </td>
+        <td class="editable-scan"
+            data-field="destino"
+            data-scan-id="${scan.scan_id}">
+          <span class="cell-value">${scan.destino ?? ""}</span>
+        </td>
+        <td class="editable-scan text-center"
+            data-field="clima"
+            data-scan-id="${scan.scan_id}">
+          <span class="cell-value">
+            ${renderClimaIcon(scan.clima)}
+          </span>
+        </td>
+        <td>${scan.user ?? ""}</td>
+      </tr>
+    `;
+    } else {
+      scan.damages.forEach((damage) => {
+        rows += `
+          <tr class="resultadosVINtr scan-base-row ${scan.unidad_transito ? "unidad-transito-row" : ""}"
+              data-scan-id="${scan.scan_id}"
+              data-damage-id="${damage.id ?? ""}"
+          >
+            <td>${new Date(scan.scan_date).toLocaleString("es-AR", {
+              year: "2-digit",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })}</td>
+            <td>${scan.marca ?? ""}</td>
+            <td>${scan.modelo ?? ""}</td>
+            <td class="vin-cell">
+              ${
+                currentMode === "add-damage"
+                  ? `
+                <span
+                  class="add-damage-icon"
+                  data-scanid="${scan.scan_id}"
+                  title="Agregar daño"
+                >
+                  <i class="mdi mdi-plus-circle-outline"></i>
+                </span>
+              `
+                  : ""
+              }
+              ${
+                currentMode === "cartaporte-vin"
+                  ? `
+                <span
+                  class="vin-cartaporte-icon"
+                  data-scan-id="${scan.scan_id}"
+                  title="Generar cartaporte"
+                >
+                  <i class="mdi mdi-note-text-outline"></i>
+                </span>
+              `
+                  : ""
+              }
+                ${
+                  currentMode === "delete-vin"
+                    ? `
+                    <span
+                      class="vin-delete-icon"
+                      data-scan-id="${scan.scan_id}"
+                      title="Eliminar etapa / scan"
+                    >
+                      <i class="mdi mdi-trash-can-outline"></i>
+                    </span>
+                  `
+                    : ""
+                }
+              ${
+                fotosPorScan[scan.scan_id]?.length
+                  ? `
+                    <a
+                      href="#"
+                      class="vin-link open-gallery vin-hover"
+                      data-vin="${scan.vin}"
+                      data-scan-id="${scan.scan_id}"
+                      data-scanid="${scan.scan_id}"
+                      title="Ver fotos"
+                    >
+                      <span>${scan.vin}</span>
+                    </a>
+                  `
+                  : `
+                    <span class="vin-text vin-hover" data-vin="${scan.vin}" data-scan-id="${scan.scan_id}">${scan.vin ?? ""}</span>
+                  `
+              }
+            </td>
+            <td
+              class="editable-cell area-cell"
+              data-field="area"
+              data-scan-id="${scan.scan_id}"
+              data-damage-id="${damage.id ?? ""}"
+            >
+              <span
+                class="damage-delete-icon d-none"
+                title="Eliminar daño"
+                data-damage-id="${damage.id ?? ""}"
+              >
+                <i class="mdi mdi-trash-can-outline"></i>
+              </span>
+
+              <span class="cell-value">
+                ${damage.area + " - " + damage.area_desc}
+              </span>
+            </td>
+            <td
+              class="editable-cell"
+              data-field="averia"
+              data-scan-id="${scan.scan_id}"
+              data-damage-id="${damage.id ?? ""}"
+            >
+              <span class="cell-value">${damage.averia + " - " + damage.averia_desc}</span>
+            </td>
+            <td
+              class="editable-cell"
+              data-field="gravedad"
+              data-scan-id="${scan.scan_id}"
+              data-damage-id="${damage.id ?? ""}"
+            >
+              <span class="cell-value">${damage.grav_desc}</span>
+            </td>
+            <td
+              class="editable-cell"
+              data-field="observacion"
+              data-scan-id="${scan.scan_id}"
+              data-damage-id="${damage.id ?? ""}"
+            >
+              <span class="cell-value">${damage.obs}</span>            
+            </td>
+            <td class="editable-scan"
+              data-field="batea"
+              data-scan-id="${scan.scan_id}">
+              <span class="cell-value">${scan.batea ?? ""}</span>
+            </td>
+            <td class="editable-scan"
+                data-field="movimiento"
+                data-scan-id="${scan.scan_id}">
+              <span class="cell-value">${scan.movimiento ?? ""}</span>
+            </td>
+            <td class="editable-scan"
+                data-field="lugar"
+                data-scan-id="${scan.scan_id}">
+              <span class="cell-value">${scan.lugar ?? ""}</span>
+            </td>
+            <td class="editable-scan"
+                data-field="destino"
+                data-scan-id="${scan.scan_id}">
+              <span class="cell-value">${scan.destino ?? ""}</span>
+            </td>
+            <td class="editable-scan text-center"
+                data-field="clima"
+                data-scan-id="${scan.scan_id}">
+              <span class="cell-value">
+                ${renderClimaIcon(scan.clima)}
+              </span>
+            </td>
+            <td>${scan.user ?? ""}</td>
+          </tr>
+        `;
+      });
+    }
+  });
+
+  document.getElementById("resultadosVIN").innerHTML = `
+    <div class="table-responsive">
+      <table
+        id="tabla-resultadosVIN"
+        class="table table-striped table-hover table-bordered table-auto"
+      >
+        <thead>
+          <tr>
+            <th class="dateTh">Fecha</th>
+            <th class="marcaTh">Marca</th>
+            <th class="modeloTh">Modelo</th>
+            <th class="VINth">VIN</th>
+            <th class="areaTh">Area</th>
+            <th class="averiaTh">Avería</th>
+            <th class="gravTh">Gravedad</th>
+            <th class="obsTh">Observación</th>
+            <th class="bateaTh">Batea</th>
+            <th class="movimientoTh">Movimiento</th>
+            <th class="lugarTh">Lugar</th>
+            <th class="destinoTh">Destino</th>
+            <th class="climaTh">Clima</th>
+            <th class="userTh">Usuario</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  `;
+
+  const table = document.getElementById("tabla-resultadosVIN");
+
+  /* anchos iniciales por columna */
+  const initialWidths = {
+    dateTh: 140,
+    marcaTh: 100,
+    modeloTh: 120,
+    VINth: 240,
+    areaTh: 300,
+    averiaTh: 170,
+    gravTh: 120,
+    obsTh: 200,
+    userTh: 80,
+    bateaTh: 60,
+    movimientoTh: 90,
+    lugarTh: 130,
+    destinoTh: 130,
+    climaTh: 90,
+  };
+
+  Object.entries(initialWidths).forEach(([cls, width]) => {
+    const th = table.querySelector(`th.${cls}`);
+    if (th) th.style.width = `${width}px`;
+  });
+
+  // esperar un frame
+  requestAnimationFrame(() => {
+    mostrarAccionesPostTabla();
+  });
+
+  // 🔹 Activar resize manual
+  enableColumnResize("tabla-resultadosVIN");
+}
+
+function renderClimaIcon(clima) {
+  if (!clima) return "";
+
+  const c = clima.toLowerCase();
+
+  switch (c) {
+    case "sol":
+      return `<i class="mdi mdi-weather-sunny text-warning" title="Sol"></i>`;
+
+    case "noche":
+      return `<i class="mdi mdi-weather-night text-dark" title="Noche"></i>`;
+
+    case "lluvia":
+      return `<i class="mdi mdi-weather-rainy text-primary" title="Lluvia"></i>`;
+
+    case "hielo":
+      return `<i class="mdi mdi-snowflake text-info" title="Hielo"></i>`;
+
+    case "rocío":
+      return `<i class="mdi mdi-water-outline text-secondary" title="Rocío"></i>`;
+
+    default:
+      return `<i class="mdi mdi-help-circle-outline text-muted" title="${clima}"></i>`;
+  }
+}
+
+// Resizer tabla
+function enableColumnResize(tableId) {
+  const table = document.getElementById(tableId);
+  const headers = table.querySelectorAll("th");
+
+  headers.forEach((th) => {
+    if (th.querySelector(".th-resize")) return;
+
+    const resizer = document.createElement("div");
+    resizer.classList.add("th-resize");
+    th.appendChild(resizer);
+
+    let startX, startWidth;
+
+    resizer.addEventListener("mousedown", (e) => {
+      startX = e.pageX;
+      startWidth = th.offsetWidth;
+
+      function mouseMove(e) {
+        const newWidth = Math.max(60, startWidth + (e.pageX - startX));
+        th.style.width = newWidth + "px";
+      }
+
+      function mouseUp() {
+        document.removeEventListener("mousemove", mouseMove);
+        document.removeEventListener("mouseup", mouseUp);
+      }
+
+      document.addEventListener("mousemove", mouseMove);
+      document.addEventListener("mouseup", mouseUp);
+
+      e.preventDefault();
+    });
+  });
+}
+
+/// Listeners action buttons
+document.getElementById("btnUpdateDamages").addEventListener("click", () => {
+  inlineEditor.saveAll();
+});
+
+// Listener celdas tabla para modificar daños
+document.addEventListener("click", (e) => {
+  const cell = e.target.closest(".editable-cell");
+  if (!cell || cell.classList.contains("editing")) return;
+});
+
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".open-gallery");
+  if (!btn) return;
+
+  document.activeElement?.blur();
+
+  const scanId = btn.dataset.scanid;
+  if (!scanId) return;
+
+  openGallery(scanId);
+});
+
+document.addEventListener("click", async (e) => {
+  const cell = e.target.closest(".editable-scan");
+  if (!cell || cell.classList.contains("editing")) return;
+
+  const field = cell.dataset.field;
+  const scanId = cell.dataset.scanId;
+
+  const currentValue =
+    cell.querySelector(".cell-value")?.textContent.trim() ?? "";
+
+  cell.classList.add("editing");
+
+  let input;
+
+  // ========================
+  // BATEA (text)
+  // ========================
+  if (field === "batea") {
+    input = document.createElement("input");
+    input.type = "text";
+    input.className = "form-control form-control-sm";
+    input.value = currentValue;
+  }
+
+  // ========================
+  // MOVIMIENTO (select JSON)
+  // ========================
+  if (field === "movimiento") {
+    input = document.createElement("select");
+    input.className = "form-select form-select-sm";
+
+    movimientos.forEach((m) => {
+      const option = document.createElement("option");
+      option.value = m.tipo;
+      option.textContent = m.tipo;
+
+      if (m.tipo === currentValue) {
+        option.selected = true;
+      }
+
+      input.appendChild(option);
+    });
+  }
+
+  // ========================
+  // LUGAR (select JSON)
+  // ========================
+  if (field === "lugar") {
+    input = document.createElement("select");
+    input.className = "form-select form-select-sm";
+
+    lugares.forEach((l) => {
+      const option = document.createElement("option");
+      option.value = l.nombre;
+      option.textContent = l.nombre;
+
+      if (l.nombre === currentValue) {
+        option.selected = true;
+      }
+
+      input.appendChild(option);
+    });
+  }
+
+  // ========================
+  // LUGAR (select JSON)
+  // ========================
+  if (field === "destino") {
+    input = document.createElement("select");
+    input.className = "form-select form-select-sm";
+
+    destinos.forEach((l) => {
+      const option = document.createElement("option");
+      option.value = l.nombre;
+      option.textContent = l.nombre;
+
+      if (l.nombre === currentValue) {
+        option.selected = true;
+      }
+
+      input.appendChild(option);
+    });
+  }
+
+  // ========================
+  // CLIMA (select iconos)
+  // ========================
+  if (field === "clima") {
+    input = document.createElement("select");
+    input.className = "form-select form-select-sm";
+
+    const CLIMAS = ["sol", "noche", "lluvia", "hielo", "rocío"];
+
+    CLIMAS.forEach((c) => {
+      const option = document.createElement("option");
+      option.value = c;
+      option.textContent = c;
+      if (c === currentValue.toLowerCase()) option.selected = true;
+      input.appendChild(option);
+    });
+  }
+
+  if (!input) return;
+
+  cell.innerHTML = "";
+  cell.appendChild(input);
+  input.focus();
+
+  const save = async () => {
+    const newValue = input.value;
+
+    // 🔒 si no cambió, no hacer nada
+    if (newValue === currentValue) {
+      cell.innerHTML = `<span class="cell-value">${currentValue}</span>`;
+      cell.classList.remove("editing");
+      return;
+    }
+
+    // 🔄 mostrar spinner
+    cell.innerHTML = `
+    <div class="d-flex justify-content-center">
+      <div class="spinner-border spinner-border-sm text-primary"></div>
+    </div>
+  `;
+
+    try {
+      const res = await fetch(`/api/updates/${scanId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ [field]: newValue }),
+      });
+
+      if (!res.ok) throw new Error("Error backend");
+
+      // actualizar estado local
+      datosGlobales = datosGlobales.map((s) =>
+        String(s.scan_id) === String(scanId) ? { ...s, [field]: newValue } : s,
+      );
+
+      // render final
+      if (field === "clima") {
+        cell.innerHTML = `<span class="cell-value">${renderClimaIcon(newValue)}</span>`;
+      } else {
+        cell.innerHTML = `<span class="cell-value">${newValue}</span>`;
+      }
+
+      cell.classList.remove("editing");
+    } catch (err) {
+      console.error(err);
+
+      // restaurar valor anterior
+      if (field === "clima") {
+        cell.innerHTML = `<span class="cell-value">${renderClimaIcon(currentValue)}</span>`;
+      } else {
+        cell.innerHTML = `<span class="cell-value">${currentValue}</span>`;
+      }
+
+      cell.classList.remove("editing");
+      toastError("No se pudo actualizar");
+    }
+  };
+
+  input.addEventListener("blur", save);
+  input.addEventListener("keydown", (ev) => {
+    if (ev.key === "Enter") {
+      ev.preventDefault();
+      input.blur();
+    }
+    if (ev.key === "Escape") {
+      renderTabla();
+    }
+  });
+});
+
+function injectGalleryControls(lightbox, scanId) {
+  const interval = setInterval(() => {
+    const container = document.querySelector(".glightbox-container");
+    if (!container) return;
+
+    clearInterval(interval);
+    if (container.querySelector(".gallery-controls")) return;
+
+    const controls = document.createElement("div");
+    controls.className = "gallery-controls";
+    controls.innerHTML = `
+      <button class="btn btn-sm btn-danger" data-action="delete-one">
+        <i class="mdi mdi-trash-can-outline"></i>
+      </button>
+      <button class="btn btn-sm btn-outline-danger" data-action="delete-all">
+        <i class="mdi mdi-delete-sweep-outline"></i>
+      </button>
+    `;
+
+    container.appendChild(controls);
+
+    controls.addEventListener("click", async (e) => {
+      e.stopPropagation();
+
+      const action = e.target.closest("button")?.dataset.action;
+      if (!action) return;
+
+      if (action === "delete-one") {
+        await deleteCurrentPhoto(lightbox, scanId);
+      }
+
+      if (action === "delete-all") {
+        await deleteAllPhotos(lightbox, scanId);
+      }
+    });
+
+    lightbox.on("close", () => controls.remove());
+  }, 50);
+}
+
+async function deleteCurrentPhoto(lightbox, scanId) {
+  const oldIndex = lightbox.index;
+  const photo = fotosPorScan[scanId]?.[oldIndex];
+  if (!photo) return;
+
+  const confirmed = await confirmModal({
+    title: "Eliminar foto",
+    body: "¿Eliminar esta foto?",
+    confirmText: "Eliminar",
+    confirmClass: "btn-danger",
+  });
+  if (!confirmed) return;
+
+  try {
+    showGallerySpinner();
+    await fetch("/api/photos/delete", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        pict_id: photo.pict_id ?? null,
+        upload_id: photo.upload_id ?? null,
+        pictureurl: photo.fileUrl ?? photo.href,
+      }),
+    });
+
+    // 🔥 actualizar estado
+    fotosPorScan[scanId].splice(oldIndex, 1);
+
+    // 🔥 si no quedan fotos
+    if (!fotosPorScan[scanId]?.length) {
+      delete fotosPorScan[scanId];
+      lightbox.close();
+      renderTabla();
+      toastSuccess("Foto eliminada");
+      return;
+    }
+
+    // 🔥 índice nuevo (misma posición visual)
+    const newIndex = Math.min(oldIndex, fotosPorScan[scanId].length - 1);
+
+    // 🔥 cierre silencioso
+    lightbox.close();
+
+    // 🔥 limpieza total
+    hardResetGLightbox();
+
+    // 🔥 reapertura inmediata y controlada
+    requestAnimationFrame(() => {
+      lightbox.setElements(fotosPorScan[scanId]);
+      lightbox.openAt(newIndex);
+    });
+
+    toastSuccess("Foto eliminada");
+  } catch (err) {
+    console.error(err);
+    toastError("No se pudo eliminar la foto");
+  } finally {
+    hideGallerySpinner();
+  }
+}
+
+async function deleteAllPhotos(lightbox, scanId) {
+  const confirmed = await confirmModal({
+    title: "Eliminar galería",
+    body: `
+      <p class="mb-0">
+        ¿Eliminar <strong>TODAS</strong> las fotos?<br>
+        <small class="text-muted">Esta acción no se puede deshacer</small>
+      </p>
+    `,
+    confirmText: "Eliminar todo",
+    confirmClass: "btn-danger",
+  });
+
+  if (!confirmed) return;
+
+  try {
+    showGallerySpinner();
+    await fetch("/api/photos/delete-all", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ scan_id: scanId }),
+    });
+
+    //  cerrar lightbox actual
+    try {
+      lightbox.close();
+    } catch {}
+
+    //  limpieza total (loader, container, estado)
+    hardResetGLightbox();
+
+    //  limpiar estado frontend
+    delete fotosPorScan[scanId];
+
+    //  refrescar tabla (VIN deja de ser link)
+    renderTabla();
+
+    toastSuccess("Galería eliminada");
+  } catch (err) {
+    console.error(err);
+    toastError("No se pudo eliminar la galería");
+  } finally {
+    hideGallerySpinner();
+  }
+}
+
+function hardResetGLightbox() {
+  document
+    .querySelectorAll(".glightbox-container, .glightbox-clean, .gloader")
+    .forEach((el) => el.remove());
+
+  document.body.classList.remove("glightbox-open");
+}
+
+document.getElementById("btnDeleteDamages").addEventListener("click", () => {
+  setMode(currentMode === "delete-damage" ? null : "delete-damage");
+});
+
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".vin-upload-btn");
+  if (!btn) return;
+
+  const input = vinTooltip.querySelector(".vin-file-input");
+  if (!input) return;
+
+  input.click();
+});
+
+document.addEventListener("click", async (e) => {
+  const icon = e.target.closest(".damage-delete-icon");
+  if (!icon) return;
+
+  if (currentMode !== "delete-damage") return;
+
+  e.stopPropagation(); // evita inline-edit
+
+  const damageId = icon.dataset.damageId;
+  if (!damageId) return;
+
+  const confirmed = await confirmModal({
+    title: "Eliminar daño",
+    body: `
+      <p class="mb-0">
+        ¿Eliminar este daño?<br>
+        <small class="text-muted">Esta acción no se puede deshacer</small>
+      </p>
+    `,
+    confirmText: "Eliminar",
+    confirmClass: "btn-danger",
+  });
+
+  if (!confirmed) return;
+
+  try {
+    const res = await fetch(`/api/damages/deletedamages/${damageId}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) throw new Error("Error backend");
+
+    // eliminar del estado
+    datosGlobales = datosGlobales.map((scan) => ({
+      ...scan,
+      damages: scan.damages?.filter((d) => d.id !== damageId),
+    }));
+
+    // eliminar fila visualmente
+    const row = document.querySelector(`tr[data-damage-id="${damageId}"]`);
+
+    if (row) {
+      const tbody = row.parentNode;
+
+      row.style.opacity = "0";
+
+      setTimeout(() => {
+        row.remove();
+
+        // 🔍 ¿quedan daños?
+        const quedanDanios =
+          tbody.querySelectorAll("tr[data-damage-id]").length > 0;
+
+        if (!quedanDanios) {
+          renderTabla();
+        }
+      }, 200);
+    }
+
+    toastSuccess("Daño eliminado");
+  } catch (err) {
+    console.error(err);
+    toastError("No se pudo eliminar el daño");
+  }
+});
+
+document.getElementById("btnAddDamage").addEventListener("click", () => {
+  setMode(currentMode === "add-damage" ? null : "add-damage");
+
+  renderTabla();
+});
+
+document.addEventListener("click", (e) => {
+  const icon = e.target.closest(".add-damage-icon");
+  if (!icon) return;
+
+  e.stopPropagation();
+  e.preventDefault();
+
+  const scanId = icon.dataset.scanid;
+
+  if (!scanId) return;
+
+  if (currentMode !== "add-damage") return;
+
+  agregarDanio(scanId);
+});
+
+document.addEventListener("click", async (e) => {
+  const icon = e.target.closest(".vin-delete-icon");
+  if (!icon) return;
+
+  if (currentMode !== "delete-vin") return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  const scanId = icon.dataset.scanId;
+  if (!scanId) return;
+
+  // info visual opcional
+  const scan = datosGlobales.find((s) => String(s.scan_id) === String(scanId));
+
+  const confirmed = await confirmModal({
+    title: "Eliminar VIN",
+    body: `
+      <p class="mb-2">
+        ¿Eliminar el VIN <strong>${scan?.vin ?? ""}</strong><br>
+        del <strong>${scan?.movimiento ?? ""}</strong> en <strong>${scan?.lugar ?? ""}</strong> <strong>${new Date(
+          scan.scan_date,
+        ).toLocaleString("es-AR", {
+          year: "2-digit",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        })}</strong>?<br> 
+        Esto incluye todo lo asociado al VIN:
+      </p>
+      <ul class="mb-0">
+        <li>VIN</li>
+        <li>Daños</li>
+        <li>Fotos</li>
+      </ul>
+      <small class="text-muted">Esta acción no se puede deshacer</small>
+    `,
+    confirmText: "Eliminar",
+    confirmClass: "btn-danger",
+  });
+
+  if (!confirmed) return;
+
+  try {
+    showGlobalSpinner();
+
+    const res = await fetch(`/api/scans/deletebyscan_id/${scanId}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) throw new Error("Error de solicitud en DB al eliminar VIN");
+
+    // 🔥 eliminar del estado
+    datosGlobales = datosGlobales.filter(
+      (s) => String(s.scan_id) !== String(scanId),
+    );
+
+    // 🔥 limpiar fotos de ese scan
+    delete fotosPorScan[scanId];
+
+    // 🔄 re-render
+    if (datosGlobales.length === 0) {
+      document.getElementById("resultadosVIN").innerHTML =
+        "<p class='text-muted text-center mt-3'>Sin resultados</p>";
+      setMode(null);
+    } else {
+      renderTabla();
+    }
+
+    toastSuccess("VIN eliminado");
+  } catch (err) {
+    console.error(err);
+    toastError("No se pudo eliminar el VIN");
+  } finally {
+    hideGlobalSpinner();
+  }
+});
+
+document.getElementById("btnDeleteVIN").addEventListener("click", () => {
+  setMode(currentMode === "delete-vin" ? null : "delete-vin");
+  renderTabla(); // muestra / oculta iconos
+});
+
+document.getElementById("btnCartaporte").addEventListener("click", () => {
+  setMode(currentMode === "cartaporte-vin" ? null : "cartaporte-vin");
+  renderTabla(); // muestra / oculta iconos
+});
+
+// ==============================
+// BODY DEL MODAL CARTA DE PORTE
+// ==============================
+
+const bodyCartaPorte = `
+  <div class="mb-2">
+    <label class="form-label">Nro. Carta de Porte</label>
+    <input type="text" class="form-control" id="cp-nro" />
+  </div>
+
+  <div class="mb-2">
+    <label class="form-label">Destino</label>
+    <input type="text" class="form-control" id="cp-destino" />
+    <div class="invalid-feedback">
+      El destino ingresado no existe
+    </div>
+  </div>
+
+  <div class="mb-2">
+    <label class="form-label">Fecha de remito</label>
+    <input type="date" class="form-control" id="cp-fecha" />
+  </div>
+
+  <div class="text-danger small d-none" id="cp-error">
+    Completar todos los campos
+  </div>
+`;
+
+document.addEventListener("click", async (e) => {
+  const icon = e.target.closest(".vin-cartaporte-icon");
+  if (!icon) return;
+  if (currentMode !== "cartaporte-vin") return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  const scanId = icon.dataset.scanId;
+  if (!scanId) return;
+
+  const scan = datosGlobales.find((s) => String(s.scan_id) === String(scanId));
+
+  const formData = await openCartaPorteModal(scan, bodyCartaPorte);
+  if (!formData) return;
+
+  const cliente = cartaporteInfo.clientData(scan.marca);
+  const origen = cartaporteInfo.originData(scan.lugar) || {};
+  const destino = cartaporteInfo.destinationData(formData.destino);
+  const damages = formatDamages(scan.damages).join(" /// ");
+  const actualDate = Date.now();
+
+  const data = {
+    cartaPorte: formData.cartaPorte,
+    fechaRemito: formData.fechaRemito,
+    destino: destino.company,
+    fecha_cartaporte: new Date(actualDate).toLocaleString("es-AR", {
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }),
+    cliente: cliente.cliente,
+    cuit_cliente: cliente.cuit_cliente,
+    cod_cliente: cliente.codigo,
+    origen: scan.lugar,
+    dir_origen: origen.dir_origen ?? "",
+    cuit_origen: origen.cuit_origen ?? "",
+    dir_destino: destino.dir_destino,
+    cuit_destino: destino.cuit_destino,
+    vin: scan.vin,
+    modelo: scan.modelo,
+    batea: scan.batea,
+    damages: damages,
+  };
+
+  // detectar VERIFICAR
+  const verificarCampos = hasVerificarValues(scan);
+
+  if (verificarCampos.length) {
+    const ok = await confirmarValoresVerificar(verificarCampos);
+    if (!ok) return;
+  }
+
+  try {
+    showGlobalSpinner();
+
+    const res = await fetch(`/api/scans/cartaporte/${scanId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) throw new Error("Error backend");
+
+    toastSuccess("Carta de porte generada");
+
+    const blob = await res.blob();
+    const disposition = res.headers.get("Content-Disposition");
+    let fileName = "cartaporte.pdf";
+
+    if (disposition) {
+      const match = disposition.match(/filename="(.+)"/);
+      if (match?.[1]) fileName = match[1];
+    }
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = fileName;
+    a.click();
+
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    console.error(err);
+    toastError("No se pudo generar la carta de porte");
+  } finally {
+    hideGlobalSpinner();
+  }
+});
+
+function formatDamages(damages = []) {
+  return damages.map((d) => {
+    const parts = [
+      `(${d.area})`,
+      d.area_desc,
+      `(${d.averia})`,
+      d.averia_desc,
+      d.grav_desc,
+      d.obs,
+    ].filter(Boolean);
+
+    return parts.join(" ");
+  });
+}
+
+function agregarDanio(scanId) {
+  const scan = datosGlobales.find((s) => String(s.scan_id) === String(scanId));
+
+  // 🚫 evitar más de uno nuevo
+  const existing = document.querySelector(
+    `.resultadosVINtr.new-damage-row[data-scan-id="${scanId}"]`,
+  );
+  if (existing) {
+    toastInfo("Guardá el daño actual antes de agregar otro");
+    return;
+  }
+
+  // 🔎 fila del VIN
+  const vinRow = document.querySelector(
+    `.scan-base-row[data-scan-id="${scanId}"]`,
+  );
+
+  if (!vinRow) return;
+
+  // 🔥 crear fila
+  const temp = document.createElement("tbody");
+  temp.innerHTML = createNewDamageRow(scan);
+  const newRow = temp.firstElementChild;
+
+  // 🔥 animación inicial
+  newRow.style.opacity = "0";
+  newRow.style.maxHeight = "0";
+  newRow.style.overflow = "hidden";
+
+  vinRow.after(newRow);
+
+  // 🎬 animar entrada
+  requestAnimationFrame(() => {
+    newRow.style.transition = "opacity 200ms ease, max-height 200ms ease";
+    newRow.style.opacity = "1";
+    newRow.style.maxHeight = "200px"; // suficiente para la fila
+  });
+
+  // ✏️ abrir editor automáticamente (Área)
+  requestAnimationFrame(() => {
+    const cell = newRow.querySelector(`.editable-cell[data-field="area"]`);
+    if (cell) cell.click();
+  });
+
+  setTimeout(() => {
+    newRow.style.maxHeight = "";
+    newRow.style.overflow = "";
+  }, 250);
+}
+
+function createNewDamageRow(scan) {
+  return `
+    <tr class="resultadosVINtr new-damage-row" data-damage-id="">
+      <td>${new Date(scan.scan_date).toLocaleString("es-AR")}</td>
+      <td>${scan.marca ?? ""}</td>
+      <td>${scan.modelo ?? ""}</td>
+      <td>
+        ${
+          fotosPorScan[scan.scan_id]?.length
+            ? `
+              <a href="#"
+                class="vin-link open-gallery vin-hover"
+                data-scanid="${scan.scan_id}" data-vin="${scan.vin}"
+                data-scan-id="${scan.scan_id}">
+                <span>${scan.vin}</span>
+              </a>
+            `
+            : `<span class="vin-text vin-hover" data-vin="${scan.vin}" data-scan-id="${scan.scan_id}">${scan.vin}</span>`
+        }
+      </td>
+
+      <td class="editable-cell area-cell"
+          data-field="area"
+          data-scan-id="${scan.scan_id}"
+          data-damage-id="">
+        <span class="cell-value text-muted">—</span>
+      </td>
+
+      <td class="editable-cell"
+          data-field="averia"
+          data-scan-id="${scan.scan_id}"
+          data-damage-id="">
+        <span class="cell-value text-muted">—</span>
+      </td>
+
+      <td class="editable-cell"
+          data-field="gravedad"
+          data-scan-id="${scan.scan_id}"
+          data-damage-id="">
+        <span class="cell-value text-muted">—</span>
+      </td>
+
+      <td class="editable-cell"
+          data-field="observacion"
+          data-scan-id="${scan.scan_id}"
+          data-damage-id="">
+        <span class="cell-value text-muted"></span>
+      </td>
+
+      <td>${scan.batea ?? ""}</td>
+      <td>${scan.movimiento ?? ""}</td>
+      <td>${scan.lugar ?? ""}</td>
+      <td>${scan.destino ?? ""}</td>
+      <td>${renderClimaIcon(scan.clima)}</td>
+      <td>${scan.user ?? ""}</td>
+    </tr>
+  `;
+}
+
+function setMode(mode) {
+  currentMode = mode;
+
+  // reset visual general
+  toggleDeleteDamageIcons(false);
+
+  document.querySelectorAll(".post-table-action-buttons").forEach((btn) => {
+    btn.disabled = false;
+    btn.classList.remove("active");
+  });
+
+  switch (mode) {
+    case "delete-damage":
+      document.getElementById("btnDeleteDamages").classList.add("active");
+      toggleDeleteDamageIcons(true);
+      break;
+
+    case "add-damage":
+      document.getElementById("btnAddDamage").classList.add("active");
+      break;
+
+    case "delete-vin":
+      document.getElementById("btnDeleteVIN")?.classList.add("active");
+      break;
+
+    case "cartaporte-vin":
+      document.getElementById("btnCartaporte")?.classList.add("active");
+      break;
+  }
+
+  disableOtherButtons(mode);
+}
+
+function disableOtherButtons(activeMode) {
+  const map = {
+    "delete-damage": ["btnAddDamage", "btnDeleteVIN", "btnCartaporte"],
+    "add-damage": ["btnDeleteDamages", "btnDeleteVIN", "btnCartaporte"],
+    "delete-vin": ["btnAddDamage", "btnDeleteDamages", "btnCartaporte"],
+    "cartaporte-vin": ["btnAddDamage", "btnDeleteDamages", "btnDeleteVIN"],
+  };
+
+  (map[activeMode] || []).forEach((id) => {
+    const btn = document.getElementById(id);
+    if (btn) btn.disabled = true;
+  });
+}
+
+function toggleDeleteDamageIcons(show) {
+  document.querySelectorAll(".damage-delete-icon").forEach((icon) => {
+    icon.classList.toggle("d-none", !show);
+  });
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+///
+///  MODAL CARTA PORTE
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+
+function openCartaPorteModal(scan, bodyCartaPorte) {
+  const MODAL_ID = "cartaPorteModal";
+
+  let modalEl = document.getElementById(MODAL_ID);
+
+  if (!modalEl) {
+    modalEl = document.createElement("div");
+    modalEl.id = MODAL_ID;
+    modalEl.className = "modal fade";
+    modalEl.tabIndex = -1;
+    modalEl.innerHTML = `
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Generar Carta de Porte</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            ${bodyCartaPorte}
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-cancel>Cancelar</button>
+            <button class="btn btn-primary" data-confirm disabled>
+              Generar
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modalEl);
+  }
+
+  modalEl.addEventListener("input", () => {
+    const confirmBtn = modalEl.querySelector("[data-confirm]");
+    confirmBtn.disabled = !validarCartaPorte(modalEl);
+  });
+
+  const modal = new bootstrap.Modal(modalEl);
+
+  // 🔥 guardar foco previo
+  const previouslyFocused = document.activeElement;
+
+  // 🔥 restaurar foco cuando el modal termina de cerrarse
+  modalEl.addEventListener(
+    "hidden.bs.modal",
+    () => {
+      previouslyFocused?.focus();
+    },
+    { once: true },
+  );
+
+  const confirmBtn = modalEl.querySelector("[data-confirm]");
+  const cancelBtn = modalEl.querySelector("[data-cancel]");
+
+  // 🔁 reset estado
+  confirmBtn.disabled = true;
+  modalEl.querySelector("#cp-nro").value = "";
+  modalEl.querySelector("#cp-error").classList.add("d-none");
+
+  return new Promise((resolve) => {
+    confirmBtn.onclick = () => {
+      if (!validarCartaPorte(modalEl)) return;
+      document.activeElement?.blur();
+      modal.hide();
+      resolve(getCartaPorteData());
+    };
+
+    cancelBtn.onclick = () => {
+      document.activeElement?.blur();
+      modal.hide();
+      resolve(null);
+    };
+
+    modal.show();
+  });
+}
+
+function validarCartaPorte(modalEl) {
+  const nro = modalEl.querySelector("#cp-nro")?.value.trim();
+  const fecha = modalEl.querySelector("#cp-fecha")?.value;
+
+  const destinoOk = validarDestino(modalEl);
+
+  const valido = !!(nro && fecha && destinoOk);
+
+  const errorEl = modalEl.querySelector("#cp-error");
+  errorEl.classList.toggle("d-none", valido);
+
+  return valido;
+}
+
+function validarDestino(modalEl) {
+  const input = modalEl.querySelector("#cp-destino");
+  if (!input) return false;
+
+  const value = input.value.trim();
+
+  if (!value) {
+    input.classList.remove("is-invalid", "is-valid");
+    return false;
+  }
+
+  const destinoInfo = cartaporteInfo.destinationData(value);
+
+  if (!destinoInfo) {
+    input.classList.add("is-invalid");
+    input.classList.remove("is-valid");
+    return false;
+  }
+
+  // válido
+  input.classList.remove("is-invalid");
+  input.classList.add("is-valid");
+  return true;
+}
+
+function getCartaPorteData() {
+  return {
+    cartaPorte: document.getElementById("cp-nro")?.value.trim(),
+    destino: document.getElementById("cp-destino")?.value.trim(),
+    fechaRemito: document.getElementById("cp-fecha")?.value,
+  };
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+///
+///  MODAL - advertencia por si viene marca / modelo VERIFICAR desde backend
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+
+function hasVerificarValues(scan) {
+  const campos = [];
+
+  if (scan?.marca === "VERIFICAR") campos.push("Marca");
+  if (scan?.modelo === "VERIFICAR") campos.push("Modelo");
+
+  return campos;
+}
+
+async function confirmarValoresVerificar(campos) {
+  return await confirmModal({
+    title: "Datos a verificar",
+    body: `
+      <p class="mb-2">
+        <strong>ATENCION:  </strong>Los siguientes campos no están disponibles y quedarán en carta de porte como <strong>VERIFICAR</strong>:<br>
+        Chequear consultando el VIN y consistencia con base de datos
+      </p>
+      <ul>
+        ${campos.map((c) => `<li>${c}</li>`).join("")}
+      </ul>
+      <p class="mb-0">
+        ¿Desea continuar?
+      </p>
+    `,
+    confirmText: "Continuar",
+    confirmClass: "btn-warning",
+  });
+}
+
+const vinTooltip = document.createElement("div");
+vinTooltip.className = "vin-floating-tooltip";
+vinTooltip.innerHTML = `
+  <button class="btn btn-sm btn-light vin-upload-btn">
+    <i class="mdi mdi-upload"></i> Subir archivo
+  </button>
+
+  <div class="form-check form-switch mt-2">
+    <input class="form-check-input vin-transito-switch" type="checkbox">
+    <label class="form-check-label small">
+      Unidad en tránsito
+    </label>
+  </div>
+
+  <input type="file"
+         class="vin-file-input d-none"
+         accept="application/pdf,image/*" />
+`;
+
+document.body.appendChild(vinTooltip);
+
+let currentVin = null;
+let currentScanId = null;
+
+let hideTimeout = null;
+
+document.addEventListener("mouseover", (e) => {
+  const vin = e.target.closest(".vin-hover");
+  const overTooltip = e.target.closest(".vin-floating-tooltip");
+
+  if (vin) {
+    clearTimeout(hideTimeout);
+
+    currentVin = vin.dataset.vin;
+    currentScanId = vin.dataset.scanId;
+
+    const scan = datosGlobales.find(
+      (s) => String(s.scan_id) === String(currentScanId),
+    );
+
+    const switchEl = vinTooltip.querySelector(".vin-transito-switch");
+
+    if (switchEl && scan) {
+      switchEl.checked = !!scan.unidad_transito;
+    }
+
+    const rect = vin.getBoundingClientRect();
+
+    vinTooltip.style.top = rect.bottom + 6 + "px";
+    vinTooltip.style.left = rect.left + "px";
+    vinTooltip.style.opacity = "1";
+    vinTooltip.style.pointerEvents = "auto";
+  }
+
+  if (overTooltip) {
+    clearTimeout(hideTimeout);
+  }
+});
+
+document.addEventListener("mouseout", (e) => {
+  const fromVin = e.target.closest(".vin-hover");
+  const fromTooltip = e.target.closest(".vin-floating-tooltip");
+
+  if (fromVin || fromTooltip) {
+    hideTimeout = setTimeout(() => {
+      vinTooltip.style.opacity = "0";
+      vinTooltip.style.pointerEvents = "none";
+    }, 200); // pequeño delay para permitir cruzar
+  }
+});
+
+vinTooltip
+  .querySelector(".vin-file-input")
+  .addEventListener("change", async function () {
+    const file = this.files[0];
+    if (!file || !currentVin || !currentScanId) return;
+
+    const now = new Date();
+    const pad = (n) => n.toString().padStart(2, "0");
+
+    const timestamp =
+      now.getFullYear().toString() +
+      pad(now.getMonth() + 1) +
+      pad(now.getDate()) +
+      "_" +
+      pad(now.getHours()) +
+      pad(now.getMinutes()) +
+      pad(now.getSeconds());
+
+    const ext = file.name.split(".").pop().toLowerCase();
+    const newFileName = `${currentVin}_${timestamp}.${ext}`;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("vin", currentVin);
+    formData.append("fileName", newFileName);
+    formData.append("scanId", currentScanId);
+
+    try {
+      showGlobalSpinner();
+
+      const res = await fetch("/api/photos/upload-files", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("Upload error");
+
+      toastSuccess("Archivo subido correctamente");
+
+      // 🔄 refrescar solo si corresponde
+      await cargarDatos(currentVin);
+    } catch (err) {
+      console.error(err);
+      toastError("No se pudo subir el archivo");
+    } finally {
+      hideGlobalSpinner();
+      this.value = "";
+    }
+  });
+
+vinTooltip
+  .querySelector(".vin-transito-switch")
+  .addEventListener("change", async function () {
+    if (!currentScanId) return;
+
+    const newValue = this.checked;
+
+    try {
+      const res = await fetch(`/api/updates/${currentScanId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          unidad_transito: newValue,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Error backend");
+
+      // 🔄 actualizar estado local
+      datosGlobales = datosGlobales.map((s) =>
+        String(s.scan_id) === String(currentScanId)
+          ? { ...s, unidad_transito: newValue }
+          : s,
+      );
+
+      renderTabla();
+
+      toastSuccess("Estado actualizado");
+    } catch (err) {
+      console.error(err);
+      toastError("No se pudo actualizar");
+    }
+  });
+
+function openGallery(scanId) {
+  const elements = fotosPorScan[scanId];
+  if (!elements?.length) return;
+
+  // 🔥 destruir instancia anterior
+  if (lightbox) {
+    lightbox.destroy();
+    lightbox = null;
+  }
+
+  lightbox = GLightbox({
+    elements,
+    loop: true,
+    zoomable: true,
+    draggable: true,
+    preload: false,
+  });
+
+  lightbox.on("open", () => {
+    injectGalleryControls(lightbox, scanId);
+  });
+
+  lightbox.open();
+}

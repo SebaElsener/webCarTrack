@@ -2020,10 +2020,16 @@ thead {
   justify-content: center;
 }
 
+.filterContainerCarpointer {
+  flex-direction: row;
+  display: flex;
+  gap: 15px;
+}
+
 #carpointer-title-date-input,
 #carpointer-title-VIN-input {
   display: grid;
-  max-width: 820px;
+  max-width: 825px;
   grid-template-columns: 400px 1fr;
   align-items: center;
   gap: 2rem;
@@ -2602,4 +2608,22 @@ body > .glightbox-container {
 .marker-number.actual {
   border: 3px solid black;
   transform: scale(1.2);
+}
+
+.choices__inner {
+  height: 100%;
+}
+
+.filterContainerCarpointer {
+  flex-direction: row;
+  display: flex;
+  gap: 15px;
+  flex-basis: fit-content !important;
+  height: 63px;
+  min-width: 200px;
+}
+
+.filterContainerBatea,
+.filterContainerOrigen {
+  z-index: 999;
 }

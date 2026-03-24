@@ -1,6 +1,7 @@
 import {
   carpointerQueryRenderBusiness,
   carpointerQuerybydateBusiness,
+  getDataByVINfromCarpointerBusiness,
 } from "../business/carpointerBusiness.js";
 
 const carpointerQueryRender = async (req, res) => {
@@ -25,4 +26,18 @@ const carpointerQuerybydate = async (req, res) => {
   }
 };
 
-export { carpointerQueryRender, carpointerQuerybydate };
+const getDataByVINfromCarpointerController = async (req, res) => {
+  const { vin } = req.body;
+  try {
+    const data = await getDataByVINfromCarpointerBusiness(vin);
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: "Error al consultar VIN en base de datos" });
+  }
+};
+
+export {
+  carpointerQueryRender,
+  carpointerQuerybydate,
+  getDataByVINfromCarpointerController,
+};

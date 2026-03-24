@@ -110,35 +110,35 @@
               <div class="col-md-2 filterContainer">
                 <label class="form-label fw-semibold">Marca</label>
                 <select id="filtroMarca" class="form-select" multiple>
-                  <option value="">Todas</option>
+                  <option value=""></option>
                 </select>
               </div>
               <!-- Modelo -->
               <div class="col-md-2 filterContainer">
                 <label class="form-label fw-semibold">Modelo</label>
                 <select id="filtroModelo" class="form-select" multiple>
-                  <option value="">Todos</option>
+                  <option value=""></option>
                 </select>
               </div>
               <!-- Batea -->
-              <div class="col-md-2 filterContainer">
+              <div class="col-md-2 filterContainer filterContainerBatea">
                 <label class="form-label fw-semibold">Batea</label>
                 <select id="filtroBatea" class="form-select" multiple>
-                  <option value="">Todas</option>
+                  <option value=""></option>
                 </select>
               </div>
               <!-- Origen -->
-              <div class="col-md-2 filterContainer">
+              <div class="col-md-2 filterContainer filterContainerOrigen">
                 <label class="form-label fw-semibold">Origen</label>
                 <select id="filtroOrigen" class="form-select" multiple>
-                  <option value="">Todas</option>
+                  <option value=""></option>
                 </select>
               </div>
               <!-- Destino -->
               <div class="col-md-2 filterContainer">
                 <label class="form-label fw-semibold">Destino</label>
                 <select id="filtroDestino" class="form-select" multiple>
-                  <option value="">Todas</option>
+                  <option value=""></option>
                 </select>
               </div>
             </div>
@@ -206,6 +206,13 @@
             <button id="btnVerMapa" class="btn btn-primary">
               🗺️ Ver recorrido
             </button>
+          </div>
+          <!-- Viaje -->
+          <div class="col-md-2 filterContainer filterContainerCarpointer">
+            <label class="form-label fw-semibold">Viaje:</label>
+            <select id="filtroViaje" class="form-select" multiple>
+              <option value=""></option>
+            </select>
           </div>
         </div>
 
@@ -286,8 +293,8 @@
       const choicesMarca = new Choices("#filtroMarca", {
         removeItemButton: true,
         placeholder: true,
-        placeholderValue: "Buscar marca...",
-        searchPlaceholderValue: "Buscar...",
+        //placeholderValue: "Buscar marca...",
+        //searchPlaceholderValue: "Buscar...",
         itemSelectText: "",
         shouldSort: true,
         searchEnabled: true,
@@ -296,8 +303,8 @@
       const choicesModelo = new Choices("#filtroModelo", {
         removeItemButton: true,
         placeholder: true,
-        placeholderValue: "Buscar modelo...",
-        searchPlaceholderValue: "Buscar...",
+        // placeholderValue: "Buscar modelo...",
+        // searchPlaceholderValue: "Buscar...",
         itemSelectText: "",
         shouldSort: true,
         searchEnabled: true,
@@ -306,8 +313,8 @@
       const choicesBatea = new Choices("#filtroBatea", {
         removeItemButton: true,
         placeholder: true,
-        placeholderValue: "Buscar batea...",
-        searchPlaceholderValue: "Buscar...",
+        //placeholderValue: "Buscar batea...",
+        //searchPlaceholderValue: "Buscar...",
         itemSelectText: "",
         shouldSort: true,
         searchEnabled: true,
@@ -316,7 +323,7 @@
       const choicesOrigenes = new Choices("#filtroOrigen", {
         removeItemButton: true,
         searchEnabled: true,
-        placeholderValue: "Lugar",
+        //placeholderValue: "Lugar",
         itemSelectText: "",
         shouldSort: false,
       });
@@ -324,9 +331,19 @@
       const choicesDestino = new Choices("#filtroDestino", {
         removeItemButton: true,
         searchEnabled: true,
-        placeholderValue: "Destino",
+        //placeholderValue: "Destino",
         itemSelectText: "",
         shouldSort: false,
+      });
+
+      const choicesViaje = new Choices("#filtroViaje", {
+        removeItemButton: true,
+        placeholder: true,
+        //placeholderValue: "Viajes:  todos",
+        searchPlaceholderValue: "Buscar...",
+        itemSelectText: "",
+        shouldSort: true,
+        searchEnabled: true,
       });
     </script>
 

@@ -303,6 +303,7 @@ class ContenedorSupabase {
             origen,
             destino,
             gps_stamp,
+            id_viaje,
             carpointer_pictures (
               pictureurl
             )
@@ -332,11 +333,11 @@ class ContenedorSupabase {
         origen: s.origen,
         destino: s.destino,
         gps_stamp: s.gps_stamp,
+        id_viaje: s.id_viaje,
         fotos: (s.carpointer_pictures ?? [])
           .map((p) => p.pictureurl)
           .filter(Boolean),
       }));
-
       return result;
     } catch (error) {
       infoLogger.info("Error al consultar base de datos por fecha", error);
@@ -430,6 +431,56 @@ class ContenedorSupabase {
             id: u.id,
             upload_scan_id: u.scan_id,
           })) ?? [],
+      }));
+    } catch (err) {
+      console.error("Error al consultar VIN en DB", err);
+      return null;
+    }
+  }
+
+  //Traer datos por chasis-vin desde schema carpointer
+  async getDataByVINfromCarpointer(vin) {
+    try {
+      const { data: scans, error } = await supabase
+        .schema("carpointer")
+        .from("scans")
+        .select(
+          `
+            id,
+            vin,
+            created_at,
+            marca,
+            modelo,
+            transport_nbr,
+            movimiento,
+            origen,
+            destino,
+            gps_stamp,
+            carpointer_pictures (
+              pictureurl
+            )
+         `,
+        )
+        .ilike("vin", `%${vin}%`)
+        .order("created_at", { ascending: true });
+
+      if (error) throw error;
+      if (!scans?.length) return [];
+
+      return scans.map((s) => ({
+        scan_id: s.id,
+        vin: s.vin,
+        scan_date: s.created_at,
+        marca: s.marca,
+        modelo: s.modelo,
+        movimiento: s.movimiento,
+        batea: s.transport_nbr,
+        origen: s.origen,
+        destino: s.destino,
+        gps_stamp: s.gps_stamp,
+        fotos: (s.carpointer_pictures ?? [])
+          .map((p) => p.pictureurl)
+          .filter(Boolean),
       }));
     } catch (err) {
       console.error("Error al consultar VIN en DB", err);
