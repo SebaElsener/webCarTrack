@@ -256,6 +256,47 @@ async function cargarDatos(desde, hasta) {
 
           vinsConFotos.add(scan.scan_id);
         }
+
+        // ==========================
+        // UPLOADS (imagenes + pdf)
+        // ==========================
+        if (scan.uploads?.length) {
+          scan.uploads.forEach((u, idx) => {
+            const isPDF = u.publicUrl.toLowerCase().endsWith(".pdf");
+
+            if (isPDF) {
+              elementos.push({
+                upload_id: u.id,
+                upload_scan_id: u.upload_scan_id,
+                type: "inline",
+                fileUrl: u.publicUrl,
+                content: `
+              <div style="width:90vw;height:90vh">
+                <embed src="${u.publicUrl}" type="application/pdf" width="100%" height="100%"/>
+              </div>
+            `,
+                title: `VIN ${scan.vin} · ${scan.movimiento} en ${scan.lugar} · ${new Date(
+                  scan.scan_date,
+                ).toLocaleString(
+                  "es-AR",
+                )} · Archivo ${idx + 1} ${isPDF ? "(PDF)" : ""}`,
+              });
+            } else {
+              elementos.push({
+                upload_id: u.id,
+                upload_scan_id: u.upload_scan_id,
+                href: u.publicUrl,
+                fileUrl: u.pictureurl,
+                type: "image",
+                title: `VIN ${scan.vin} · ${scan.movimiento} en ${scan.lugar} · ${new Date(
+                  scan.scan_date,
+                ).toLocaleString(
+                  "es-AR",
+                )} · Archivo ${idx + 1} ${isPDF ? "(PDF)" : ""}`,
+              });
+            }
+          });
+        }
       });
 
       const transformScans = data.map((scan) => ({
