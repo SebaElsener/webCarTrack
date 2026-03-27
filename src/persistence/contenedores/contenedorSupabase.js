@@ -252,6 +252,13 @@ class ContenedorSupabase {
             ),
             pictures (
               pictureurl
+              id,
+              scan_id
+            ),
+            uploads (
+              public_url,
+              id,
+              scan_id
             )
         `,
         )
@@ -286,7 +293,18 @@ class ContenedorSupabase {
             d.grav !== null ||
             d.obs !== null,
         ),
-        fotos: (s.pictures ?? []).map((p) => p.pictureurl).filter(Boolean),
+        fotos:
+          s.pictures?.map((p) => ({
+            pictureurl: p.pictureurl,
+            id: p.id,
+            pict_scan_id: p.scan_id,
+          })) ?? [],
+        uploads:
+          s.uploads?.map((u) => ({
+            publicUrl: u.public_url,
+            id: u.id,
+            upload_scan_id: u.scan_id,
+          })) ?? [],
       }));
 
       return result;

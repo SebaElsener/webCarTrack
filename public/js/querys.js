@@ -234,6 +234,9 @@ async function cargarDatos(desde, hasta) {
       fotosPorVin = {};
       vinsConFotos.clear();
 
+      // ==========================
+      // FOTOS (imagenes clásicas)
+      // ==========================
       data.forEach((scan) => {
         if (scan.fotos?.length) {
           fotosPorVin[scan.scan_id] = scan.fotos.map((f, idx) => ({
