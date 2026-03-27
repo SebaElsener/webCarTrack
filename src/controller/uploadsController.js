@@ -25,7 +25,7 @@ const uploadMovimientos = async (req, res) => {
       jobs[jobId].etapa = "limpiando tabla";
 
       const { error: truncateError } = await supabase.rpc(
-        "truncate_movimientos_test",
+        "truncate_movimientos",
       );
 
       if (truncateError) throw truncateError;
@@ -104,7 +104,7 @@ const uploadMovimientos = async (req, res) => {
 
         const { error } = await supabase
           .schema("carpointer")
-          .from("movimientos_test")
+          .from("movimientos")
           .insert(chunk);
 
         if (error) throw error;
