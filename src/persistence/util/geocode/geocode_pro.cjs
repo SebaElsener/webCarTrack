@@ -13,7 +13,7 @@ const OUTPUT = "clientes_con_gps.csv";
 const CACHE_FILE = "geocode_cache.json";
 const PROGRESS_FILE = "geocode_progress.json";
 
-const GOOGLE_API_KEY = "AIzaSyB7F5V_QH8QY0ZBNz8AMFDs2tqUJ-kc27Y";
+const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 
 const DELAY_MS = 1200;
 const MAX_RETRIES = 3;
