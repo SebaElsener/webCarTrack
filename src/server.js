@@ -26,6 +26,7 @@ import carpointerRouter from "./router/carpointerRouter.js";
 import timeout from "./router/timeout.js";
 import unauthorized from "./router/unauthorized.js";
 import cookieParser from "cookie-parser";
+import uploadsRouter from "./router/uploadsRouter.js";
 
 dotenv.config();
 
@@ -60,6 +61,7 @@ app.use("/api/updates", requireLogin, updatesRouter);
 app.use("/api/damages", requireLogin, damagesRouter);
 app.use("/api/photos", requireLogin, photosRouter);
 app.use("/api/scans", requireLogin, scansRoute);
+app.use("/api/uploads", requireLogin, uploadsRouter);
 app.use("/api/login", userLogin);
 app.use("/api/logout", userLogout);
 app.use("/api/register", userReg);

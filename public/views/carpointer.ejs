@@ -44,59 +44,101 @@
       <div class="navBarSeparator"></div>
 
       <main id="main">
-        <div id="carpointerInputContainer">
-          <div class="container mt-1" id="carpointer-title-date-input">
-            <h3 class="carpointer-formTitle">Consulta por rango de fechas</h3>
+        <div id="carpointerInputContainer" class="container mt-1">
+          <div class="uploadBtnContainer">
+            <input
+              type="file"
+              id="fileInput"
+              accept=".xlsx,.xls"
+              style="display: none"
+            />
 
-            <form id="form-fechas">
-              <div id="inputGroup" class="input-group">
-                <span class="input-group-text">📅</span>
-                <input
-                  type="text"
-                  id="rangoFechas"
-                  class="form-control"
-                  placeholder="Seleccionar fechas"
-                  readonly
-                />
-                <div class="btnFormContainer">
-                  <button
-                    id="btnFormSubmit"
-                    class="btn btn-primary"
-                    type="submit"
-                  >
-                    Consultar
-                  </button>
-                </div>
+            <button id="uploadBtn" class="btn btn-outline-success">
+              Actualizar movimientos
+            </button>
+            <div
+              id="progressContainer"
+              style="margin-top: 10px; width: 120px; display: none"
+            >
+              <div
+                style="
+                  background: #eee;
+                  height: 20px;
+                  border-radius: 8px;
+                  overflow: hidden;
+                "
+              >
+                <div
+                  id="barra"
+                  style="
+                    height: 100%;
+                    width: 0%;
+                    background: #4caf50;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: white;
+                    font-size: 12px;
+                    font-weight: bold;
+                    transition: width 0.4s ease; /* 👈 CLAVE */
+                  "
+                ></div>
               </div>
-            </form>
+              <div id="etapa"></div>
+            </div>
           </div>
-
-          <div class="container mt-1" id="carpointer-title-VIN-input">
-            <h3 class="carpointer-formTitle">Consulta chasis / VIN</h3>
-
-            <form id="form-vin">
-              <div id="VINinputGroup" class="input-group">
-                <input
-                  type="text"
-                  id="vinInput"
-                  class="form-control"
-                  placeholder="Ingrese chasis o VIN"
-                  onInput="this.value = this.value.toUpperCase();"
-                  maxlength="17"
-                  autocomplete="off"
-                />
-                <div class="btnFormContainer">
-                  <button
-                    id="btnFormSubmit"
-                    class="btn btn-primary"
-                    type="submit"
-                  >
-                    Consultar
-                  </button>
+          <div>
+            <div id="carpointer-title-date-input">
+              <h3 class="carpointer-formTitle">Consulta por rango de fechas</h3>
+              <form id="form-fechas">
+                <div id="inputGroup" class="input-group">
+                  <span class="input-group-text">📅</span>
+                  <input
+                    type="text"
+                    id="rangoFechas"
+                    class="form-control"
+                    placeholder="Seleccionar fechas"
+                    readonly
+                  />
+                  <div class="btnFormContainer">
+                    <button
+                      id="btnFormSubmit"
+                      class="btn btn-primary"
+                      type="submit"
+                    >
+                      Consultar
+                    </button>
+                  </div>
                 </div>
-                <div class="invalid-feedback" id="vinError"></div>
-              </div>
-            </form>
+              </form>
+            </div>
+
+            <div id="carpointer-title-VIN-input">
+              <h3 class="carpointer-formTitle">Consulta chasis / VIN</h3>
+              <form id="form-vin">
+                <div id="VINinputGroup" class="input-group">
+                  <input
+                    type="text"
+                    id="vinInput"
+                    class="form-control"
+                    placeholder="Ingrese chasis o VIN"
+                    onInput="this.value = this.value.toUpperCase();"
+                    maxlength="17"
+                    autocomplete="off"
+                  />
+                  <div class="btnFormContainer">
+                    <button
+                      id="btnFormSubmit"
+                      class="btn btn-primary"
+                      type="submit"
+                    >
+                      Consultar
+                    </button>
+                  </div>
+                  <div class="invalid-feedback" id="vinError"></div>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
 

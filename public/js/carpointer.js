@@ -725,6 +725,118 @@ document.getElementById("btnAnimarMapa").addEventListener("click", () => {
   animarSuave(puntos);
 });
 
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////// Upload tabla carpointer.movimientos /////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+const uploadBtn = document.getElementById("uploadBtn");
+const fileInput = document.getElementById("fileInput");
+
+uploadBtn.addEventListener("click", () => {
+  fileInput.click(); // abre selector
+});
+
+fileInput.addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  await subirExcel(file);
+});
+
+async function subirExcel(file) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  // reset UI
+  mostrarBarra();
+  uploadBtn.disabled = true;
+  //setTimeout(() => {}, 3000);
+  animarFake();
+  actualizarBarra(0);
+  // actualizarEtapa("subiendo archivo");
+
+  const res = await fetch("/api/uploads/upload-movimientos", {
+    method: "POST",
+    body: formData,
+  });
+
+  const { jobId } = await res.json();
+
+  // 📡 escuchar progreso
+  const evtSource = new EventSource(`/api/uploads/progress/${jobId}`);
+
+  evtSource.onmessage = (e) => {
+    const data = JSON.parse(e.data);
+
+    if (data.error) {
+      alert("Error: " + data.error);
+      evtSource.close();
+      return;
+    }
+
+    actualizarBarra(data.progress ?? 0);
+    // actualizarEtapa(data.etapa || "");
+
+    if (data.done) {
+      actualizarBarra(100); // 👈 aseguramos 100%
+      // actualizarEtapa("✅ Completo");
+      uploadBtn.disabled = false;
+      evtSource.close();
+
+      setTimeout(() => {
+        ocultarBarra(); // 👈 desaparece después
+      }, 2000);
+    }
+  };
+}
+
+let fakeProgress = 0;
+
+function animarFake() {
+  if (fakeProgress < 95) {
+    fakeProgress += Math.random() * 2;
+    actualizarBarra(fakeProgress);
+    requestAnimationFrame(animarFake);
+  }
+}
+
+let lastProgress = -1;
+
+function actualizarBarra(progress) {
+  const barra = document.getElementById("barra");
+
+  const p = Math.round(Math.min(100, Math.max(0, progress)));
+
+  // 👇 evita que se renderice mil veces el mismo número
+  if (p === lastProgress) return;
+  lastProgress = p;
+
+  barra.style.width = p + "%";
+
+  // 👇 usa textContent (más limpio que innerText)
+  barra.textContent = p + "%";
+
+  // 🎨 color dinámico
+  if (p < 30)
+    barra.style.background = "#f44336"; // rojo
+  else if (p < 70)
+    barra.style.background = "#ff9800"; // naranja
+  else barra.style.background = "#4caf50"; // verde
+}
+
+// function actualizarEtapa(texto) {
+//   document.getElementById("etapa").innerText = texto;
+// }
+
+function mostrarBarra() {
+  document.getElementById("progressContainer").style.display = "block";
+}
+
+function ocultarBarra() {
+  document.getElementById("progressContainer").style.display = "none";
+}
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+
 document.getElementById("btnPauseMapa").addEventListener("click", () => {
   pausarAnimacion();
 });
