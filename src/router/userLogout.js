@@ -12,7 +12,7 @@ userLogout.post("/", (req, res) => {
     secure: false, // en producción poner true
     sameSite: "lax",
     path: "/",
-    maxAge: 1000 * 60 * 60 * 24, // 1 día
+    //maxAge: 1000 * 60 * 60 * 24, // 1 día
   });
 
   res.json({ success: true });

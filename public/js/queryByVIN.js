@@ -225,14 +225,20 @@ function renderTabla() {
     if (!scan.damages || scan.damages.length === 0) {
       rows += `
       <tr class="resultadosVINtr scan-base-row ${scan.unidad_transito ? "unidad-transito-row" : ""}" data-scan-id="${scan.scan_id}">
-        <td>${new Date(scan.scan_date).toLocaleString("es-AR", {
-          year: "2-digit",
-          month: "2-digit",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-        })}</td>
+        <td class="editable-scan"
+            data-field="date"
+            data-scan-id="${scan.scan_id}">
+          <span class="cell-value" data-raw="${scan.scan_date}">
+            ${new Date(scan.scan_date).toLocaleString("es-AR", {
+              year: "2-digit",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })}
+          </span>
+        </td>
         <td>${scan.marca ?? ""}</td>
         <td>${scan.modelo ?? ""}</td>
         <td class="vin-cell">
@@ -371,14 +377,20 @@ function renderTabla() {
               data-scan-id="${scan.scan_id}"
               data-damage-id="${damage.id ?? ""}"
           >
-            <td>${new Date(scan.scan_date).toLocaleString("es-AR", {
-              year: "2-digit",
-              month: "2-digit",
-              day: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
-            })}</td>
+            <td class="editable-scan"
+                data-field="date"
+                data-scan-id="${scan.scan_id}">
+              <span class="cell-value" data-raw="${scan.scan_date}">
+                ${new Date(scan.scan_date).toLocaleString("es-AR", {
+                  year: "2-digit",
+                  month: "2-digit",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: false,
+                })}
+              </span>
+            </td>
             <td>${scan.marca ?? ""}</td>
             <td>${scan.modelo ?? ""}</td>
             <td class="vin-cell">
@@ -666,13 +678,16 @@ document.addEventListener("click", (e) => {
 
 document.addEventListener("click", async (e) => {
   const cell = e.target.closest(".editable-scan");
+
   if (!cell || cell.classList.contains("editing")) return;
 
   const field = cell.dataset.field;
   const scanId = cell.dataset.scanId;
 
+  const span = cell.querySelector(".cell-value");
+
   const currentValue =
-    cell.querySelector(".cell-value")?.textContent.trim() ?? "";
+    field === "date" ? span?.dataset.raw : (span?.textContent.trim() ?? "");
 
   cell.classList.add("editing");
 
@@ -766,6 +781,34 @@ document.addEventListener("click", async (e) => {
     });
   }
 
+  // ========================
+  // FECHA (datetime-local)
+  // ========================
+  if (field === "date") {
+    input = document.createElement("input");
+    input.type = "datetime-local";
+    input.className = "form-control form-control-sm";
+
+    if (currentValue) {
+      const date = new Date(currentValue);
+
+      const pad = (n) => n.toString().padStart(2, "0");
+
+      const formatted =
+        date.getFullYear() +
+        "-" +
+        pad(date.getMonth() + 1) +
+        "-" +
+        pad(date.getDate()) +
+        "T" +
+        pad(date.getHours()) +
+        ":" +
+        pad(date.getMinutes());
+
+      input.value = formatted;
+    }
+  }
+
   if (!input) return;
 
   cell.innerHTML = "";
@@ -773,13 +816,51 @@ document.addEventListener("click", async (e) => {
   input.focus();
 
   const save = async () => {
-    const newValue = input.value;
+    let newValue = input.value;
 
-    // 🔒 si no cambió, no hacer nada
-    if (newValue === currentValue) {
-      cell.innerHTML = `<span class="cell-value">${currentValue}</span>`;
-      cell.classList.remove("editing");
-      return;
+    // ========================
+    // FECHA
+    // ========================
+    if (field === "date") {
+      const toMinute = (d) => {
+        if (!d) return null;
+        const date = new Date(d);
+        date.setSeconds(0, 0); // 🔥 eliminar segundos y ms
+        return date.getTime();
+      };
+
+      const original = toMinute(currentValue);
+      const incoming = toMinute(newValue);
+
+      // 🔒 no cambió
+      if (original === incoming) {
+        const formatted = new Date(currentValue).toLocaleString("es-AR", {
+          year: "2-digit",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        });
+
+        cell.innerHTML = `<span class="cell-value" data-raw="${currentValue}">${formatted}</span>`;
+        cell.classList.remove("editing");
+        return;
+      }
+
+      // ✅ convertir correctamente
+      newValue = new Date(newValue).toISOString();
+    }
+
+    // ========================
+    // RESTO DE CAMPOS
+    // ========================
+    else {
+      if (newValue === currentValue) {
+        cell.innerHTML = `<span class="cell-value">${currentValue}</span>`;
+        cell.classList.remove("editing");
+        return;
+      }
     }
 
     // 🔄 mostrar spinner
@@ -808,6 +889,18 @@ document.addEventListener("click", async (e) => {
         cell.innerHTML = `<span class="cell-value">${renderClimaIcon(newValue)}</span>`;
       } else {
         cell.innerHTML = `<span class="cell-value">${newValue}</span>`;
+      }
+      if (field === "date") {
+        const formatted = new Date(newValue).toLocaleString("es-AR", {
+          year: "2-digit",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        });
+
+        cell.innerHTML = `<span class="cell-value">${formatted}</span>`;
       }
 
       cell.classList.remove("editing");
