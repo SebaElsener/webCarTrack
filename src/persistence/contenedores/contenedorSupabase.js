@@ -251,7 +251,7 @@ class ContenedorSupabase {
               date
             ),
             pictures (
-              pictureurl
+              pictureurl,
               id,
               scan_id
             ),
@@ -267,11 +267,13 @@ class ContenedorSupabase {
         .order("date", { ascending: true });
 
       query = this.applyVisibilityFilter(query, user);
-      console.log(startDate, endDate);
 
       const { data, error } = await query;
 
-      if (error) throw error;
+      if (error) {
+        console.log(error);
+        throw error;
+      }
 
       const result = data.map((s) => ({
         scan_id: s.supabase_id,

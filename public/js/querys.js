@@ -234,31 +234,27 @@ async function cargarDatos(desde, hasta) {
       fotosPorVin = {};
       vinsConFotos.clear();
 
-      // ==========================
-      // FOTOS (imagenes clásicas)
-      // ==========================
       data.forEach((scan) => {
-        if (scan.fotos?.length) {
-          fotosPorVin[scan.scan_id] = scan.fotos.map((f, idx) => ({
-            href: f,
-            type: "image",
-            title: `VIN ${scan.vin} · ${scan.movimiento} en ${scan.lugar} ·  ${new Date(
-              scan.scan_date,
-            ).toLocaleString("es-AR", {
-              year: "2-digit",
-              month: "2-digit",
-              day: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
-            })} · Imagen ${idx + 1}`,
-          }));
+        const elementos = [];
 
-          vinsConFotos.add(scan.scan_id);
+        // ==========================
+        // FOTOS
+        // ==========================
+        if (scan.fotos?.length) {
+          scan.fotos.forEach((f, idx) => {
+            elementos.push({
+              href: f.pictureurl,
+              fileUrl: f.pictureurl,
+              type: "image",
+              title: `VIN ${scan.vin} · ${scan.movimiento} en ${scan.lugar} · ${new Date(
+                scan.scan_date,
+              ).toLocaleString("es-AR")} · Imagen ${idx + 1}`,
+            });
+          });
         }
 
         // ==========================
-        // UPLOADS (imagenes + pdf)
+        // UPLOADS (imagenes + PDF)
         // ==========================
         if (scan.uploads?.length) {
           scan.uploads.forEach((u, idx) => {
@@ -266,15 +262,12 @@ async function cargarDatos(desde, hasta) {
 
             if (isPDF) {
               elementos.push({
-                upload_id: u.id,
-                upload_scan_id: u.upload_scan_id,
                 type: "inline",
-                fileUrl: u.publicUrl,
                 content: `
-              <div style="width:90vw;height:90vh">
-                <embed src="${u.publicUrl}" type="application/pdf" width="100%" height="100%"/>
-              </div>
-            `,
+                  <div style="width:90vw;height:90vh">
+                    <embed src="${u.publicUrl}" type="application/pdf" width="100%" height="100%"/>
+                  </div>
+                `,
                 title: `VIN ${scan.vin} · ${scan.movimiento} en ${scan.lugar} · ${new Date(
                   scan.scan_date,
                 ).toLocaleString(
@@ -283,10 +276,8 @@ async function cargarDatos(desde, hasta) {
               });
             } else {
               elementos.push({
-                upload_id: u.id,
-                upload_scan_id: u.upload_scan_id,
                 href: u.publicUrl,
-                fileUrl: u.pictureurl,
+                fileUrl: u.publicUrl,
                 type: "image",
                 title: `VIN ${scan.vin} · ${scan.movimiento} en ${scan.lugar} · ${new Date(
                   scan.scan_date,
@@ -296,6 +287,14 @@ async function cargarDatos(desde, hasta) {
               });
             }
           });
+        }
+
+        // ==========================
+        // guardar si hay contenido
+        // ==========================
+        if (elementos.length) {
+          fotosPorVin[scan.scan_id] = elementos;
+          vinsConFotos.add(scan.scan_id);
         }
       });
 
@@ -1367,20 +1366,39 @@ async function withBootstrapButtonLock(button, action) {
   }
 }
 
+let lightbox = null;
+
 document.addEventListener("click", (e) => {
   const btn = e.target.closest(".open-gallery");
   if (!btn) return;
 
   const scanId = btn.dataset.scanid;
-  if (!scanId || !fotosPorVin[scanId]) return;
+  const elements = fotosPorVin[scanId];
 
-  const lightbox = GLightbox({
-    elements: fotosPorVin[scanId],
+  if (!scanId || !elements?.length) return;
+
+  hardResetGLightbox();
+
+  if (lightbox) {
+    lightbox.destroy();
+    lightbox = null;
+  }
+
+  lightbox = GLightbox({
+    elements,
     loop: true,
     zoomable: true,
     draggable: true,
-    preload: true, // 🔥 clave
+    preload: false,
   });
 
   lightbox.open();
 });
+
+function hardResetGLightbox() {
+  document
+    .querySelectorAll(".glightbox-container, .glightbox-clean, .gloader")
+    .forEach((el) => el.remove());
+
+  document.body.classList.remove("glightbox-open");
+}
