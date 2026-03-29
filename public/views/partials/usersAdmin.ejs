@@ -20,7 +20,10 @@
       <h2 class="usersFormTitle">Administración de usuarios</h2>
 
       <form id="usersForm">
-        <div class="d-flex gap-2" style="padding: 0px 20px;">
+        <div
+          class="d-flex gap-2"
+          style="padding: 0px 20px; justify-content: space-between"
+        >
           <input
             id="userSearch"
             class="form-control"
@@ -30,22 +33,25 @@
 
           <div class="form-check form-switch d-flex align-items-center">
             <input class="form-check-input" type="checkbox" id="toggleTipo" />
-            <span class="roleSpinner d-none spinner-border spinner-border-sm"></span>
-            <label for="toggleTipo" class="form-check-label ms-2">Transportistas</label>
+            <span
+              class="roleSpinner d-none spinner-border spinner-border-sm"
+            ></span>
+            <label for="toggleTipo" class="form-check-label ms-2"
+              >Ir a Transportistas</label
+            >
+            <button id="addBtn" class="btn btn-primary d-none" type="button">
+              + Nuevo
+            </button>
           </div>
-
-          <button id="addBtn" class="btn btn-primary d-none" type="button">
-            + Nuevo
-          </button>
         </div>
 
         <div class="usersAdminContainer">
           <table class="table table-hover usersAdminTable align-middle">
             <colgroup>
-                <col id="col1" />
-                <col id="col2" />
-                <col />
-            </colgroup>       
+              <col id="col1" />
+              <col id="col2" />
+              <col />
+            </colgroup>
             <thead>
               <tr>
                 <th id="thCol1">Email</th>
@@ -92,9 +98,13 @@
         </div>
 
         <!-- <button class="sendBtn sendBtnUsersAdmin" type="submit">Enviar</button> -->
-        <a class="formBackLink usersAdminBackBtn" href="/api/productos"
-          ><button class="formBackLinkBtn">Volver</button></a
+        <button
+          type="button"
+          class="formBackLinkBtn"
+          onclick="window.location.href = '/api/productos'"
         >
+          Volver
+        </button>
       </form>
 
       <%- include('footer') %>

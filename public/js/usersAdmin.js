@@ -1,15 +1,10 @@
 const navBarMin = document.getElementById("navBarMin");
 navBarMin.style.top = "0";
 
-const savedMode = localStorage.getItem("modoAdmin");
-
-if (savedMode === "transportistas") {
-  toggle.checked = true;
-  currentMode = "transportistas";
-}
 const search = document.getElementById("userSearch");
 const tbody = document.querySelector("tbody");
 const toggle = document.getElementById("toggleTipo");
+const usersFormTitle = document.querySelector(".usersFormTitle");
 let currentMode = "users"; // users | transportistas
 currentMode = toggle.checked ? "transportistas" : "users";
 
@@ -129,7 +124,6 @@ const table = document.querySelector(".usersAdminTable");
 
 toggle.addEventListener("change", async (e) => {
   currentMode = toggle.checked ? "transportistas" : "users";
-  localStorage.setItem("modoAdmin", currentMode);
 
   if (currentMode === "users") {
     window.location.href = "/api/userdata/usersadmin";
@@ -138,8 +132,6 @@ toggle.addEventListener("change", async (e) => {
 
   updateTableHeaders();
 
-  // 👉 transportistas
-  label.textContent = "Transportistas";
   addBtn.classList.remove("d-none");
 
   const container = e.target.closest(".form-check");
@@ -164,28 +156,68 @@ document.addEventListener("click", async (e) => {
   if (!e.target.classList.contains("saveBtn")) return;
 
   const row = e.target.closest("tr");
-  const id = row.dataset.id;
+  const isNew = row.dataset.new === "true";
 
+  const nbrInput = row.querySelector(".transportNbr");
   const nameInput = row.querySelector(".transportName");
-  const name = nameInput.value.trim();
+
+  const transport_nbr = nbrInput?.value.trim() || "";
+  const name = nameInput?.value.trim() || "";
 
   const spinner = row.querySelector(".roleSpinner");
+  const btn = e.target;
 
   try {
-    e.target.disabled = true;
+    btn.disabled = true;
     spinner.classList.remove("d-none");
 
-    const res = await fetch(`/api/userdata/transportistas/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name }),
-    });
+    let res, data;
 
-    const data = await res.json();
+    if (!transport_nbr && isNew) {
+      showToast({ text: "Falta número de equipo", type: "error" });
+      return;
+    }
 
-    if (!res.ok) throw new Error(data.error);
+    if (isNew) {
+      // 🔥 INSERT
+      res = await fetch(`/api/userdata/transportistas`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ transport_nbr, name }),
+      });
 
-    showToast({ text: "Guardado", type: "success" });
+      data = await res.json();
+
+      if (!res.ok) throw new Error(data.error);
+
+      // normalizar fila
+      row.dataset.id = data.id;
+      delete row.dataset.new;
+      row.classList.remove("table-success");
+
+      showToast({
+        text: "Transportista creado",
+        type: "success",
+      });
+    } else {
+      // 🔁 UPDATE
+      const id = row.dataset.id;
+
+      res = await fetch(`/api/userdata/transportistas/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+
+      data = await res.json();
+
+      if (!res.ok) throw new Error(data.error);
+
+      showToast({
+        text: "Guardado",
+        type: "success",
+      });
+    }
   } catch (err) {
     showToast({
       text: err.message || "Error",
@@ -193,8 +225,16 @@ document.addEventListener("click", async (e) => {
     });
   } finally {
     spinner.classList.add("d-none");
-    e.target.disabled = false;
+    btn.disabled = false;
+    loadData();
   }
+});
+
+document.addEventListener("click", (e) => {
+  if (!e.target.classList.contains("cancelBtn")) return;
+
+  const row = e.target.closest("tr");
+  row.remove();
 });
 
 async function loadData() {
@@ -235,33 +275,33 @@ function renderTransportistas(data) {
     .join("");
 }
 
-addBtn.addEventListener("click", async () => {
-  try {
-    const res = await fetch("/api/userdata/transportistas", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        transport_nbr: "",
-        name: "",
-      }),
-    });
+addBtn.addEventListener("click", () => {
+  const newRow = document.createElement("tr");
 
-    const nuevo = await res.json();
+  newRow.dataset.new = "true"; // 🔥 clave para distinguir
+  newRow.classList.add("table-success"); // verde Bootstrap
 
-    await loadData();
+  newRow.innerHTML = `
+    <td class="col1">
+      <input class="form-control form-control-sm transportNbr">
+    </td>
 
-    showToast({
-      text: "Transportista creado",
-      type: "success",
-    });
-  } catch {
-    showToast({
-      text: "Error creando",
-      type: "error",
-    });
-  }
+    <td class="col2">
+      <input class="form-control form-control-sm transportName">
+    </td>
+
+    <td class="text-end">
+      <button class="btn btn-success btn-sm saveBtn" type="button">
+        Guardar
+        <span class="roleSpinner d-none spinner-border spinner-border-sm"></span>
+      </button>
+      <button class="btn btn-secondary btn-sm cancelBtn" type="button" style="width: 90px">
+        Cancelar
+      </button>
+    </td>
+  `;
+
+  tbody.prepend(newRow); // arriba de todo
 });
 
 document.addEventListener("click", async (e) => {
@@ -343,11 +383,16 @@ function isDuplicateNbr(value, currentRow) {
 }
 
 function updateTableHeaders() {
+  const thCol1 = document.getElementById("thCol1");
+  const thCol2 = document.getElementById("thCol2");
   if (currentMode === "transportistas") {
+    usersFormTitle.textContent = "Administración de transportistas";
     thCol1.textContent = "Equipo";
     thCol2.textContent = "Nombre y apellido";
+    label.textContent = "Ir a Usuarios";
   } else {
     thCol1.textContent = "Email";
     thCol2.textContent = "Rol";
+    label.textContent = "Ir a Transportistas";
   }
 }
