@@ -2479,6 +2479,10 @@ body > .glightbox-container {
   gap: 8px;
 }
 
+.deleteBtn {
+  margin: 0;
+}
+
 .usersAdminTable td {
   vertical-align: middle;
 }
@@ -2666,4 +2670,35 @@ body > .glightbox-container {
 .filterContainerBatea,
 .filterContainerOrigen {
   z-index: 999;
+}
+
+/* modo usuarios */
+.table-users th.col1,
+.table-users td.col1 {
+  width: auto;
+}
+
+.table-users th.col2,
+.table-users td.col2 {
+  width: 220px;
+}
+
+/* modo transportistas */
+.table-transportistas th.col1,
+.table-transportistas td.col1 {
+  width: 100px !important;
+}
+
+.table-transportistas th.col2,
+.table-transportistas td.col2 {
+  width: 400px !important;
+}
+
+.col1 input,
+.col2 input {
+  width: 100% !important;
+}
+
+.usersAdminTable {
+  table-layout: fixed;
 }

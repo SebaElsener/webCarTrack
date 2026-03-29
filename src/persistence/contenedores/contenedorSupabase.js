@@ -835,6 +835,77 @@ class ContenedorSupabase {
       throw error;
     }
   }
+
+  /// METODOS TRANSPORTISTAS ///
+  async getTransportistas() {
+    const { data, error } = await supabase
+      .schema("carpointer")
+      .from("transportistas")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    return data;
+  }
+
+  async postNewTransportista(transport_nbr, name) {
+    const { data, error } = await supabase
+      .schema("carpointer")
+      .from("transportistas")
+      .insert([{ transport_nbr, name }])
+      .select()
+      .single();
+
+    if (error) {
+      const err = new Error(error.message);
+      err.code = error.code;
+      err.details = error.details;
+      throw err;
+    }
+
+    return data;
+  }
+
+  async updateTransportista(id, name) {
+    const { error } = await supabase
+      .schema("carpointer")
+      .from("transportistas")
+      .update({ name })
+      .eq("id", id);
+
+    if (error) {
+      const err = new Error(error.message);
+      err.code = error.code;
+      throw err;
+    }
+
+    return { ok: true };
+  }
+
+  async deleteTransportista(id) {
+    const { data, error } = await supabase
+      .schema("carpointer")
+      .from("transportistas")
+      .delete()
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      const err = new Error(error.message);
+      err.code = error.code;
+      throw err;
+    }
+
+    if (!data) {
+      const err = new Error("Transportista no encontrado");
+      err.code = "NOT_FOUND";
+      throw err;
+    }
+
+    return { ok: true };
+  }
 }
 
 export default ContenedorSupabase;

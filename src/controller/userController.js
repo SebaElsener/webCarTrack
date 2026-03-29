@@ -5,8 +5,13 @@ import {
   getAllUsers,
   deleteUser,
   passBusiness,
+  getTransportistasBusiness,
+  postTransportistasBusiness,
+  putTransportistasBusiness,
+  deleteTransportistasBusiness,
 } from "../business/userBusiness.js";
 
+/// USUARIOS ///
 const renderUserData = async (req, res) => {
   const userId = req.user.id;
   const userName = req.user.email;
@@ -99,6 +104,84 @@ const passChange = async (req, res) => {
   }
 };
 
+/// TRANSPORTISTAS ///
+const getTransportistasController = async (req, res) => {
+  try {
+    const data = await getTransportistasBusiness();
+    res.json(data);
+  } catch (error) {
+    console.error("Error al leer DB: ", error);
+    res.status(500).json({
+      error: "Error interno",
+    });
+  }
+};
+
+const postTransportistasController = async (req, res) => {
+  const { transport_nbr, name } = req.body;
+
+  try {
+    const data = await postTransportistasBusiness(transport_nbr, name);
+    res.json(data);
+  } catch (error) {
+    if (error.code === "23505") {
+      return res.status(400).json({
+        error: "El número de transporte ya existe",
+        field: "transport_nbr",
+      });
+    }
+
+    console.error("Error al crear nuevo transportista: ", error);
+
+    res.status(500).json({
+      error: "Error interno",
+    });
+  }
+};
+
+const putTransportistasController = async (req, res) => {
+  const { id } = req.params;
+  const { name } = req.body;
+
+  try {
+    const data = await putTransportistasBusiness(id, name);
+    res.json(data);
+  } catch (error) {
+    if (error.code === "23505") {
+      return res.status(400).json({
+        error: "El número de transporte ya existe",
+        field: "transport_nbr",
+      });
+    }
+
+    console.error("Error al actualizar transportista: ", error);
+
+    res.status(500).json({
+      error: "Error interno",
+    });
+  }
+};
+
+const deleteTransportistasController = async (req, res) => {
+  const { id } = req.params;
+  const data = await deleteTransportistasBusiness(id);
+  res.json(data);
+  try {
+  } catch (error) {
+    if (error.code === "NOT_FOUND") {
+      return res.status(404).json({
+        error: "Transportista no encontrado",
+      });
+    }
+
+    console.error("Error al eliminar transportista: ", error);
+
+    res.status(500).json({
+      error: "Error interno",
+    });
+  }
+};
+
 export {
   renderUserData,
   getUser,
@@ -107,4 +190,8 @@ export {
   usersAdmin,
   userDelete,
   passChange,
+  getTransportistasController,
+  postTransportistasController,
+  putTransportistasController,
+  deleteTransportistasController,
 };
