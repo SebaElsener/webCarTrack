@@ -2701,3 +2701,21 @@ body > .glightbox-container {
 .usersAdminTable {
   table-layout: fixed;
 }
+
+.transportNbr,
+.transportName {
+  text-transform: uppercase;
+}
+
+/* estado inicial */
+.table-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+/* animación */
+.table-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.3s ease;
+}

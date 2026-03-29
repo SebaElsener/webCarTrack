@@ -126,30 +126,51 @@ toggle.addEventListener("change", async (e) => {
   currentMode = toggle.checked ? "transportistas" : "users";
 
   if (currentMode === "users") {
-    window.location.href = "/api/userdata/usersadmin";
+    const root = document.getElementById("app-root");
+
+    root.classList.add("fade-out");
+
+    setTimeout(() => {
+      window.location.href = "/api/userdata/usersadmin";
+    }, 300);
+
     return;
   }
-
-  updateTableHeaders();
-
-  addBtn.classList.remove("d-none");
 
   const container = e.target.closest(".form-check");
   const spinner = container.querySelector(".roleSpinner");
 
-  col1.style.width = "100px";
-  col2.style.width = "550px";
-
-  // 🔥 LIMPIAR TABLA ANTES (importante)
-  tbody.innerHTML = "";
-
   spinner.classList.remove("d-none");
 
   try {
+    await fadeOutTable();
+
+    updateTableHeaders();
+    addBtn.classList.remove("d-none");
+
+    col1.style.width = "100px";
+    col2.style.width = "550px";
+
     await loadData();
+
+    table.style.transition = "opacity 0.25s ease";
+    table.style.opacity = "1";
   } finally {
     spinner.classList.add("d-none");
   }
+});
+
+function fadeOutTable() {
+  return new Promise((resolve) => {
+    table.style.transition = "opacity 0.25s ease";
+    table.style.opacity = "0";
+
+    setTimeout(resolve, 250);
+  });
+}
+
+table.addEventListener("transitionend", () => {
+  table.classList.remove("table-enter-active");
 });
 
 document.addEventListener("click", async (e) => {
@@ -396,3 +417,21 @@ function updateTableHeaders() {
     label.textContent = "Ir a Transportistas";
   }
 }
+
+document.addEventListener("input", (e) => {
+  if (e.target.classList.contains("transportNbr")) {
+    e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+  }
+  if (
+    e.target.classList.contains("transportNbr") ||
+    e.target.classList.contains("transportName")
+  ) {
+    const start = e.target.selectionStart;
+    const end = e.target.selectionEnd;
+
+    e.target.value = e.target.value.toUpperCase();
+
+    // 🔥 mantener cursor (importante)
+    e.target.setSelectionRange(start, end);
+  }
+});
